@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import styles from "./RegisterPage.module.css"; // CSS 모듈 import
 
 const RegisterPage = () => {
     const [form, setForm] = useState({ username: "", email: "", password: "" });
@@ -22,16 +23,16 @@ const RegisterPage = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100">
-            <form onSubmit={handleSubmit} className="bg-white p-8 rounded shadow-lg w-80">
-                <h2 className="text-2xl font-bold mb-4 text-center">회원가입</h2>
+        <div className={styles.container}>
+            <form onSubmit={handleSubmit} className={styles.form}>
+                <h2 className={styles.title}>회원가입</h2>
                 <input
                     type="text"
                     name="username"
                     placeholder="아이디"
                     value={form.username}
                     onChange={handleChange}
-                    className="border w-full p-2 mb-3 rounded"
+                    className={styles.input}
                     required
                 />
                 <input
@@ -40,7 +41,7 @@ const RegisterPage = () => {
                     placeholder="이메일 (예: test@example.com)"
                     value={form.email}
                     onChange={handleChange}
-                    className="border w-full p-2 mb-3 rounded"
+                    className={styles.input}
                     required
                 />
                 <input
@@ -49,13 +50,10 @@ const RegisterPage = () => {
                     placeholder="비밀번호"
                     value={form.password}
                     onChange={handleChange}
-                    className="border w-full p-2 mb-4 rounded"
+                    className={styles.input}
                     required
                 />
-                <button
-                    type="submit"
-                    className="bg-blue-600 text-white w-full py-2 rounded hover:bg-blue-700"
-                >
+                <button type="submit" className={styles.button}>
                     회원가입
                 </button>
             </form>

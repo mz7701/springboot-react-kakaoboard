@@ -1,0 +1,343 @@
+.container {
+    min-height: 100vh;
+    background-color: #f7f7f7;
+    padding: 2rem;
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+.header {
+    background-color: #fff;
+    padding: 1.25rem;
+    border-radius: 1rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #e5e5e5;
+}
+
+.title {
+    font-size: 1.75rem;
+    font-weight: bold;
+    color: #3c1e1e;
+}
+
+.userInfo {
+    text-align: right;
+}
+
+.username {
+    font-weight: bold;
+    color: #3c1e1e;
+}
+
+.exp {
+    font-size: 0.875rem;
+    color: #ffcd00;
+}
+
+.postButton {
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    color: white;
+    background-color: #ffcd00;
+    transition: background-color 0.3s ease;
+    margin-bottom: 1.25rem;
+    border: none;
+    cursor: pointer;
+}
+
+.postButton:hover {
+    background-color: #f0c000;
+}
+
+.card {
+    background-color: #fff;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e5e5e5;
+    transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.cardTitle {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #3c1e1e;
+}
+
+.deleteButton {
+    color: #d32f2f;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.cardContent {
+    color: #4a4a4a;
+    margin-bottom: 0.75rem;
+}
+
+.cardMeta {
+    font-size: 0.875rem;
+    color: #888;
+    margin-bottom: 1rem;
+}
+
+.actions {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.actionButton {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+    cursor: pointer;
+    background: none;
+    border: none;
+}
+
+.like {
+    color: #2e7d32;
+}
+
+.dislike {
+    color: #c62828;
+}
+
+.commentSection {
+    border-top: 1px solid #e0e0e0;
+    padding-top: 1rem;
+}
+
+.commentTitle {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #3c1e1e;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.commentList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.commentItem {
+    background-color: #f9f9f9;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    border: 1px solid #ddd;
+    font-size: 0.875rem;
+}
+
+.commentAuthor {
+    font-weight: bold;
+    color: #333;
+}
+
+.commentInputGroup {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.commentInput {
+    flex: 1;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    border: 1px solid #ccc;
+    font-size: 0.875rem;
+}
+
+.commentSubmit {
+    background-color: #ffcd00;
+    color: white;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+}
+
+.commentSubmit:hover {
+    background-color: #f0c000;
+}
+
+/* ✅ 반박 영역 전체 */
+.rebuttalArea {
+    margin-top: 1rem;
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+/* ✅ 반박 버튼 */
+.rebuttalButton {
+    background: linear-gradient(135deg, #ffb700, #ffdd55);
+    border: none;
+    color: #222;
+    font-weight: 600;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+}
+
+.rebuttalButton:hover {
+    background: linear-gradient(135deg, #ffc800, #ffe98f);
+    transform: translateY(-2px);
+}
+
+/* ✅ 반박 작성 폼 (최종 통합, 닫기버튼 + textarea 수정 반영) */
+.rebuttalForm {
+    position: relative;
+    background: #fffbe9;
+    border-radius: 12px;
+    padding: 25px 20px 55px;
+    width: 95%;
+    max-width: 600px;
+    margin-top: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.3s ease-in-out;
+    border: 1px solid #f0e2a4;
+}
+
+
+
+/* ✅ 제목 입력창 */
+.rebuttalForm input {
+    display: block;
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    outline: none;
+    padding: 12px 14px;
+    font-size: 15px;
+    margin-bottom: 12px;
+    background: #fff;
+    box-sizing: border-box;
+}
+/* ✅ 반박 내용 textarea */
+.rebuttalForm textarea {
+    display: block;
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    outline: none;
+    padding: 12px 14px;
+    font-size: 15px;
+    height: 120px;
+    resize: none;
+    background: #fff;
+    box-sizing: border-box; /* ✅ padding + border 포함해서 폭 계산 */
+}
+
+.rebuttalForm input:focus,
+.rebuttalForm textarea:focus {
+    box-shadow: 0 0 0 2px #ffd43b;
+}
+
+/* ✅ textarea 크기 조절 금지 */
+.rebuttalTextarea {
+    resize: none;
+    height: 120px;
+}
+
+/* ✅ 닫기 버튼 */
+.rebuttalCloseBtn {
+    position: absolute;
+    top: 10px;         /* 살짝 여백을 두어 input과 겹치지 않게 */
+    right: 10px;
+    background: #fff;  /* 폼 배경과 어울리는 흰색 */
+    border: 2px solid #ff6b81;
+    color: #ff6b81;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.25s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.rebuttalCloseBtn:hover {
+    background: #ff6b81;
+    color: white;
+    transform: scale(1.1);
+}
+
+/* ✅ 등록 버튼 */
+.rebuttalSubmit {
+    position: absolute;
+    bottom: 15px;
+    right: 20px;
+    background: linear-gradient(135deg, #007bff, #00a2ff);
+    color: white;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 18px;
+    cursor: pointer;
+    font-size: 15px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    transition: 0.2s ease;
+}
+.rebuttalSubmit:hover {
+    background: linear-gradient(135deg, #0062d1, #008cff);
+    transform: translateY(-2px);
+}
+
+/* ✅ 등록된 반박 표시 박스 */
+.rebuttalBox {
+    margin-top: 12px;
+    padding: 15px;
+    background: #f3f6ff;
+    border-left: 5px solid #4a90e2;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.rebuttalBox h4 {
+    color: #1e4ea3;
+    margin-bottom: 5px;
+}
+
+.rebuttalMeta {
+    font-size: 0.85em;
+    color: #666;
+    text-align: right;
+    margin-top: 6px;
+}
+
+/* ✅ 애니메이션 */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}

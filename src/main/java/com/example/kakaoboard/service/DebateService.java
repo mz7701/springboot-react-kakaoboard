@@ -41,7 +41,16 @@ public class DebateService {
         comment.setDebate(debate);
         return commentRepository.save(comment);
     }
+    //반박부분
+    public Debate findById(Long id) {
+        return debateRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("해당 ID의 토론을 찾을 수 없습니다."));
+    }
 
+    public Debate save(Debate debate) {
+        return debateRepository.save(debate);
+    }
+    //
     public void deleteById(Long id) {
         debateRepository.deleteById(id);
     }

@@ -30,9 +30,15 @@ public class Debate {
 
     private LocalDateTime createdAt;
 
+    // ✅ 댓글 (1:N 관계)
     @JsonManagedReference
     @OneToMany(mappedBy = "debate", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
+
+    // ✅ 반박 기능 필드 추가
+    private String rebuttalTitle;     // 반박 제목
+    private String rebuttalContent;   // 반박 내용
+    private String rebuttalAuthor;    // 반박 작성자
 
     @PrePersist
     public void prePersist() {
