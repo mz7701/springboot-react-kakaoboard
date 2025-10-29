@@ -16,7 +16,10 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/debates")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = {
+        "http://localhost:3000",
+        "http://192.168.0.21:3000"
+})
 public class DebateController {
 
     private final DebateService debateService;
@@ -29,9 +32,11 @@ public class DebateController {
         LocalDateTime now = LocalDateTime.now();
 
         for (Debate d : debates) {
+            // ✅ 반박 등록 후 12시간이 지났고 아직 마감 안 된 경우만 마감 처리
             if (d.getRebuttalAt() != null &&
                     Duration.between(d.getRebuttalAt(), now).toHours() >= 12 &&
                     !d.isClosed()) {
+
                 d.setClosed(true);
                 d.setClosedAt(now);
                 debateRepository.save(d);
@@ -51,12 +56,30 @@ public class DebateController {
                 debate.setAuthor("익명");
 
             debate.setCreatedAt(LocalDateTime.now());
+            debate.setClosed(false); // ✅ 새 토론은 항상 오픈 상태
             Debate saved = debateService.createDebate(debate);
             return ResponseEntity.ok(saved);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
+    }
+
+    /** ✅ 수동 마감 */
+    @PatchMapping("/{id}/close")
+    public ResponseEntity<?> closeDebate(@PathVariable Long id) {
+        Debate debate = debateRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("해당 토론을 찾을 수 없습니다."));
+
+        if (debate.isClosed()) {
+            return ResponseEntity.badRequest().body("이미 마감된 토론입니다.");
+        }
+
+        debate.setClosed(true);
+        debate.setClosedAt(LocalDateTime.now());
+        debateRepository.save(debate);
+
+        return ResponseEntity.ok("✅ 토론이 수동으로 마감되었습니다.");
     }
 
     /** ✅ 좋아요 / 싫어요 */
@@ -102,6 +125,8 @@ public class DebateController {
         debate.setRebuttalContent(body.get("content"));
         debate.setRebuttalAuthor(body.get("author"));
         debate.setRebuttalAt(LocalDateTime.now());
+        debate.setClosed(false); // ✅ 반박 등록 시 무조건 마감 해제 (투표 가능하도록)
+        debate.setClosedAt(null);
 
         debateRepository.save(debate);
         return ResponseEntity.ok(debate);
@@ -118,10 +143,22 @@ public class DebateController {
             if (opt.isEmpty()) return ResponseEntity.notFound().build();
 
             Debate debate = opt.get();
+
             if (debate.getRebuttalTitle() == null)
                 return ResponseEntity.badRequest().body("아직 반박이 등록되지 않았습니다.");
-            if (debate.isClosed())
-                return ResponseEntity.badRequest().body("이미 마감된 토론입니다.");
+
+            // ✅ 마감 여부는 '12시간이 실제로 지난 경우에만' 차단
+            if (debate.isClosed()) {
+                LocalDateTime now = LocalDateTime.now();
+                if (debate.getRebuttalAt() != null &&
+                        Duration.between(debate.getRebuttalAt(), now).toHours() < 12) {
+                    // 아직 12시간 안 지났으면 투표 가능
+                    debate.setClosed(false);
+                } else {
+                    return ResponseEntity.badRequest().body("이미 마감된 토론입니다.");
+                }
+            }
+
             if (debate.getAuthor().equals(voter) ||
                     (debate.getRebuttalAuthor() != null && debate.getRebuttalAuthor().equals(voter)))
                 return ResponseEntity.badRequest().body("작성자 또는 반박자는 투표할 수 없습니다.");
@@ -142,7 +179,7 @@ public class DebateController {
             debateRepository.save(debate);
 
             return ResponseEntity.ok(Map.of(
-                    "message", "투표 성공",
+                    "message", "✅ 투표 성공",
                     "authorVotes", debate.getAuthorVotes(),
                     "rebuttalVotes", debate.getRebuttalVotes()
             ));

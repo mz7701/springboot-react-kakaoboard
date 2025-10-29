@@ -24,8 +24,7 @@ const DebateBoard = () => {
 
         const rebuttalTime = new Date(debate.rebuttalAt);
         const now = new Date();
-        const diffMs =
-            rebuttalTime.getTime() + 12 * 60 * 60 * 1000 - now.getTime(); // 12시간 기준
+        const diffMs = rebuttalTime.getTime() + 12 * 60 * 60 * 1000 - now.getTime(); // 12시간 기준
 
         if (diffMs <= 0) return "⏰ 마감된 토론";
 
@@ -40,15 +39,20 @@ const DebateBoard = () => {
         if (savedUser) setCurrentUser(JSON.parse(savedUser));
 
         fetchDebates();
-        // 🔁 3초마다갱신
         const interval = setInterval(fetchDebates, 3000);
         return () => clearInterval(interval);
     }, []);
 
     const fetchDebates = async () => {
         try {
-            const res = await axios.get("http://localhost:8080/api/debates");
-            setDebates(Array.isArray(res.data) ? res.data.reverse() : []);
+            const res = await axios.get("http://192.168.0.21:8080/api/debates");
+            const data = Array.isArray(res.data) ? res.data.reverse() : [];
+            setDebates(data);
+
+            // ✅ 마감된 토론이 새로 생겼을 경우 자동 이동
+            if (data.some(d => d.isClosed) && activeTab !== "closed") {
+                setActiveTab("closed");
+            }
         } catch (err) {
             console.error("토론 불러오기 실패:", err);
         }
@@ -57,7 +61,7 @@ const DebateBoard = () => {
     const handleDelete = async (id) => {
         if (!window.confirm("정말 삭제하시겠습니까?")) return;
         try {
-            await axios.delete(`http://localhost:8080/api/debates/${id}`);
+            await axios.delete(`http://192.168.0.21:8080/api/debates/${id}`);
             alert("🗑️ 삭제되었습니다.");
             fetchDebates();
         } catch (err) {
@@ -71,7 +75,7 @@ const DebateBoard = () => {
         if (!input?.title || !input?.content) return alert("제목과 내용을 입력하세요!");
 
         try {
-            await axios.post(`http://localhost:8080/api/debates/${debateId}/rebuttal`, {
+            await axios.post(`http://192.168.0.21:8080/api/debates/${debateId}/rebuttal`, {
                 title: input.title,
                 content: input.content,
                 author: currentUser?.username || "익명",
@@ -84,24 +88,18 @@ const DebateBoard = () => {
         }
     };
 
-    // ✅ 투표 관련
-    const hasVoted = (debateId) => localStorage.getItem(`voted_${debateId}`) === "true";
-
     const handleVote = async (debateId, type) => {
-        if (hasVoted(debateId)) {
-            alert("이미 투표하셨습니다!");
-            return;
-        }
         try {
-            await axios.post(`http://localhost:8080/api/debates/${debateId}/vote`, {
+            await axios.post(`http://192.168.0.21:8080/api/debates/${debateId}/vote`, {
                 type,
                 voter: currentUser?.username,
             });
-            localStorage.setItem(`voted_${debateId}`, "true");
+            alert("✅ 투표가 완료되었습니다!");
             fetchDebates();
         } catch (err) {
             console.error("투표 실패:", err);
-            alert("서버 오류로 투표 실패");
+            const msg = err.response?.data?.message || err.response?.data || "서버 오류로 투표 실패";
+            alert(typeof msg === "string" ? msg : JSON.stringify(msg));
         }
     };
 
@@ -113,7 +111,7 @@ const DebateBoard = () => {
         const text = commentInputs[debateId];
         if (!text || !text.trim()) return alert("댓글을 입력하세요!");
         try {
-            await axios.post(`http://localhost:8080/api/debates/${debateId}/comments`, {
+            await axios.post(`http://192.168.0.21:8080/api/debates/${debateId}/comments`, {
                 author: currentUser?.username || "익명",
                 text,
             });
@@ -123,32 +121,32 @@ const DebateBoard = () => {
             console.error("댓글 등록 실패:", err);
         }
     };
+
     const handleReplySubmit = async (debateId, parentId) => {
         const text = replyInputs[parentId];
         if (!text || !text.trim()) return alert("대댓글을 입력하세요!");
 
         try {
-            await axios.post(`http://localhost:8080/api/debates/${debateId}/comments/${parentId}/reply`, {
-                author: currentUser?.username || "익명",
-                text,
-            });
-
+            await axios.post(
+                `http://192.168.0.21:8080/api/debates/${debateId}/comments/${parentId}/reply`,
+                {
+                    author: currentUser?.username || "익명",
+                    text,
+                }
+            );
             setReplyInputs({ ...replyInputs, [parentId]: "" });
-            // 🔥 아래 중복 호출 제거
-            // fetchDebates(); ❌ 제거
-            await fetchDebates(); // ✅ 하나만 호출
+            await fetchDebates();
         } catch (err) {
             console.error("대댓글 등록 실패:", err);
         }
     };
-    // ✅ 안전한 필터 (null-safe)
+
     const filteredDebates =
         activeTab === "unrebutted"
             ? debates.filter((d) => !d.rebuttalTitle && !d.isClosed)
             : activeTab === "rebutted"
                 ? debates.filter((d) => (d.rebuttalAuthor || d.rebuttalContent) && !d.isClosed)
                 : debates.filter((d) => d.isClosed);
-
 
     return (
         <div className={styles.container}>
@@ -175,25 +173,19 @@ const DebateBoard = () => {
             {/* ✅ 탭 메뉴 */}
             <div className={styles.tabContainer}>
                 <button
-                    className={`${styles.tabButton} ${
-                        activeTab === "unrebutted" ? styles.activeTab : ""
-                    }`}
+                    className={`${styles.tabButton} ${activeTab === "unrebutted" ? styles.activeTab : ""}`}
                     onClick={() => setActiveTab("unrebutted")}
                 >
                     🗣️ 반박해보세요
                 </button>
                 <button
-                    className={`${styles.tabButton} ${
-                        activeTab === "rebutted" ? styles.activeTab : ""
-                    }`}
+                    className={`${styles.tabButton} ${activeTab === "rebutted" ? styles.activeTab : ""}`}
                     onClick={() => setActiveTab("rebutted")}
                 >
                     ⚔️ 반박중
                 </button>
                 <button
-                    className={`${styles.tabButton} ${
-                        activeTab === "closed" ? styles.activeTab : ""
-                    }`}
+                    className={`${styles.tabButton} ${activeTab === "closed" ? styles.activeTab : ""}`}
                     onClick={() => setActiveTab("closed")}
                 >
                     🕛 마감된 토론
@@ -227,11 +219,9 @@ const DebateBoard = () => {
 
                             <p className={styles.cardContent}>{debate.content}</p>
 
-                            {/* ✅ 반박해보세요 */}
-                            {/* ✅ 반박해보세요 */}
+                            {/* ✅ 반박하기 */}
                             {activeTab === "unrebutted" && (
                                 <div className={styles.rebuttalArea}>
-                                    {/* 🔥 본인 글일 경우 버튼/폼 모두 숨김 */}
                                     {debate.author !== currentUser?.username && (
                                         !showRebuttalInput[debate.id] ? (
                                             <button
@@ -299,29 +289,12 @@ const DebateBoard = () => {
                                     )}
                                 </div>
                             )}
-                            {/* ✅ 반박중 (남은시간 + 투표) */}
+
+                            {/* ✅ 반박중 (투표) */}
                             {activeTab === "rebutted" && (
                                 <>
-                                    {/* 남은시간 표시 */}
                                     {debate.rebuttalAt && !debate.isClosed && (
-                                        <p
-                                            style={{
-                                                textAlign: "right",
-                                                fontWeight: 600,
-                                                color: (() => {
-                                                    const rebuttalTime = new Date(debate.rebuttalAt);
-                                                    const now = new Date();
-                                                    const diffHours =
-                                                        (rebuttalTime.getTime() +
-                                                            12 * 60 * 60 * 1000 -
-                                                            now.getTime()) /
-                                                        (1000 * 60 * 60);
-                                                    if (diffHours <= 0) return "#777";
-                                                    if (diffHours <= 1) return "#ff3b30";
-                                                    return "#555";
-                                                })(),
-                                            }}
-                                        >
+                                        <p style={{ textAlign: "right", fontWeight: 600 }}>
                                             🕒 {getRemainingTime(debate)}
                                         </p>
                                     )}
@@ -337,8 +310,7 @@ const DebateBoard = () => {
                                             disabled={
                                                 debate.isClosed ||
                                                 currentUser?.username === debate.author ||
-                                                currentUser?.username === debate.rebuttalAuthor ||
-                                                hasVoted(debate.id)
+                                                currentUser?.username === debate.rebuttalAuthor
                                             }
                                             onClick={() => handleVote(debate.id, "author")}
                                             className={styles.voteButton}
@@ -352,8 +324,7 @@ const DebateBoard = () => {
                                             disabled={
                                                 debate.isClosed ||
                                                 currentUser?.username === debate.author ||
-                                                currentUser?.username === debate.rebuttalAuthor ||
-                                                hasVoted(debate.id)
+                                                currentUser?.username === debate.rebuttalAuthor
                                             }
                                             onClick={() => handleVote(debate.id, "rebuttal")}
                                             className={styles.voteButton}
@@ -397,7 +368,6 @@ const DebateBoard = () => {
                                             <span className={styles.commentAuthor}>{c.author}:</span>{" "}
                                             {c.text}
 
-                                            {/* ✅ 답글 버튼 */}
                                             <button
                                                 onClick={() =>
                                                     setShowReplyInput({
@@ -410,7 +380,6 @@ const DebateBoard = () => {
                                                 💬 답글
                                             </button>
 
-                                            {/* ✅ 대댓글 입력창 */}
                                             {showReplyInput[c.id] && (
                                                 <div className={styles.replyInputGroup}>
                                                     <input
@@ -434,15 +403,16 @@ const DebateBoard = () => {
                                                 </div>
                                             )}
 
-                                            {/* ✅ 대댓글 표시 */}
                                             {c.replies?.map((r) => (
                                                 <div key={r.id} className={styles.replyItem}>
-                                                    <span className={styles.replyAuthor}>↳ {r.author}:</span> {r.text}
+                                                    <span className={styles.replyAuthor}>
+                                                        ↳ {r.author}:
+                                                    </span>{" "}
+                                                    {r.text}
                                                 </div>
                                             ))}
                                         </div>
                                     ))}
-
                                 </div>
 
                                 {currentUser && (
