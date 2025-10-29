@@ -1,26 +1,23 @@
+/* ✅ 전체 컨테이너 */
 .container {
-    min-height: 100vh;
-    background-color: #f7f7f7;
-    padding: 2rem;
-    font-family: 'Noto Sans KR', sans-serif;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 1.5rem;
+    font-family: "Noto Sans KR", sans-serif;
 }
 
+/* ✅ 헤더 */
 .header {
-    background-color: #fff;
-    padding: 1.25rem;
-    border-radius: 1rem;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-    margin-bottom: 1.5rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border: 1px solid #e5e5e5;
+    margin-bottom: 1.2rem;
 }
 
 .title {
-    font-size: 1.75rem;
-    font-weight: bold;
-    color: #3c1e1e;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #222;
 }
 
 .userInfo {
@@ -28,169 +25,116 @@
 }
 
 .username {
-    font-weight: bold;
-    color: #3c1e1e;
+    font-weight: 600;
+    color: #444;
 }
 
 .exp {
-    font-size: 0.875rem;
-    color: #ffcd00;
+    font-size: 0.9rem;
+    color: #888;
 }
 
+/* ✅ 새 토론 등록 버튼 */
 .postButton {
-    padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
-    font-weight: 600;
-    color: white;
-    background-color: #ffcd00;
-    transition: background-color 0.3s ease;
-    margin-bottom: 1.25rem;
+    background: linear-gradient(135deg, #007bff, #00a2ff);
+    color: #fff;
     border: none;
+    border-radius: 10px;
+    padding: 10px 18px;
+    font-weight: 600;
     cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1rem;
 }
 
 .postButton:hover {
-    background-color: #f0c000;
+    transform: translateY(-2px);
+    background: linear-gradient(135deg, #0062d1, #0097ff);
 }
 
+/* ✅ 탭 버튼 */
+.tabContainer {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.2rem;
+    gap: 10px;
+}
+
+.tabButton {
+    background: #f1f1f1;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 18px;
+    font-weight: 600;
+    color: #555;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.tabButton:hover {
+    background: #ffe8a3;
+}
+
+.activeTab {
+    background: linear-gradient(135deg, #ffd43b, #ffda6a);
+    color: #222;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* ✅ 토론 카드 */
 .card {
-    background-color: #fff;
-    padding: 1.5rem;
-    border-radius: 1rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-    border: 1px solid #e5e5e5;
-    transition: box-shadow 0.3s ease;
-}
-
-.card:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    background: #fff;
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 1.2rem;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
+    border: 1px solid #eee;
+    position: relative;
 }
 
 .cardHeader {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.5rem;
 }
 
 .cardTitle {
-    font-size: 1.25rem;
-    font-weight: bold;
-    color: #3c1e1e;
-}
-
-.deleteButton {
-    color: #d32f2f;
-    background: none;
-    border: none;
-    cursor: pointer;
-}
-
-.cardContent {
-    color: #4a4a4a;
-    margin-bottom: 0.75rem;
-}
-
-.cardMeta {
-    font-size: 0.875rem;
-    color: #888;
-    margin-bottom: 1rem;
-}
-
-.actions {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 1rem;
-}
-
-.actionButton {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-weight: 500;
-    cursor: pointer;
-    background: none;
-    border: none;
-}
-
-.like {
-    color: #2e7d32;
-}
-
-.dislike {
-    color: #c62828;
-}
-
-.commentSection {
-    border-top: 1px solid #e0e0e0;
-    padding-top: 1rem;
-}
-
-.commentTitle {
-    font-size: 1rem;
-    font-weight: bold;
-    color: #3c1e1e;
-    margin-bottom: 0.75rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.commentList {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-}
-
-.commentItem {
-    background-color: #f9f9f9;
-    padding: 0.75rem;
-    border-radius: 0.5rem;
-    border: 1px solid #ddd;
-    font-size: 0.875rem;
-}
-
-.commentAuthor {
-    font-weight: bold;
+    font-size: 1.2rem;
+    font-weight: 600;
     color: #333;
 }
 
-.commentInputGroup {
-    display: flex;
-    gap: 0.5rem;
+.cardContent {
+    margin: 0.8rem 0;
+    color: #444;
+    line-height: 1.5;
 }
 
-.commentInput {
-    flex: 1;
-    padding: 0.5rem 0.75rem;
-    border-radius: 0.5rem;
-    border: 1px solid #ccc;
-    font-size: 0.875rem;
+.cardMeta {
+    font-size: 0.9rem;
+    color: #777;
+    margin-bottom: 0.6rem;
 }
 
-.commentSubmit {
-    background-color: #ffcd00;
-    color: white;
-    padding: 0.5rem 0.75rem;
-    border-radius: 0.5rem;
-    font-size: 0.875rem;
-    font-weight: 600;
+/* ✅ 삭제 버튼 */
+.deleteButton {
+    background: none;
     border: none;
+    color: #ff6b6b;
     cursor: pointer;
+    transition: 0.2s;
 }
 
-.commentSubmit:hover {
-    background-color: #f0c000;
+.deleteButton:hover {
+    transform: scale(1.1);
+    color: #ff1e1e;
 }
 
-/* ✅ 반박 영역 전체 */
+/* ✅ 반박 영역 */
 .rebuttalArea {
     margin-top: 1rem;
     text-align: right;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
 }
 
 /* ✅ 반박 버튼 */
@@ -203,7 +147,7 @@
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s ease-in-out;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
 }
 
 .rebuttalButton:hover {
@@ -211,92 +155,67 @@
     transform: translateY(-2px);
 }
 
-/* ✅ 반박 작성 폼 (최종 통합, 닫기버튼 + textarea 수정 반영) */
+/* ✅ 반박 입력 폼 */
 .rebuttalForm {
     position: relative;
     background: #fffbe9;
     border-radius: 12px;
-    padding: 25px 20px 55px;
-    width: 95%;
+    padding: 20px 22px 60px;
+    width: 90%;
     max-width: 600px;
     margin-top: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
     animation: fadeIn 0.3s ease-in-out;
     border: 1px solid #f0e2a4;
+    margin-left: auto;
 }
 
-
-
-/* ✅ 제목 입력창 */
-.rebuttalForm input {
-    display: block;
-    width: 100%;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    outline: none;
-    padding: 12px 14px;
-    font-size: 15px;
-    margin-bottom: 12px;
-    background: #fff;
-    box-sizing: border-box;
-}
-/* ✅ 반박 내용 textarea */
-.rebuttalForm textarea {
-    display: block;
-    width: 100%;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    outline: none;
-    padding: 12px 14px;
-    font-size: 15px;
-    height: 120px;
-    resize: none;
-    background: #fff;
-    box-sizing: border-box; /* ✅ padding + border 포함해서 폭 계산 */
-}
-
-.rebuttalForm input:focus,
-.rebuttalForm textarea:focus {
-    box-shadow: 0 0 0 2px #ffd43b;
-}
-
-/* ✅ textarea 크기 조절 금지 */
-.rebuttalTextarea {
-    resize: none;
-    height: 120px;
-}
-
-/* ✅ 닫기 버튼 */
 .rebuttalCloseBtn {
     position: absolute;
-    top: 10px;         /* 살짝 여백을 두어 input과 겹치지 않게 */
+    top: 8px;
     right: 10px;
-    background: #fff;  /* 폼 배경과 어울리는 흰색 */
-    border: 2px solid #ff6b81;
+    background: none;
+    border: none;
     color: #ff6b81;
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
+    font-size: 20px;
     font-weight: bold;
     cursor: pointer;
-    transition: 0.25s ease;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: all 0.25s ease;
 }
 
 .rebuttalCloseBtn:hover {
-    background: #ff6b81;
-    color: white;
+    color: #ff1744;
     transform: scale(1.1);
 }
 
-/* ✅ 등록 버튼 */
+.rebuttalInput {
+    width: 100%;
+    border: 1px solid #ddd;
+    outline: none;
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 15px;
+    margin-bottom: 10px;
+    background: #fff;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.rebuttalTextarea {
+    width: 100%;
+    border: 1px solid #ddd;
+    outline: none;
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 15px;
+    height: 120px;
+    background: #fff;
+    resize: none;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
 .rebuttalSubmit {
     position: absolute;
-    bottom: 15px;
+    bottom: 14px;
     right: 20px;
     background: linear-gradient(135deg, #007bff, #00a2ff);
     color: white;
@@ -309,19 +228,20 @@
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
     transition: 0.2s ease;
 }
+
 .rebuttalSubmit:hover {
     background: linear-gradient(135deg, #0062d1, #008cff);
     transform: translateY(-2px);
 }
 
-/* ✅ 등록된 반박 표시 박스 */
+/* ✅ 반박 표시 박스 */
 .rebuttalBox {
-    margin-top: 12px;
+    margin-top: 1rem;
     padding: 15px;
     background: #f3f6ff;
     border-left: 5px solid #4a90e2;
     border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
 .rebuttalBox h4 {
@@ -336,8 +256,167 @@
     margin-top: 6px;
 }
 
+/* ✅ 투표 영역 */
+.voteSection {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin: 1rem 0;
+}
+
+.voteButton {
+    background: #e8f0ff;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 18px;
+    font-weight: 600;
+    color: #1e4ea3;
+    cursor: pointer;
+    transition: 0.2s;
+    min-width: 120px;
+}
+
+.voteButton:hover:not(:disabled) {
+    background: #d0e0ff;
+    transform: translateY(-2px);
+}
+
+.voteButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.vs {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #333;
+}
+
+/* ✅ 마감된 토론 */
+.closedSection {
+    text-align: center;
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 15px;
+    border: 1px solid #eee;
+    margin-top: 10px;
+}
+
+.closedSection h4 {
+    color: #555;
+    margin-bottom: 5px;
+}
+
+.closedSection p {
+    color: #1e4ea3;
+    font-weight: 700;
+}
+
+/* ✅ 댓글 */
+.commentSection {
+    margin-top: 1.2rem;
+}
+
+.commentTitle {
+    font-weight: 600;
+    margin-bottom: 0.6rem;
+    color: #333;
+}
+
+.commentList {
+    background: #fafafa;
+    border-radius: 8px;
+    padding: 10px;
+    border: 1px solid #eee;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.commentItem {
+    font-size: 0.95rem;
+    margin-bottom: 5px;
+    color: #444;
+}
+
+.commentAuthor {
+    font-weight: 600;
+    color: #007bff;
+}
+
+.commentInputGroup {
+    display: flex;
+    margin-top: 0.6rem;
+    gap: 8px;
+}
+
+.commentInput {
+    flex: 1;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 8px 10px;
+}
+
+.commentSubmit {
+    background: linear-gradient(135deg, #007bff, #00a2ff);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 14px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.commentSubmit:hover {
+    transform: translateY(-2px);
+}
+
 /* ✅ 애니메이션 */
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-5px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+.replyButton {
+    background: none;
+    border: none;
+    color: #007bff;
+    font-size: 13px;
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+.replyInputGroup {
+    display: flex;
+    margin: 6px 0 0 24px;
+}
+
+.replyInput {
+    flex: 1;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-size: 14px;
+}
+
+.replySubmit {
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    margin-left: 8px;
+    padding: 6px 10px;
+    cursor: pointer;
+}
+
+.replyItem {
+    margin-left: 28px;
+    font-size: 14px;
+    color: #555;
+    padding: 4px 0;
 }

@@ -4,6 +4,10 @@ spring:
     username: root
     password: xkqtop12
 
+  jackson:
+    serialization:
+      FAIL_ON_EMPTY_BEANS: false
+
   jpa:
     hibernate:
       ddl-auto: update

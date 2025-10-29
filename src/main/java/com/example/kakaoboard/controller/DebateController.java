@@ -2,14 +2,16 @@ package com.example.kakaoboard.controller;
 
 import com.example.kakaoboard.domain.Comment;
 import com.example.kakaoboard.domain.Debate;
+import com.example.kakaoboard.domain.Reply;
+import com.example.kakaoboard.repository.DebateRepository;
 import com.example.kakaoboard.service.DebateService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/debates")
@@ -18,72 +20,139 @@ import java.util.Map;
 public class DebateController {
 
     private final DebateService debateService;
+    private final DebateRepository debateRepository;
 
-    // ✅ 전체 토론 조회
+    /** ✅ 전체 토론 조회 */
     @GetMapping
     public ResponseEntity<List<Debate>> getAllDebates() {
-        return ResponseEntity.ok(debateService.findAll());
+        List<Debate> debates = debateRepository.findAll();
+        LocalDateTime now = LocalDateTime.now();
+
+        for (Debate d : debates) {
+            if (d.getRebuttalAt() != null &&
+                    Duration.between(d.getRebuttalAt(), now).toHours() >= 12 &&
+                    !d.isClosed()) {
+                d.setClosed(true);
+                d.setClosedAt(now);
+                debateRepository.save(d);
+            }
+        }
+
+        return ResponseEntity.ok(debateRepository.findAll());
     }
 
-    // ✅ 토론 등록
+    /** ✅ 새 토론 생성 */
     @PostMapping
     public ResponseEntity<?> createDebate(@RequestBody Debate debate) {
         try {
             if (debate.getTitle() == null || debate.getContent() == null)
                 return ResponseEntity.badRequest().body("제목과 내용을 입력하세요.");
-
             if (debate.getAuthor() == null || debate.getAuthor().isEmpty())
                 debate.setAuthor("익명");
 
             debate.setCreatedAt(LocalDateTime.now());
-            return ResponseEntity.ok(debateService.createDebate(debate));
+            Debate saved = debateService.createDebate(debate);
+            return ResponseEntity.ok(saved);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
 
-    // ✅ 좋아요
+    /** ✅ 좋아요 / 싫어요 */
     @PostMapping("/{id}/like")
     public ResponseEntity<?> like(@PathVariable Long id) {
         return ResponseEntity.ok(debateService.like(id));
     }
 
-    // ✅ 싫어요
     @PostMapping("/{id}/dislike")
     public ResponseEntity<?> dislike(@PathVariable Long id) {
         return ResponseEntity.ok(debateService.dislike(id));
     }
 
-    // ✅ 댓글 추가
+    /** ✅ 댓글 추가 */
     @PostMapping("/{debateId}/comments")
     public ResponseEntity<?> addComment(@PathVariable Long debateId, @RequestBody Comment comment) {
-        return ResponseEntity.ok(debateService.addComment(debateId, comment));
+        Comment saved = debateService.addComment(debateId, comment);
+        return ResponseEntity.ok(saved);
     }
 
-    // ✅ 반박 추가 기능 (여기 추가됨)
+    /** ✅ 대댓글 추가 (Reply 엔티티로 처리) */
+    @PostMapping("/{debateId}/comments/{parentId}/reply")
+    public ResponseEntity<?> addReply(
+            @PathVariable Long debateId,
+            @PathVariable Long parentId,
+            @RequestBody Reply reply) {
+
+        Reply saved = debateService.addReply(debateId, parentId, reply);
+        return ResponseEntity.ok(saved);
+    }
+
+    /** ✅ 반박 등록 */
     @PostMapping("/{id}/rebuttal")
     public ResponseEntity<?> addRebuttal(@PathVariable Long id, @RequestBody Map<String, String> body) {
+        Optional<Debate> opt = debateRepository.findById(id);
+        if (opt.isEmpty()) return ResponseEntity.notFound().build();
+
+        Debate debate = opt.get();
+        if (debate.getRebuttalTitle() != null)
+            return ResponseEntity.badRequest().body("이미 반박이 등록된 토론입니다.");
+
+        debate.setRebuttalTitle(body.get("title"));
+        debate.setRebuttalContent(body.get("content"));
+        debate.setRebuttalAuthor(body.get("author"));
+        debate.setRebuttalAt(LocalDateTime.now());
+
+        debateRepository.save(debate);
+        return ResponseEntity.ok(debate);
+    }
+
+    /** ✅ 투표 기능 */
+    @PostMapping("/{id}/vote")
+    public ResponseEntity<?> vote(@PathVariable Long id, @RequestBody Map<String, Object> body) {
         try {
-            Debate debate = debateService.findById(id);
+            String type = (String) body.get("type");
+            String voter = (String) body.get("voter");
 
-            // 이미 반박이 존재하면 에러 반환
-            if (debate.getRebuttalTitle() != null)
-                return ResponseEntity.badRequest().body("이미 반박이 등록되었습니다.");
+            Optional<Debate> opt = debateRepository.findById(id);
+            if (opt.isEmpty()) return ResponseEntity.notFound().build();
 
-            debate.setRebuttalTitle(body.get("title"));
-            debate.setRebuttalContent(body.get("content"));
-            debate.setRebuttalAuthor(body.get("author"));
+            Debate debate = opt.get();
+            if (debate.getRebuttalTitle() == null)
+                return ResponseEntity.badRequest().body("아직 반박이 등록되지 않았습니다.");
+            if (debate.isClosed())
+                return ResponseEntity.badRequest().body("이미 마감된 토론입니다.");
+            if (debate.getAuthor().equals(voter) ||
+                    (debate.getRebuttalAuthor() != null && debate.getRebuttalAuthor().equals(voter)))
+                return ResponseEntity.badRequest().body("작성자 또는 반박자는 투표할 수 없습니다.");
 
-            debateService.save(debate);
-            return ResponseEntity.ok("반박 등록 완료");
+            if (debate.getVoters() == null)
+                debate.setVoters(new ArrayList<>());
+            if (debate.getVoters().contains(voter))
+                return ResponseEntity.badRequest().body("이미 투표하셨습니다.");
+
+            if ("author".equals(type))
+                debate.setAuthorVotes(debate.getAuthorVotes() + 1);
+            else if ("rebuttal".equals(type))
+                debate.setRebuttalVotes(debate.getRebuttalVotes() + 1);
+            else
+                return ResponseEntity.badRequest().body("잘못된 투표 타입입니다.");
+
+            debate.getVoters().add(voter);
+            debateRepository.save(debate);
+
+            return ResponseEntity.ok(Map.of(
+                    "message", "투표 성공",
+                    "authorVotes", debate.getAuthorVotes(),
+                    "rebuttalVotes", debate.getRebuttalVotes()
+            ));
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.internalServerError().body("반박 등록 실패: " + e.getMessage());
+            return ResponseEntity.internalServerError().body("서버 오류 발생: " + e.getMessage());
         }
     }
 
-    // ✅ 토론 삭제
+    /** ✅ 토론 삭제 */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteDebate(@PathVariable Long id) {
         debateService.deleteById(id);

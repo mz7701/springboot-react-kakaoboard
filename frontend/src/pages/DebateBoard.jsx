@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { ThumbsUp, ThumbsDown, MessageSquare, Trash2 } from "lucide-react";
+import { Trash2, MessageSquare } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import styles from "./DebateBoard.module.css";
+
+axios.defaults.headers.post["Content-Type"] = "application/json";
 
 const DebateBoard = () => {
     const [debates, setDebates] = useState([]);
@@ -11,13 +13,34 @@ const DebateBoard = () => {
     const [rebuttalInputs, setRebuttalInputs] = useState({});
     const [showRebuttalInput, setShowRebuttalInput] = useState({});
     const [loading, setLoading] = useState(false);
+    const [replyInputs, setReplyInputs] = useState({});
+    const [showReplyInput, setShowReplyInput] = useState({});
+    const [activeTab, setActiveTab] = useState("unrebutted");
     const navigate = useNavigate();
 
+    // ✅ 남은시간 계산 함수
+    const getRemainingTime = (debate) => {
+        if (!debate.rebuttalAt || debate.isClosed) return null;
+
+        const rebuttalTime = new Date(debate.rebuttalAt);
+        const now = new Date();
+        const diffMs =
+            rebuttalTime.getTime() + 12 * 60 * 60 * 1000 - now.getTime(); // 12시간 기준
+
+        if (diffMs <= 0) return "⏰ 마감된 토론";
+
+        const hours = Math.floor(diffMs / (1000 * 60 * 60));
+        const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+        return `${hours}시간 ${minutes}분 남음`;
+    };
+
+    // ✅ 데이터 주기적 갱신
     useEffect(() => {
         const savedUser = localStorage.getItem("user");
         if (savedUser) setCurrentUser(JSON.parse(savedUser));
 
         fetchDebates();
+        // 🔁 3초마다갱신
         const interval = setInterval(fetchDebates, 3000);
         return () => clearInterval(interval);
     }, []);
@@ -39,41 +62,10 @@ const DebateBoard = () => {
             fetchDebates();
         } catch (err) {
             console.error("삭제 실패:", err);
-            alert("삭제 중 오류가 발생했습니다.");
+            alert("삭제 중 오류 발생");
         }
     };
 
-    const handleLike = async (id) => {
-        await axios.post(`http://localhost:8080/api/debates/${id}/like`);
-        fetchDebates();
-    };
-
-    const handleDislike = async (id) => {
-        await axios.post(`http://localhost:8080/api/debates/${id}/dislike`);
-        fetchDebates();
-    };
-
-    const handleCommentChange = (debateId, text) => {
-        setCommentInputs({ ...commentInputs, [debateId]: text });
-    };
-
-    const handleCommentSubmit = async (debateId) => {
-        const text = commentInputs[debateId];
-        if (!text || !text.trim()) return alert("댓글을 입력하세요!");
-
-        try {
-            await axios.post(`http://localhost:8080/api/debates/${debateId}/comments`, {
-                author: currentUser?.username || "익명",
-                text,
-            });
-            setCommentInputs({ ...commentInputs, [debateId]: "" });
-            fetchDebates();
-        } catch (err) {
-            console.error("댓글 등록 실패:", err);
-        }
-    };
-
-    // ✅ 반박 등록 함수
     const handleRebuttalSubmit = async (debateId) => {
         const input = rebuttalInputs[debateId];
         if (!input?.title || !input?.content) return alert("제목과 내용을 입력하세요!");
@@ -89,9 +81,74 @@ const DebateBoard = () => {
             fetchDebates();
         } catch (err) {
             console.error("반박 등록 실패:", err);
-            alert("반박 등록 중 오류가 발생했습니다.");
         }
     };
+
+    // ✅ 투표 관련
+    const hasVoted = (debateId) => localStorage.getItem(`voted_${debateId}`) === "true";
+
+    const handleVote = async (debateId, type) => {
+        if (hasVoted(debateId)) {
+            alert("이미 투표하셨습니다!");
+            return;
+        }
+        try {
+            await axios.post(`http://localhost:8080/api/debates/${debateId}/vote`, {
+                type,
+                voter: currentUser?.username,
+            });
+            localStorage.setItem(`voted_${debateId}`, "true");
+            fetchDebates();
+        } catch (err) {
+            console.error("투표 실패:", err);
+            alert("서버 오류로 투표 실패");
+        }
+    };
+
+    const handleCommentChange = (debateId, text) => {
+        setCommentInputs({ ...commentInputs, [debateId]: text });
+    };
+
+    const handleCommentSubmit = async (debateId) => {
+        const text = commentInputs[debateId];
+        if (!text || !text.trim()) return alert("댓글을 입력하세요!");
+        try {
+            await axios.post(`http://localhost:8080/api/debates/${debateId}/comments`, {
+                author: currentUser?.username || "익명",
+                text,
+            });
+            setCommentInputs({ ...commentInputs, [debateId]: "" });
+            fetchDebates();
+        } catch (err) {
+            console.error("댓글 등록 실패:", err);
+        }
+    };
+    const handleReplySubmit = async (debateId, parentId) => {
+        const text = replyInputs[parentId];
+        if (!text || !text.trim()) return alert("대댓글을 입력하세요!");
+
+        try {
+            await axios.post(`http://localhost:8080/api/debates/${debateId}/comments/${parentId}/reply`, {
+                author: currentUser?.username || "익명",
+                text,
+            });
+
+            setReplyInputs({ ...replyInputs, [parentId]: "" });
+            // 🔥 아래 중복 호출 제거
+            // fetchDebates(); ❌ 제거
+            await fetchDebates(); // ✅ 하나만 호출
+        } catch (err) {
+            console.error("대댓글 등록 실패:", err);
+        }
+    };
+    // ✅ 안전한 필터 (null-safe)
+    const filteredDebates =
+        activeTab === "unrebutted"
+            ? debates.filter((d) => !d.rebuttalTitle && !d.isClosed)
+            : activeTab === "rebutted"
+                ? debates.filter((d) => (d.rebuttalAuthor || d.rebuttalContent) && !d.isClosed)
+                : debates.filter((d) => d.isClosed);
+
 
     return (
         <div className={styles.container}>
@@ -115,13 +172,46 @@ const DebateBoard = () => {
                 </button>
             )}
 
-            {debates.length === 0 ? (
+            {/* ✅ 탭 메뉴 */}
+            <div className={styles.tabContainer}>
+                <button
+                    className={`${styles.tabButton} ${
+                        activeTab === "unrebutted" ? styles.activeTab : ""
+                    }`}
+                    onClick={() => setActiveTab("unrebutted")}
+                >
+                    🗣️ 반박해보세요
+                </button>
+                <button
+                    className={`${styles.tabButton} ${
+                        activeTab === "rebutted" ? styles.activeTab : ""
+                    }`}
+                    onClick={() => setActiveTab("rebutted")}
+                >
+                    ⚔️ 반박중
+                </button>
+                <button
+                    className={`${styles.tabButton} ${
+                        activeTab === "closed" ? styles.activeTab : ""
+                    }`}
+                    onClick={() => setActiveTab("closed")}
+                >
+                    🕛 마감된 토론
+                </button>
+            </div>
+
+            {/* ✅ 토론 목록 */}
+            {filteredDebates.length === 0 ? (
                 <p style={{ textAlign: "center", color: "#888", marginTop: "2rem" }}>
-                    아직 등록된 토론이 없습니다.
+                    {activeTab === "unrebutted"
+                        ? "반박 가능한 토론이 없습니다."
+                        : activeTab === "rebutted"
+                            ? "현재 반박 중인 토론이 없습니다."
+                            : "마감된 토론이 없습니다."}
                 </p>
             ) : (
                 <div className={styles.debateList}>
-                    {debates.map((debate) => (
+                    {filteredDebates.map((debate) => (
                         <div key={debate.id} className={styles.card}>
                             <div className={styles.cardHeader}>
                                 <h2 className={styles.cardTitle}>{debate.title}</h2>
@@ -129,7 +219,6 @@ const DebateBoard = () => {
                                     <button
                                         onClick={() => handleDelete(debate.id)}
                                         className={styles.deleteButton}
-                                        title="삭제하기"
                                     >
                                         <Trash2 className="w-5 h-5" />
                                     </button>
@@ -137,38 +226,14 @@ const DebateBoard = () => {
                             </div>
 
                             <p className={styles.cardContent}>{debate.content}</p>
-                            <p className={styles.cardMeta}>
-                                👤 {debate.author} | 🕒{" "}
-                                {new Date(debate.createdAt).toLocaleString()}
-                            </p>
 
-                            <div className={styles.actions}>
-                                <button
-                                    onClick={() => handleLike(debate.id)}
-                                    className={`${styles.actionButton} ${styles.like}`}
-                                >
-                                    <ThumbsUp className="w-4 h-4" /> {debate.likes}
-                                </button>
-                                <button
-                                    onClick={() => handleDislike(debate.id)}
-                                    className={`${styles.actionButton} ${styles.dislike}`}
-                                >
-                                    <ThumbsDown className="w-4 h-4" /> {debate.dislikes}
-                                </button>
-                            </div>
-
-                            {/* ✅ 반박 표시 영역 */}
-                            {debate.rebuttalTitle ? (
-                                <div className={styles.rebuttalBox}>
-                                    <h4>🗣️ {debate.rebuttalTitle}</h4>
-                                    <p>{debate.rebuttalContent}</p>
-                                    <p className={styles.rebuttalMeta}>- {debate.rebuttalAuthor}</p>
-                                </div>
-                            ) : (
-                                currentUser &&
-                                currentUser.username !== debate.author && (
-                                    <div className={styles.rebuttalArea}>
-                                        {!showRebuttalInput[debate.id] ? (
+                            {/* ✅ 반박해보세요 */}
+                            {/* ✅ 반박해보세요 */}
+                            {activeTab === "unrebutted" && (
+                                <div className={styles.rebuttalArea}>
+                                    {/* 🔥 본인 글일 경우 버튼/폼 모두 숨김 */}
+                                    {debate.author !== currentUser?.username && (
+                                        !showRebuttalInput[debate.id] ? (
                                             <button
                                                 onClick={() =>
                                                     setShowRebuttalInput({
@@ -182,7 +247,6 @@ const DebateBoard = () => {
                                             </button>
                                         ) : (
                                             <div className={styles.rebuttalForm}>
-                                                {/* ❌ 닫기 버튼 */}
                                                 <button
                                                     onClick={() =>
                                                         setShowRebuttalInput({
@@ -191,7 +255,6 @@ const DebateBoard = () => {
                                                         })
                                                     }
                                                     className={styles.rebuttalCloseBtn}
-                                                    title="닫기"
                                                 >
                                                     ❌
                                                 </button>
@@ -232,12 +295,96 @@ const DebateBoard = () => {
                                                     등록
                                                 </button>
                                             </div>
-                                        )}
+                                        )
+                                    )}
+                                </div>
+                            )}
+                            {/* ✅ 반박중 (남은시간 + 투표) */}
+                            {activeTab === "rebutted" && (
+                                <>
+                                    {/* 남은시간 표시 */}
+                                    {debate.rebuttalAt && !debate.isClosed && (
+                                        <p
+                                            style={{
+                                                textAlign: "right",
+                                                fontWeight: 600,
+                                                color: (() => {
+                                                    const rebuttalTime = new Date(debate.rebuttalAt);
+                                                    const now = new Date();
+                                                    const diffHours =
+                                                        (rebuttalTime.getTime() +
+                                                            12 * 60 * 60 * 1000 -
+                                                            now.getTime()) /
+                                                        (1000 * 60 * 60);
+                                                    if (diffHours <= 0) return "#777";
+                                                    if (diffHours <= 1) return "#ff3b30";
+                                                    return "#555";
+                                                })(),
+                                            }}
+                                        >
+                                            🕒 {getRemainingTime(debate)}
+                                        </p>
+                                    )}
+
+                                    <div className={styles.rebuttalBox}>
+                                        <h4>🗣️ {debate.rebuttalTitle}</h4>
+                                        <p>{debate.rebuttalContent}</p>
+                                        <p className={styles.rebuttalMeta}>- {debate.rebuttalAuthor}</p>
                                     </div>
-                                )
+
+                                    <div className={styles.voteSection}>
+                                        <button
+                                            disabled={
+                                                debate.isClosed ||
+                                                currentUser?.username === debate.author ||
+                                                currentUser?.username === debate.rebuttalAuthor ||
+                                                hasVoted(debate.id)
+                                            }
+                                            onClick={() => handleVote(debate.id, "author")}
+                                            className={styles.voteButton}
+                                        >
+                                            {debate.author} ({debate.authorVotes})
+                                        </button>
+
+                                        <span className={styles.vs}>VS</span>
+
+                                        <button
+                                            disabled={
+                                                debate.isClosed ||
+                                                currentUser?.username === debate.author ||
+                                                currentUser?.username === debate.rebuttalAuthor ||
+                                                hasVoted(debate.id)
+                                            }
+                                            onClick={() => handleVote(debate.id, "rebuttal")}
+                                            className={styles.voteButton}
+                                        >
+                                            {debate.rebuttalAuthor} ({debate.rebuttalVotes})
+                                        </button>
+                                    </div>
+                                </>
                             )}
 
-                            {/* ✅ 댓글 영역 기존 그대로 */}
+                            {/* ✅ 마감된 토론 */}
+                            {activeTab === "closed" && (
+                                <>
+                                    <div className={styles.rebuttalBox}>
+                                        <h4>🗣️ {debate.rebuttalTitle}</h4>
+                                        <p>{debate.rebuttalContent}</p>
+                                        <p className={styles.rebuttalMeta}>- {debate.rebuttalAuthor}</p>
+                                    </div>
+                                    <div className={styles.closedSection}>
+                                        <h4>🕛 마감된 토론</h4>
+                                        <p>
+                                            🏆 승자:{" "}
+                                            {debate.authorVotes > debate.rebuttalVotes
+                                                ? debate.author
+                                                : debate.rebuttalAuthor}
+                                        </p>
+                                    </div>
+                                </>
+                            )}
+
+                            {/* ✅ 댓글 */}
                             <div className={styles.commentSection}>
                                 <h3 className={styles.commentTitle}>
                                     <MessageSquare className="w-4 h-4" /> 댓글 (
@@ -249,8 +396,53 @@ const DebateBoard = () => {
                                         <div key={c.id} className={styles.commentItem}>
                                             <span className={styles.commentAuthor}>{c.author}:</span>{" "}
                                             {c.text}
+
+                                            {/* ✅ 답글 버튼 */}
+                                            <button
+                                                onClick={() =>
+                                                    setShowReplyInput({
+                                                        ...showReplyInput,
+                                                        [c.id]: !showReplyInput[c.id],
+                                                    })
+                                                }
+                                                className={styles.replyButton}
+                                            >
+                                                💬 답글
+                                            </button>
+
+                                            {/* ✅ 대댓글 입력창 */}
+                                            {showReplyInput[c.id] && (
+                                                <div className={styles.replyInputGroup}>
+                                                    <input
+                                                        type="text"
+                                                        placeholder="답글을 입력하세요..."
+                                                        value={replyInputs[c.id] || ""}
+                                                        onChange={(e) =>
+                                                            setReplyInputs({
+                                                                ...replyInputs,
+                                                                [c.id]: e.target.value,
+                                                            })
+                                                        }
+                                                        className={styles.replyInput}
+                                                    />
+                                                    <button
+                                                        onClick={() => handleReplySubmit(debate.id, c.id)}
+                                                        className={styles.replySubmit}
+                                                    >
+                                                        등록
+                                                    </button>
+                                                </div>
+                                            )}
+
+                                            {/* ✅ 대댓글 표시 */}
+                                            {c.replies?.map((r) => (
+                                                <div key={r.id} className={styles.replyItem}>
+                                                    <span className={styles.replyAuthor}>↳ {r.author}:</span> {r.text}
+                                                </div>
+                                            ))}
                                         </div>
                                     ))}
+
                                 </div>
 
                                 {currentUser && (
