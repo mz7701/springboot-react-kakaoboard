@@ -6,7 +6,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 @Getter
@@ -24,6 +24,7 @@ public class Debate {
     private String content;
     private String author;
 
+    private String winner; // "author", "rebuttal", or "draw"
     // ✅ 반박 정보
     private String rebuttalTitle;
     private String rebuttalContent;
@@ -45,7 +46,9 @@ public class Debate {
     private List<String> voters = new ArrayList<>();
 
     // ✅ 상태 관련
+    @JsonProperty("isClosed")
     private boolean isClosed = false;
+
     private LocalDateTime createdAt;
     private LocalDateTime closedAt;
 

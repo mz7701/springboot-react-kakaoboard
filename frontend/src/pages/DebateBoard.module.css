@@ -420,3 +420,38 @@
     color: #555;
     padding: 4px 0;
 }
+.userArea {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.loginBtn {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.2s;
+}
+
+.loginBtn:hover {
+    background: #2563eb;
+}
+
+.logoutBtn {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.2s;
+}
+
+.logoutBtn:hover {
+    background: #dc2626;
+}

@@ -3,26 +3,24 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import DebateBoard from "./pages/DebateBoard";
-import CreateDebatePage from "./pages/CreateDebatePage"; // 추가
-
+import CreateDebatePage from "./pages/CreateDebatePage";
 
 function App() {
-    const isLoggedIn = localStorage.getItem("user");
-
     return (
         <Router>
             <Routes>
-                <Route path="/" element={<Navigate to="/login" />} />
+                {/* ✅ 첫 진입 시 자동으로 토론의 전당으로 */}
+                <Route path="/" element={<Navigate to="/board" />} />
+
+                {/* 로그인 관련 */}
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
-                <Route
-                    path="/board"
-                    element={isLoggedIn ? <DebateBoard /> : <Navigate to="/login" />}
-                />
-                <Route
-                    path="/create"
-                    element={isLoggedIn ? <CreateDebatePage /> : <Navigate to="/login" />}
-                />
+
+                {/* ✅ 비회원도 글 보기 가능 */}
+                <Route path="/board" element={<DebateBoard />} />
+
+                {/* ✅ 새 토론 만들기 (비회원 접근 시 alert) */}
+                <Route path="/create" element={<CreateDebatePage />} />
             </Routes>
         </Router>
     );

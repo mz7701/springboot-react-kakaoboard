@@ -74,7 +74,16 @@ public class DebateService {
     public void deleteById(Long id) {
         debateRepository.deleteById(id);
     }
-
+    public void updateWinner(Debate debate) {
+        if (debate.getAuthorVotes() > debate.getRebuttalVotes()) {
+            debate.setWinner("author");
+        } else if (debate.getAuthorVotes() < debate.getRebuttalVotes()) {
+            debate.setWinner("rebuttal");
+        } else {
+            debate.setWinner("draw");
+        }
+        debateRepository.save(debate);
+    }
     /** ✅ 자동 마감 기능 1분마다 검사) */
     @Scheduled(fixedRate = 60000) // 60초마다 검사
     public void closeExpiredDebates() {

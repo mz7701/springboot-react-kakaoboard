@@ -25,20 +25,20 @@ public class DebateController {
     private final DebateService debateService;
     private final DebateRepository debateRepository;
 
-    /** ✅ 전체 토론 조회 */
+    /** ✅ 전체 토론 조회 + 자동 마감 */
     @GetMapping
     public ResponseEntity<List<Debate>> getAllDebates() {
         List<Debate> debates = debateRepository.findAll();
         LocalDateTime now = LocalDateTime.now();
 
         for (Debate d : debates) {
-            // ✅ 반박 등록 후 12시간이 지났고 아직 마감 안 된 경우만 마감 처리
             if (d.getRebuttalAt() != null &&
                     Duration.between(d.getRebuttalAt(), now).toHours() >= 12 &&
                     !d.isClosed()) {
 
                 d.setClosed(true);
                 d.setClosedAt(now);
+                debateService.updateWinner(d); // ✅ 승자 계산
                 debateRepository.save(d);
             }
         }

@@ -32,29 +32,48 @@ const DebateBoard = () => {
         const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
         return `${hours}시간 ${minutes}분 남음`;
     };
+    // ✅ 로그인 필요 기능 공통 가드
 
-    // ✅ 데이터 주기적 갱신
+    const requireLogin = () => {
+        if (!currentUser) {
+            alert("⚠️ 로그인 후 이용해주세요.");
+            return false;
+        }
+        return true;
+    };
+
+
+
+
     useEffect(() => {
         const savedUser = localStorage.getItem("user");
         if (savedUser) setCurrentUser(JSON.parse(savedUser));
 
+        // 첫 로딩 시 데이터 가져오기
         fetchDebates();
-        const interval = setInterval(fetchDebates, 3000);
+
+        // 3초마다 주기적으로 갱신
+        const interval = setInterval(() => {
+            fetchDebates(false); // 👈 탭 상태 변경 방지용 인자
+        }, 3000);
+
         return () => clearInterval(interval);
     }, []);
 
-    const fetchDebates = async () => {
+    const fetchDebates = async (shouldAutoSwitch = true) => {
         try {
-            const res = await axios.get("http://192.168.0.21:8080/api/debates");
+            const res = await axios.get("http://localhost:8080/api/debates");
             const data = Array.isArray(res.data) ? res.data.reverse() : [];
             setDebates(data);
 
-            // ✅ 마감된 토론이 새로 생겼을 경우 자동 이동
-            if (data.some(d => d.isClosed) && activeTab !== "closed") {
-                setActiveTab("closed");
+            // 👇 이 부분이 문제였을 가능성 높음
+            if (shouldAutoSwitch) {
+                // 자동 탭 전환 로직이 있다면 여기에 두기
+                // (예: 특정 상태에서만 탭 이동)
             }
+
         } catch (err) {
-            console.error("토론 불러오기 실패:", err);
+            console.error("❌ 토론 데이터 불러오기 실패:", err);
         }
     };
 
@@ -71,6 +90,7 @@ const DebateBoard = () => {
     };
 
     const handleRebuttalSubmit = async (debateId) => {
+        if (!requireLogin()) return;
         const input = rebuttalInputs[debateId];
         if (!input?.title || !input?.content) return alert("제목과 내용을 입력하세요!");
 
@@ -89,6 +109,7 @@ const DebateBoard = () => {
     };
 
     const handleVote = async (debateId, type) => {
+        if (!requireLogin()) return;
         try {
             await axios.post(`http://192.168.0.21:8080/api/debates/${debateId}/vote`, {
                 type,
@@ -109,6 +130,8 @@ const DebateBoard = () => {
 
     const handleCommentSubmit = async (debateId) => {
         const text = commentInputs[debateId];
+        if (!requireLogin()) return;  // ✅ 추가
+
         if (!text || !text.trim()) return alert("댓글을 입력하세요!");
         try {
             await axios.post(`http://192.168.0.21:8080/api/debates/${debateId}/comments`, {
@@ -123,6 +146,7 @@ const DebateBoard = () => {
     };
 
     const handleReplySubmit = async (debateId, parentId) => {
+        if (!requireLogin()) return;
         const text = replyInputs[parentId];
         if (!text || !text.trim()) return alert("대댓글을 입력하세요!");
 
@@ -140,35 +164,62 @@ const DebateBoard = () => {
             console.error("대댓글 등록 실패:", err);
         }
     };
-
     const filteredDebates =
         activeTab === "unrebutted"
             ? debates.filter((d) => !d.rebuttalTitle && !d.isClosed)
             : activeTab === "rebutted"
-                ? debates.filter((d) => (d.rebuttalAuthor || d.rebuttalContent) && !d.isClosed)
+                ? debates.filter((d) => d.rebuttalTitle && !d.isClosed)
                 : debates.filter((d) => d.isClosed);
 
     return (
         <div className={styles.container}>
+            {/* ✅ 헤더 영역 */}
             <div className={styles.header}>
                 <h1 className={styles.title}>🔥 토론의 전당</h1>
-                {currentUser && (
-                    <div className={styles.userInfo}>
-                        <p className={styles.username}>{currentUser.username}</p>
-                        <p className={styles.exp}>EXP: {currentUser.exp}</p>
-                    </div>
-                )}
+
+                {/* ✅ 로그인 상태에 따라 다른 버튼 표시 */}
+                <div className={styles.userArea}>
+                    {!currentUser ? (
+                        // 로그인 안 되어 있으면 로그인 버튼만
+                        <button
+                            onClick={() => navigate("/login")}
+                            className={styles.loginBtn}
+                        >
+                            로그인
+                        </button>
+                    ) : (
+                        // 로그인 되어 있으면 사용자 정보 + 로그아웃 버튼
+                        <>
+                            <div className={styles.userInfo}>
+                                <p className={styles.username}>{currentUser.username}</p>
+                                <p className={styles.exp}>EXP: {currentUser.exp}</p>
+                            </div>
+                            <button
+                                onClick={() => {
+                                    localStorage.removeItem("user");
+                                    setCurrentUser(null);
+                                    alert("로그아웃되었습니다.");
+                                }}
+                                className={styles.logoutBtn}
+                            >
+                                로그아웃
+                            </button>
+                        </>
+                    )}
+                </div>
             </div>
 
-            {currentUser && (
-                <button
-                    onClick={() => navigate("/create")}
-                    disabled={loading}
-                    className={styles.postButton}
-                >
-                    ✏️ 새 토론 등록
-                </button>
-            )}
+            {/* ✅ 새 토론 등록 버튼 (로그인 필요) */}
+            <button
+                onClick={() => {
+                    if (!requireLogin()) return; // 로그인 가드
+                    navigate("/create");
+                }}
+                disabled={loading}
+                className={styles.postButton}
+            >
+                ✏️ 새 토론 등록
+            </button>
 
             {/* ✅ 탭 메뉴 */}
             <div className={styles.tabContainer}>
@@ -343,14 +394,21 @@ const DebateBoard = () => {
                                         <p>{debate.rebuttalContent}</p>
                                         <p className={styles.rebuttalMeta}>- {debate.rebuttalAuthor}</p>
                                     </div>
+
                                     <div className={styles.closedSection}>
                                         <h4>🕛 마감된 토론</h4>
-                                        <p>
-                                            🏆 승자:{" "}
-                                            {debate.authorVotes > debate.rebuttalVotes
-                                                ? debate.author
-                                                : debate.rebuttalAuthor}
-                                        </p>
+
+                                        {/* ✅ draw일 때 처리 추가 */}
+                                        {debate.winner === "draw" ? (
+                                            <p>🤝 무승부입니다!</p>
+                                        ) : (
+                                            <p>
+                                                🏆 승자:{" "}
+                                                {debate.winner === "author"
+                                                    ? debate.author
+                                                    : debate.rebuttalAuthor}
+                                            </p>
+                                        )}
                                     </div>
                                 </>
                             )}
