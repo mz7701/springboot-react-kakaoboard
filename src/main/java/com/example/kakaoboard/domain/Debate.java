@@ -25,6 +25,8 @@ public class Debate {
     private String author;
 
     private String winner; // "author", "rebuttal", or "draw"
+    @Column(nullable = false)
+    private String category; // ✅ 게임, 사회, 연애, 스포츠, 기타
     // ✅ 반박 정보
     private String rebuttalTitle;
     private String rebuttalContent;

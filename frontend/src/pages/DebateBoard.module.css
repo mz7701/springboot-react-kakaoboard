@@ -455,3 +455,41 @@
 .logoutBtn:hover {
     background: #dc2626;
 }
+/**/
+.tabWrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.categoryDropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    display: flex;
+    gap: 8px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 8px 10px;
+    z-index: 10;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.categoryItem {
+    padding: 6px 10px;
+    border: none;
+    background: #f3f4f6;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.categoryItem:hover {
+    background: #2563eb;
+    color: white;
+}
+
+.activeCategory {
+    background: #2563eb;
+    color: white;
+}

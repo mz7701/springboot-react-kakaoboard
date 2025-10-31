@@ -17,6 +17,9 @@ const DebateBoard = () => {
     const [showReplyInput, setShowReplyInput] = useState({});
     const [activeTab, setActiveTab] = useState("unrebutted");
     const navigate = useNavigate();
+    const [selectedCategory, setSelectedCategory] = useState("전체");
+    const categories = ["전체", "게임", "사회", "연애", "스포츠", "기타"];
+    const [hoveredTab, setHoveredTab] = useState(null);
 
     // ✅ 남은시간 계산 함수
     const getRemainingTime = (debate) => {
@@ -164,12 +167,19 @@ const DebateBoard = () => {
             console.error("대댓글 등록 실패:", err);
         }
     };
-    const filteredDebates =
-        activeTab === "unrebutted"
-            ? debates.filter((d) => !d.rebuttalTitle && !d.isClosed)
-            : activeTab === "rebutted"
-                ? debates.filter((d) => d.rebuttalTitle && !d.isClosed)
-                : debates.filter((d) => d.isClosed);
+    const filteredDebates = debates.filter((d) => {
+        const tabMatch =
+            activeTab === "unrebutted"
+                ? !d.rebuttalTitle && !d.isClosed
+                : activeTab === "rebutted"
+                    ? d.rebuttalTitle && !d.isClosed
+                    : d.isClosed;
+
+        const categoryMatch =
+            selectedCategory === "전체" || d.category === selectedCategory;
+
+        return tabMatch && categoryMatch;
+    });
 
     return (
         <div className={styles.container}>
@@ -222,27 +232,141 @@ const DebateBoard = () => {
             </button>
 
             {/* ✅ 탭 메뉴 */}
+            {/* ✅ 탭 메뉴 (hover 드롭다운 포함) */}
             <div className={styles.tabContainer}>
-                <button
-                    className={`${styles.tabButton} ${activeTab === "unrebutted" ? styles.activeTab : ""}`}
-                    onClick={() => setActiveTab("unrebutted")}
+                {/* 🗣️ 반박해보세요 */}
+                <div
+                    className={styles.tabWrapper}
+                    onMouseEnter={() => setHoveredTab("unrebutted")}
+                    onMouseLeave={() => setHoveredTab(null)}
                 >
-                    🗣️ 반박해보세요
-                </button>
-                <button
-                    className={`${styles.tabButton} ${activeTab === "rebutted" ? styles.activeTab : ""}`}
-                    onClick={() => setActiveTab("rebutted")}
+                    <button
+                        className={`${styles.tabButton} ${
+                            activeTab === "unrebutted" ? styles.activeTab : ""
+                        }`}
+                        onClick={() => {
+                            setActiveTab("unrebutted");
+                            setSelectedCategory("전체");
+                        }}
+                    >
+                        🗣️ 반박해보세요
+                    </button>
+
+                    {hoveredTab === "unrebutted" && (
+                        <div className={styles.categoryDropdown}>
+                            {["게임", "사회", "연애", "스포츠", "기타"].map((cat) => (
+                                <button
+                                    key={cat}
+                                    onClick={() => {
+                                        setSelectedCategory(cat);
+                                        setActiveTab("unrebutted");
+                                    }}
+                                    className={`${styles.categoryItem} ${
+                                        selectedCategory === cat ? styles.activeCategory : ""
+                                    }`}
+                                >
+                                    {cat}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                {/* ⚔️ 반박중 */}
+                <div
+                    className={styles.tabWrapper}
+                    onMouseEnter={() => setHoveredTab("rebutted")}
+                    onMouseLeave={() => setHoveredTab(null)}
                 >
-                    ⚔️ 반박중
-                </button>
-                <button
-                    className={`${styles.tabButton} ${activeTab === "closed" ? styles.activeTab : ""}`}
-                    onClick={() => setActiveTab("closed")}
+                    <button
+                        className={`${styles.tabButton} ${
+                            activeTab === "rebutted" ? styles.activeTab : ""
+                        }`}
+                        onClick={() => {
+                            setActiveTab("rebutted");
+                            setSelectedCategory("전체");
+                        }}
+                    >
+                        ⚔️ 반박중
+                    </button>
+
+                    {hoveredTab === "rebutted" && (
+                        <div className={styles.categoryDropdown}>
+                            {["게임", "사회", "연애", "스포츠", "기타"].map((cat) => (
+                                <button
+                                    key={cat}
+                                    onClick={() => {
+                                        setSelectedCategory(cat);
+                                        setActiveTab("rebutted");
+                                    }}
+                                    className={`${styles.categoryItem} ${
+                                        selectedCategory === cat ? styles.activeCategory : ""
+                                    }`}
+                                >
+                                    {cat}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                {/* 🕛 마감된 토론 */}
+                <div
+                    className={styles.tabWrapper}
+                    onMouseEnter={() => setHoveredTab("closed")}
+                    onMouseLeave={() => setHoveredTab(null)}
                 >
-                    🕛 마감된 토론
-                </button>
+                    <button
+                        className={`${styles.tabButton} ${
+                            activeTab === "closed" ? styles.activeTab : ""
+                        }`}
+                        onClick={() => {
+                            setActiveTab("closed");
+                            setSelectedCategory("전체");
+                        }}
+                    >
+                        🕛 마감된 토론
+                    </button>
+
+                    {hoveredTab === "closed" && (
+                        <div className={styles.categoryDropdown}>
+                            {["게임", "사회", "연애", "스포츠", "기타"].map((cat) => (
+                                <button
+                                    key={cat}
+                                    onClick={() => {
+                                        setSelectedCategory(cat);
+                                        setActiveTab("closed");
+                                    }}
+                                    className={`${styles.categoryItem} ${
+                                        selectedCategory === cat ? styles.activeCategory : ""
+                                    }`}
+                                >
+                                    {cat}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+                </div>
             </div>
 
+            {/* ✅ 나머지 토론/댓글 렌더링은 기존 그대로 */}
+            {/* 👇 이하 부분은 수정하지 않아도 됨 (원본 유지) */}
+            {/* ... 네가 올린 나머지 코드 그대로 둬 */}
+
+            {/* 카테고리 필터 */}
+            {activeTab !== "closed" && (
+                <div className={styles.categoryFilter}>
+                    {categories.map((cat) => (
+                        <button
+                            key={cat}
+                            onClick={() => setSelectedCategory(cat)}
+                            className={`${styles.categoryBtn} ${selectedCategory === cat ? styles.activeCategory : ""}`}
+                        >
+                            {cat}
+                        </button>
+                    ))}
+                </div>
+            )}
             {/* ✅ 토론 목록 */}
             {filteredDebates.length === 0 ? (
                 <p style={{ textAlign: "center", color: "#888", marginTop: "2rem" }}>

@@ -50,3 +50,29 @@
     background-color: #007bff;
     color: white;
 }
+/*추가 카테로그*/
+.categoryBox {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.select {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.select:hover {
+    border-color: #2563eb;
+}
+
+.label {
+    font-weight: 600;
+    color: #333;
+}
