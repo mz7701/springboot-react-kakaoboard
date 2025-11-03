@@ -21,7 +21,7 @@ const LoginPage = () => {
         setIsLoading(true);
         setErrMsg("");
         try {
-            const res = await axios.post("http://localhost:8080/api/auth/login", form);
+            const res = await axios.post("http://192.168.0.21:8080/api/auth/login", form);
             localStorage.setItem("user", JSON.stringify(res.data));
             alert("✅ 로그인 성공!");
             navigate("/board");

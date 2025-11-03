@@ -493,3 +493,42 @@
     background: #2563eb;
     color: white;
 }
+/*페이지 1 2 3*/
+/* 페이지네이션 스타일 */
+.pagination {
+    margin: 16px 0;
+    text-align: center;
+}
+
+.pageBtn {
+    margin: 0 4px;
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.pageBtn:hover {
+    background-color: #f1f3f8;
+}
+
+.activePage {
+    background-color: #2b6ef2;
+    color: white;
+    border-color: #2b6ef2;
+}
+
+/*검색파트*/
+.searchInput {
+    margin-left: 1rem;
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+.searchInput:focus {
+    outline: none;
+    border-color: #333;
+}

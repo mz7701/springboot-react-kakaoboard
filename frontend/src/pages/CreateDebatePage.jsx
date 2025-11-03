@@ -3,14 +3,19 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import styles from "./CreateDebatePage.module.css";
 
+// ✅ axios 기본 설정
+axios.defaults.baseURL = "http://localhost:8080";
+axios.defaults.headers.post["Content-Type"] = "application/json";
+
 const CreateDebatePage = () => {
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
-    const [category, setCategory] = useState("게임"); // ✅ 기본 카테고리 설정
+    const [category, setCategory] = useState("게임"); // 기본값
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
-    const currentUser = JSON.parse(localStorage.getItem("user"));
+    const storedUser = localStorage.getItem("user");
+    const currentUser = storedUser ? JSON.parse(storedUser) : null;
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -27,16 +32,21 @@ const CreateDebatePage = () => {
 
         setLoading(true);
         try {
-            await axios.post("http://192.168.0.21:8080/api/debates", {
+            await axios.post("/api/debates", {
                 title,
                 content,
                 author: currentUser.username,
-                category, // ✅ 카테고리 전송
+                category,
             });
+
             alert("✅ 토론이 등록되었습니다!");
-            navigate("/");
+            if (window.confirm("내가 쓴 게시글로 이동하시겠습니까?")) {
+                navigate("/mypage");
+            } else {
+                navigate("/");
+            }
         } catch (err) {
-            console.error("토론 등록 실패:", err);
+            console.error("❌ 토론 등록 실패:", err);
             alert("토론 등록 중 오류가 발생했습니다.");
         } finally {
             setLoading(false);

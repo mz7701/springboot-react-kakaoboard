@@ -20,6 +20,12 @@ const DebateBoard = () => {
     const [selectedCategory, setSelectedCategory] = useState("전체");
     const categories = ["전체", "게임", "사회", "연애", "스포츠", "기타"];
     const [hoveredTab, setHoveredTab] = useState(null);
+    // [ADD] 목록/상세 보기 모드 & 페이지네이션
+    const [viewMode, setViewMode] = useState("list");        // 'list' | 'detail'
+    const [selectedDebate, setSelectedDebate] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10; // 페이지당 10개 (원하면 나중에 UI로 변경 가능)
+    const [searchTerm, setSearchTerm] = useState("");
 
     // ✅ 남은시간 계산 함수
     const getRemainingTime = (debate) => {
@@ -65,7 +71,7 @@ const DebateBoard = () => {
 
     const fetchDebates = async (shouldAutoSwitch = true) => {
         try {
-            const res = await axios.get("http://localhost:8080/api/debates");
+            const res = await axios.get("http://192.168.0.21:8080/api/debates");
             const data = Array.isArray(res.data) ? res.data.reverse() : [];
             setDebates(data);
 
@@ -177,9 +183,17 @@ const DebateBoard = () => {
 
         const categoryMatch =
             selectedCategory === "전체" || d.category === selectedCategory;
+        const searchMatch = d.title.toLowerCase().includes(searchTerm.toLowerCase());
 
-        return tabMatch && categoryMatch;
+
+        return tabMatch && categoryMatch && searchMatch;
+
     });
+
+// ✅ 2️⃣ 페이지 나누기 (슬라이스)
+    const indexOfLast = currentPage * itemsPerPage;
+    const indexOfFirst = indexOfLast - itemsPerPage;
+    const currentDebates = filteredDebates.slice(indexOfFirst, indexOfLast);
 
     return (
         <div className={styles.container}>
@@ -187,6 +201,13 @@ const DebateBoard = () => {
             <div className={styles.header}>
                 <h1 className={styles.title}>🔥 토론의 전당</h1>
 
+                <input
+                    type="text"
+                    placeholder="게시글 제목 검색..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className={styles.searchInput}
+                />
                 {/* ✅ 로그인 상태에 따라 다른 버튼 표시 */}
                 <div className={styles.userArea}>
                     {!currentUser ? (
@@ -201,7 +222,13 @@ const DebateBoard = () => {
                         // 로그인 되어 있으면 사용자 정보 + 로그아웃 버튼
                         <>
                             <div className={styles.userInfo}>
-                                <p className={styles.username}>{currentUser.username}</p>
+                                <p
+                                    className={styles.username}
+                                    onClick={() => navigate("/mypage")}
+                                    style={{ cursor: "pointer", textDecoration: "underline" }}
+                                >
+                                    {currentUser.username}
+                                </p>
                                 <p className={styles.exp}>EXP: {currentUser.exp}</p>
                             </div>
                             <button
@@ -247,6 +274,7 @@ const DebateBoard = () => {
                         onClick={() => {
                             setActiveTab("unrebutted");
                             setSelectedCategory("전체");
+                            setCurrentPage(1);
                         }}
                     >
                         🗣️ 반박해보세요
@@ -260,6 +288,8 @@ const DebateBoard = () => {
                                     onClick={() => {
                                         setSelectedCategory(cat);
                                         setActiveTab("unrebutted");
+                                        setCurrentPage(1);
+
                                     }}
                                     className={`${styles.categoryItem} ${
                                         selectedCategory === cat ? styles.activeCategory : ""
@@ -285,6 +315,7 @@ const DebateBoard = () => {
                         onClick={() => {
                             setActiveTab("rebutted");
                             setSelectedCategory("전체");
+                            setCurrentPage(1);
                         }}
                     >
                         ⚔️ 반박중
@@ -298,6 +329,7 @@ const DebateBoard = () => {
                                     onClick={() => {
                                         setSelectedCategory(cat);
                                         setActiveTab("rebutted");
+                                        setCurrentPage(1);
                                     }}
                                     className={`${styles.categoryItem} ${
                                         selectedCategory === cat ? styles.activeCategory : ""
@@ -323,6 +355,7 @@ const DebateBoard = () => {
                         onClick={() => {
                             setActiveTab("closed");
                             setSelectedCategory("전체");
+                            setCurrentPage(1);
                         }}
                     >
                         🕛 마감된 토론
@@ -336,6 +369,7 @@ const DebateBoard = () => {
                                     onClick={() => {
                                         setSelectedCategory(cat);
                                         setActiveTab("closed");
+                                        setCurrentPage(1);
                                     }}
                                     className={`${styles.categoryItem} ${
                                         selectedCategory === cat ? styles.activeCategory : ""
@@ -378,7 +412,7 @@ const DebateBoard = () => {
                 </p>
             ) : (
                 <div className={styles.debateList}>
-                    {filteredDebates.map((debate) => (
+                    {currentDebates.map((debate) => (
                         <div key={debate.id} className={styles.card}>
                             <div className={styles.cardHeader}>
                                 <h2 className={styles.cardTitle}>{debate.title}</h2>
@@ -613,14 +647,35 @@ const DebateBoard = () => {
                                         >
                                             등록
                                         </button>
+
                                     </div>
                                 )}
                             </div>
                         </div>
                     ))}
+
                 </div>
+
             )}
+            {/* ✅ 페이지네이션 */}
+            <div className={styles.pagination}>
+                {Array.from(
+                    { length: Math.ceil(filteredDebates.length / itemsPerPage) },
+                    (_, i) => i + 1
+                ).map((page) => (
+                    <button
+                        key={page}
+                        className={`${styles.pageBtn} ${
+                            currentPage === page ? styles.activePage : ""
+                        }`}
+                        onClick={() => setCurrentPage(page)}
+                    >
+                        {page}
+                    </button>
+                ))}
+            </div>
         </div>
+
     );
 };
 

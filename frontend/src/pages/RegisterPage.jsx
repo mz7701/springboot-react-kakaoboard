@@ -14,7 +14,7 @@ const RegisterPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post("http://localhost:8080/api/auth/register", form);
+            await axios.post("http://192.168.0.21:8080/api/auth/register", form);
             alert("✅ 회원가입이 완료되었습니다! 로그인 해주세요.");
             navigate("/login");
         } catch (err) {
