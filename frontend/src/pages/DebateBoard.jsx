@@ -4,6 +4,8 @@ import { Trash2, MessageSquare } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import styles from "./DebateBoard.module.css";
 
+
+
 axios.defaults.headers.post["Content-Type"] = "application/json";
 
 const DebateBoard = () => {
@@ -26,6 +28,11 @@ const DebateBoard = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10; // 페이지당 10개 (원하면 나중에 UI로 변경 가능)
     const [searchTerm, setSearchTerm] = useState("");
+    const [currentTab, setCurrentTab] = useState("all");
+
+    useEffect(() => {
+        fetchDebates();
+    }, []);
 
     // ✅ 남은시간 계산 함수
     const getRemainingTime = (debate) => {
@@ -302,6 +309,7 @@ const DebateBoard = () => {
                     )}
                 </div>
 
+
                 {/* ⚔️ 반박중 */}
                 <div
                     className={styles.tabWrapper}
@@ -377,12 +385,20 @@ const DebateBoard = () => {
                                 >
                                     {cat}
                                 </button>
+
+
                             ))}
                         </div>
                     )}
                 </div>
             </div>
-
+            {/* 🍎 사과게임 버튼 (항상 탭 옆에 고정) */}
+            <button
+                className={styles.appleButton}
+                onClick={() => navigate("/applegame")}
+            >
+                🍎 사과게임 하러가기
+            </button>
             {/* ✅ 나머지 토론/댓글 렌더링은 기존 그대로 */}
             {/* 👇 이하 부분은 수정하지 않아도 됨 (원본 유지) */}
             {/* ... 네가 올린 나머지 코드 그대로 둬 */}

@@ -532,3 +532,31 @@
     outline: none;
     border-color: #333;
 }
+/*사과*/
+.tabContainer {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.tabWrapper {
+    position: relative;
+}
+
+.appleButton {
+    margin-left: auto; /* 오른쪽 끝으로 밀기 */
+    background: linear-gradient(135deg, #ff6b6b, #ff4040);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s ease-in-out;
+}
+
+.appleButton:hover {
+    transform: scale(1.05);
+    background: linear-gradient(135deg, #ff4040, #ff1e1e);
+}
