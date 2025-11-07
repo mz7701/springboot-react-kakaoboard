@@ -1,57 +1,172 @@
-.container {
+@import url("https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700&display=swap");
+
+:root {
+    --bg-grad-1: #1a1a40;
+    --bg-grad-2: #4c1d95;
+    --bg-grad-3: #a21caf;
+    --card-bg: rgba(255, 255, 255, 0.1);
+    --card-border: rgba(255, 255, 255, 0.2);
+    --text-main: #ffffff;
+    --text-sub: rgba(255, 255, 255, 0.8);
+    --input-bg: rgba(255, 255, 255, 0.12);
+    --input-border: rgba(255, 255, 255, 0.25);
+    --input-border-focus: rgba(255, 255, 255, 0.5);
+    --input-placeholder: rgba(255, 255, 255, 0.6);
+    --primary-grad-from: #6366f1;
+    --primary-grad-via: #8b5cf6;
+    --primary-grad-to: #ec4899;
+}
+
+.page {
     min-height: 100vh;
+    background: linear-gradient(
+            135deg,
+            var(--bg-grad-1),
+            var(--bg-grad-2),
+            var(--bg-grad-3)
+    );
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #f7f7f7;
-    font-family: 'Noto Sans KR', sans-serif;
+    color: var(--text-main);
+    font-family: "Pretendard", sans-serif;
 }
 
-.form {
-    background-color: #fff;
-    padding: 2rem;
-    border-radius: 1rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    width: 320px;
-    border: 1px solid #e0e0e0;
+.cardWrap {
+    width: 100%;
+    max-width: 420px;
+    padding: 24px;
+}
+
+.card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 18px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    padding: 28px;
 }
 
 .title {
-    font-size: 1.75rem;
-    font-weight: bold;
-    margin-bottom: 1.5rem;
     text-align: center;
-    color: #3c1e1e;
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    text-align: center;
+    color: var(--text-sub);
+    font-size: 14px;
+    margin-bottom: 20px;
 }
 
 .input {
-    border: 1px solid #ccc;
     width: 100%;
-    padding: 0.75rem;
-    margin-bottom: 1rem;
-    border-radius: 0.5rem;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid var(--input-border);
+    background: var(--input-bg);
+    color: var(--text-main);
     font-size: 0.95rem;
-    transition: border-color 0.2s ease;
+    margin-bottom: 10px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .input:focus {
-    border-color: #ffcd00;
-    outline: none;
+    border-color: var(--input-border-focus);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
 }
 
-.button {
-    background-color: #ffcd00;
-    color: #3c1e1e;
-    width: 100%;
-    padding: 0.75rem;
-    border-radius: 0.5rem;
-    font-weight: 600;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+.emailGroup,
+.codeGroup {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.smallBtn {
+    padding: 10px 14px;
     border: none;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.85);
+    color: #111827; /* ✅ 글자색 밝게 변경 */
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.25s ease;
 }
 
-.button:hover {
-    background-color: #f0c000;
+.smallBtn:hover {
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.primaryBtn {
+    width: 100%;
+    padding: 12px 14px;
+    font-weight: 700;
+    color: #fff;
+    border: 0;
+    border-radius: 12px;
+    background-image: linear-gradient(
+            90deg,
+            var(--primary-grad-from),
+            var(--primary-grad-via),
+            var(--primary-grad-to)
+    );
+    box-shadow: 0 10px 24px rgba(99, 102, 241, 0.35);
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.primaryBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 26px rgba(99, 102, 241, 0.45);
+}
+
+.actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 16px;
+}
+
+.linkBtn {
+    background: transparent;
+    border: none;
+    color: var(--text-sub);
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: color 0.25s ease;
+}
+
+.linkBtn:hover {
+    color: var(--text-main);
+}
+
+.errorMsg {
+    color: #ffbdbd;
+    font-size: 13px;
+    margin-top: -4px;
+}
+
+.successMsg {
+    color: #b5ffcb;
+    font-size: 13px;
+    margin-top: -4px;
+}
+.errorMsg {
+    color: #ffbdbd;
+    font-size: 13px;
+    margin-top: -4px;
+    text-align: left;
+    transition: 0.2s;
+}
+
+.successMsg {
+    color: #b5ffcb;
+    font-size: 13px;
+    margin-top: -4px;
+    text-align: left;
 }

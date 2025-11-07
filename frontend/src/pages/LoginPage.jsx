@@ -33,7 +33,7 @@ const LoginPage = () => {
     };
 
     const handleKakaoLogin = () => {
-        window.location.href = "/oauth2/authorization/kakao";
+        window.location.href = "http://192.168.0.21:8080/oauth2/authorization/kakao"
     };
 
     return (
@@ -189,6 +189,13 @@ const LoginPage = () => {
                                 카카오로 로그인
                             </button>
 
+
+                            <button onClick={() => navigate("/login/idsearch")} className={styles.linkBtn}>
+                                아이디 찾기
+                            </button>
+                            <button onClick={() => navigate("/login/passwordsearch")} className={styles.linkBtn}>
+                                비밀번호 찾기
+                            </button>
                             <button
                                 type="button"
                                 onClick={() => navigate("/register")}
@@ -196,6 +203,7 @@ const LoginPage = () => {
                             >
                                 회원가입
                             </button>
+
                         </div>
                     </form>
                 </div>

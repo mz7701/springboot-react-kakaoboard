@@ -6,6 +6,8 @@ import DebateBoard from "./pages/DebateBoard";
 import CreateDebatePage from "./pages/CreateDebatePage";
 import MyPage from "./pages/MyPage";
 import AppleGamePage from "./pages/AppleGamePage";
+import LoginIDsearch from "./pages/Login-IDsearch";
+import LoginPasswordsearch from "./pages/Login-Passwordsearch";
 
 export default function App() {
     return (
@@ -28,6 +30,9 @@ export default function App() {
 
                 {/* ✅ fallback */}
                 <Route path="*" element={<Navigate to="/board" />} />
+
+                <Route path="/login/idsearch" element={<LoginIDsearch />} />
+                <Route path="/login/passwordsearch" element={<LoginPasswordsearch />} />
             </Routes>
         </Router>
     );

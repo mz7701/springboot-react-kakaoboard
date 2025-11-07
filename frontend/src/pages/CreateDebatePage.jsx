@@ -3,22 +3,24 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import styles from "./CreateDebatePage.module.css";
 
-// ✅ axios 기본 설정
-axios.defaults.baseURL = "http://localhost:8080";
+// ✅ axios 기본 설정 (같은 네트워크에서 접근 가능하도록 IP 기반)
+axios.defaults.baseURL = "http://192.168.0.21:8080"; // ⚠️ 본인 서버 IP로 변경
 axios.defaults.headers.post["Content-Type"] = "application/json";
 
 const CreateDebatePage = () => {
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
-    const [category, setCategory] = useState("게임"); // 기본값
+    const [category, setCategory] = useState("게임");
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const storedUser = localStorage.getItem("user");
     const currentUser = storedUser ? JSON.parse(storedUser) : null;
 
+    // ✅ 토론 등록 처리
     const handleSubmit = async (e) => {
         e.preventDefault();
+
         if (!currentUser) {
             alert("⚠️ 로그인 후 이용해주세요.");
             navigate("/login");
@@ -39,15 +41,22 @@ const CreateDebatePage = () => {
                 category,
             });
 
-            alert("✅ 토론이 등록되었습니다!");
-            if (window.confirm("내가 쓴 게시글로 이동하시겠습니까?")) {
+            alert("✅ 토론이 성공적으로 등록되었습니다!");
+            if (window.confirm("내가 쓴 글로 이동하시겠습니까?")) {
                 navigate("/mypage");
             } else {
                 navigate("/");
             }
         } catch (err) {
             console.error("❌ 토론 등록 실패:", err);
-            alert("토론 등록 중 오류가 발생했습니다.");
+
+            if (err.code === "ERR_NETWORK") {
+                alert("서버와 연결할 수 없습니다. 백엔드가 실행 중인지 확인하세요.");
+            } else if (err.response?.status === 403) {
+                alert("접근 권한이 없습니다. 다시 로그인해주세요.");
+            } else {
+                alert("토론 등록 중 오류가 발생했습니다: " + err.message);
+            }
         } finally {
             setLoading(false);
         }
@@ -74,6 +83,7 @@ const CreateDebatePage = () => {
                     </select>
                 </div>
 
+                {/* ✅ 제목 입력 */}
                 <div className={styles.inputGroup}>
                     <label className={styles.label}>제목</label>
                     <input
@@ -85,6 +95,7 @@ const CreateDebatePage = () => {
                     />
                 </div>
 
+                {/* ✅ 내용 입력 */}
                 <div className={styles.inputGroup}>
                     <label className={styles.label}>내용</label>
                     <textarea
@@ -95,6 +106,7 @@ const CreateDebatePage = () => {
                     />
                 </div>
 
+                {/* ✅ 제출 버튼 */}
                 <button
                     type="submit"
                     disabled={loading}
