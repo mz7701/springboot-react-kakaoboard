@@ -532,6 +532,13 @@
     outline: none;
     border-color: #333;
 }
+.card.cardExpanded {
+    border: 2px solid #5b7cff;
+    background: #f7f9ff;
+}
+
+
+
 /*사과*/
 .tabContainer {
     display: flex;

@@ -4,8 +4,6 @@ import { Trash2, MessageSquare } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import styles from "./DebateBoard.module.css";
 
-
-
 axios.defaults.headers.post["Content-Type"] = "application/json";
 
 const DebateBoard = () => {
@@ -23,12 +21,15 @@ const DebateBoard = () => {
     const categories = ["전체", "게임", "사회", "연애", "스포츠", "기타"];
     const [hoveredTab, setHoveredTab] = useState(null);
     // [ADD] 목록/상세 보기 모드 & 페이지네이션
-    const [viewMode, setViewMode] = useState("list");        // 'list' | 'detail'
+    const [viewMode, setViewMode] = useState("list"); // 'list' | 'detail'
     const [selectedDebate, setSelectedDebate] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10; // 페이지당 10개 (원하면 나중에 UI로 변경 가능)
     const [searchTerm, setSearchTerm] = useState("");
     const [currentTab, setCurrentTab] = useState("all");
+
+    // ✅ 제목 클릭 시 펼침/접힘 토글용 (추가)
+    const [expandedDebateId, setExpandedDebateId] = useState(null);
 
     useEffect(() => {
         fetchDebates();
@@ -40,7 +41,8 @@ const DebateBoard = () => {
 
         const rebuttalTime = new Date(debate.rebuttalAt);
         const now = new Date();
-        const diffMs = rebuttalTime.getTime() + 12 * 60 * 60 * 1000 - now.getTime(); // 12시간 기준
+        const diffMs =
+            rebuttalTime.getTime() + 12 * 60 * 60 * 1000 - now.getTime(); // 12시간 기준
 
         if (diffMs <= 0) return "⏰ 마감된 토론";
 
@@ -48,8 +50,8 @@ const DebateBoard = () => {
         const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
         return `${hours}시간 ${minutes}분 남음`;
     };
-    // ✅ 로그인 필요 기능 공통 가드
 
+    // ✅ 로그인 필요 기능 공통 가드
     const requireLogin = () => {
         if (!currentUser) {
             alert("⚠️ 로그인 후 이용해주세요.");
@@ -57,9 +59,6 @@ const DebateBoard = () => {
         }
         return true;
     };
-
-
-
 
     useEffect(() => {
         const savedUser = localStorage.getItem("user");
@@ -87,7 +86,6 @@ const DebateBoard = () => {
                 // 자동 탭 전환 로직이 있다면 여기에 두기
                 // (예: 특정 상태에서만 탭 이동)
             }
-
         } catch (err) {
             console.error("❌ 토론 데이터 불러오기 실패:", err);
         }
@@ -111,11 +109,14 @@ const DebateBoard = () => {
         if (!input?.title || !input?.content) return alert("제목과 내용을 입력하세요!");
 
         try {
-            await axios.post(`http://192.168.0.21:8080/api/debates/${debateId}/rebuttal`, {
-                title: input.title,
-                content: input.content,
-                author: currentUser?.username || "익명",
-            });
+            await axios.post(
+                `http://192.168.0.21:8080/api/debates/${debateId}/rebuttal`,
+                {
+                    title: input.title,
+                    content: input.content,
+                    author: currentUser?.username || "익명",
+                }
+            );
             alert("반박이 등록되었습니다!");
             setShowRebuttalInput({ ...showRebuttalInput, [debateId]: false });
             fetchDebates();
@@ -135,7 +136,10 @@ const DebateBoard = () => {
             fetchDebates();
         } catch (err) {
             console.error("투표 실패:", err);
-            const msg = err.response?.data?.message || err.response?.data || "서버 오류로 투표 실패";
+            const msg =
+                err.response?.data?.message ||
+                err.response?.data ||
+                "서버 오류로 투표 실패";
             alert(typeof msg === "string" ? msg : JSON.stringify(msg));
         }
     };
@@ -146,14 +150,17 @@ const DebateBoard = () => {
 
     const handleCommentSubmit = async (debateId) => {
         const text = commentInputs[debateId];
-        if (!requireLogin()) return;  // ✅ 추가
+        if (!requireLogin()) return; // ✅ 추가
 
         if (!text || !text.trim()) return alert("댓글을 입력하세요!");
         try {
-            await axios.post(`http://192.168.0.21:8080/api/debates/${debateId}/comments`, {
-                author: currentUser?.username || "익명",
-                text,
-            });
+            await axios.post(
+                `http://192.168.0.21:8080/api/debates/${debateId}/comments`,
+                {
+                    author: currentUser?.username || "익명",
+                    text,
+                }
+            );
             setCommentInputs({ ...commentInputs, [debateId]: "" });
             fetchDebates();
         } catch (err) {
@@ -180,6 +187,7 @@ const DebateBoard = () => {
             console.error("대댓글 등록 실패:", err);
         }
     };
+
     const filteredDebates = debates.filter((d) => {
         const tabMatch =
             activeTab === "unrebutted"
@@ -190,14 +198,14 @@ const DebateBoard = () => {
 
         const categoryMatch =
             selectedCategory === "전체" || d.category === selectedCategory;
-        const searchMatch = d.title.toLowerCase().includes(searchTerm.toLowerCase());
-
+        const searchMatch = d.title
+            ?.toLowerCase()
+            .includes(searchTerm.toLowerCase());
 
         return tabMatch && categoryMatch && searchMatch;
-
     });
 
-// ✅ 2️⃣ 페이지 나누기 (슬라이스)
+    // ✅ 2️⃣ 페이지 나누기 (슬라이스)
     const indexOfLast = currentPage * itemsPerPage;
     const indexOfFirst = indexOfLast - itemsPerPage;
     const currentDebates = filteredDebates.slice(indexOfFirst, indexOfLast);
@@ -219,10 +227,7 @@ const DebateBoard = () => {
                 <div className={styles.userArea}>
                     {!currentUser ? (
                         // 로그인 안 되어 있으면 로그인 버튼만
-                        <button
-                            onClick={() => navigate("/login")}
-                            className={styles.loginBtn}
-                        >
+                        <button onClick={() => navigate("/login")} className={styles.loginBtn}>
                             로그인
                         </button>
                     ) : (
@@ -265,7 +270,6 @@ const DebateBoard = () => {
                 ✏️ 새 토론 등록
             </button>
 
-            {/* ✅ 탭 메뉴 */}
             {/* ✅ 탭 메뉴 (hover 드롭다운 포함) */}
             <div className={styles.tabContainer}>
                 {/* 🗣️ 반박해보세요 */}
@@ -296,7 +300,6 @@ const DebateBoard = () => {
                                         setSelectedCategory(cat);
                                         setActiveTab("unrebutted");
                                         setCurrentPage(1);
-
                                     }}
                                     className={`${styles.categoryItem} ${
                                         selectedCategory === cat ? styles.activeCategory : ""
@@ -308,7 +311,6 @@ const DebateBoard = () => {
                         </div>
                     )}
                 </div>
-
 
                 {/* ⚔️ 반박중 */}
                 <div
@@ -385,23 +387,16 @@ const DebateBoard = () => {
                                 >
                                     {cat}
                                 </button>
-
-
                             ))}
                         </div>
                     )}
                 </div>
             </div>
+
             {/* 🍎 사과게임 버튼 (항상 탭 옆에 고정) */}
-            <button
-                className={styles.appleButton}
-                onClick={() => navigate("/applegame")}
-            >
+            <button className={styles.appleButton} onClick={() => navigate("/applegame")}>
                 🍎 사과게임 하러가기
             </button>
-            {/* ✅ 나머지 토론/댓글 렌더링은 기존 그대로 */}
-            {/* 👇 이하 부분은 수정하지 않아도 됨 (원본 유지) */}
-            {/* ... 네가 올린 나머지 코드 그대로 둬 */}
 
             {/* 카테고리 필터 */}
             {activeTab !== "closed" && (
@@ -410,13 +405,16 @@ const DebateBoard = () => {
                         <button
                             key={cat}
                             onClick={() => setSelectedCategory(cat)}
-                            className={`${styles.categoryBtn} ${selectedCategory === cat ? styles.activeCategory : ""}`}
+                            className={`${styles.categoryBtn} ${
+                                selectedCategory === cat ? styles.activeCategory : ""
+                            }`}
                         >
                             {cat}
                         </button>
                     ))}
                 </div>
             )}
+
             {/* ✅ 토론 목록 */}
             {filteredDebates.length === 0 ? (
                 <p style={{ textAlign: "center", color: "#888", marginTop: "2rem" }}>
@@ -429,12 +427,26 @@ const DebateBoard = () => {
             ) : (
                 <div className={styles.debateList}>
                     {currentDebates.map((debate) => (
-                        <div key={debate.id} className={styles.card}>
+                        <div
+                            key={debate.id}
+                            className={`${styles.card} ${expandedDebateId === debate.id ? styles.cardExpanded : ""}`}
+                        >
                             <div className={styles.cardHeader}>
-                                <h2 className={styles.cardTitle}>{debate.title}</h2>
+                                <h2
+                                    className={styles.cardTitle}
+                                    onClick={() =>
+                                        setExpandedDebateId(expandedDebateId === debate.id ? null : debate.id)
+                                    }
+                                    style={{ cursor: "pointer" }}
+                                >
+                                    {debate.title}
+                                </h2>
                                 {currentUser?.username === debate.author && (
                                     <button
-                                        onClick={() => handleDelete(debate.id)}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleDelete(debate.id);
+                                        }}
                                         className={styles.deleteButton}
                                     >
                                         <Trash2 className="w-5 h-5" />
@@ -442,237 +454,257 @@ const DebateBoard = () => {
                                 )}
                             </div>
 
-                            <p className={styles.cardContent}>{debate.content}</p>
+                            {/* ⬇️ 제목 클릭 시에만 펼침 (본문/반박/댓글 전부) */}
+                            {expandedDebateId === debate.id && (
+                                <>
+                                    <p className={styles.cardContent}>{debate.content}</p>
 
-                            {/* ✅ 반박하기 */}
-                            {activeTab === "unrebutted" && (
-                                <div className={styles.rebuttalArea}>
-                                    {debate.author !== currentUser?.username && (
-                                        !showRebuttalInput[debate.id] ? (
-                                            <button
-                                                onClick={() =>
-                                                    setShowRebuttalInput({
-                                                        ...showRebuttalInput,
-                                                        [debate.id]: true,
-                                                    })
-                                                }
-                                                className={styles.rebuttalButton}
-                                            >
-                                                🗣️ 토론 반박하기
-                                            </button>
-                                        ) : (
-                                            <div className={styles.rebuttalForm}>
+                                    {/* ✅ 반박하기 */}
+                                    {activeTab === "unrebutted" && (
+                                        <div className={styles.rebuttalArea}>
+                                            {debate.author !== currentUser?.username &&
+                                                (!showRebuttalInput[debate.id] ? (
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setShowRebuttalInput({
+                                                                ...showRebuttalInput,
+                                                                [debate.id]: true,
+                                                            });
+                                                        }}
+                                                        className={styles.rebuttalButton}
+                                                    >
+                                                        🗣️ 토론 반박하기
+                                                    </button>
+                                                ) : (
+                                                    <div className={styles.rebuttalForm}>
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setShowRebuttalInput({
+                                                                    ...showRebuttalInput,
+                                                                    [debate.id]: false,
+                                                                });
+                                                            }}
+                                                            className={styles.rebuttalCloseBtn}
+                                                        >
+                                                            ❌
+                                                        </button>
+
+                                                        <input
+                                                            type="text"
+                                                            placeholder="반박 제목"
+                                                            value={rebuttalInputs[debate.id]?.title || ""}
+                                                            onChange={(e) =>
+                                                                setRebuttalInputs({
+                                                                    ...rebuttalInputs,
+                                                                    [debate.id]: {
+                                                                        ...rebuttalInputs[debate.id],
+                                                                        title: e.target.value,
+                                                                    },
+                                                                })
+                                                            }
+                                                            className={styles.rebuttalInput}
+                                                            onClick={(e) => e.stopPropagation()}
+                                                        />
+                                                        <textarea
+                                                            placeholder="반박 내용을 입력해주세요"
+                                                            value={rebuttalInputs[debate.id]?.content || ""}
+                                                            onChange={(e) =>
+                                                                setRebuttalInputs({
+                                                                    ...rebuttalInputs,
+                                                                    [debate.id]: {
+                                                                        ...rebuttalInputs[debate.id],
+                                                                        content: e.target.value,
+                                                                    },
+                                                                })
+                                                            }
+                                                            className={styles.rebuttalTextarea}
+                                                            onClick={(e) => e.stopPropagation()}
+                                                        />
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleRebuttalSubmit(debate.id);
+                                                            }}
+                                                            className={styles.rebuttalSubmit}
+                                                        >
+                                                            등록
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                        </div>
+                                    )}
+
+                                    {/* ✅ 반박중 (투표) */}
+                                    {activeTab === "rebutted" && (
+                                        <>
+                                            {debate.rebuttalAt && !debate.isClosed && (
+                                                <p style={{ textAlign: "right", fontWeight: 600 }}>
+                                                    🕒 {getRemainingTime(debate)}
+                                                </p>
+                                            )}
+
+                                            <div className={styles.rebuttalBox}>
+                                                <h4>🗣️ {debate.rebuttalTitle}</h4>
+                                                <p>{debate.rebuttalContent}</p>
+                                                <p className={styles.rebuttalMeta}>- {debate.rebuttalAuthor}</p>
+                                            </div>
+
+                                            <div className={styles.voteSection}>
                                                 <button
-                                                    onClick={() =>
-                                                        setShowRebuttalInput({
-                                                            ...showRebuttalInput,
-                                                            [debate.id]: false,
-                                                        })
+                                                    disabled={
+                                                        debate.isClosed ||
+                                                        currentUser?.username === debate.author ||
+                                                        currentUser?.username === debate.rebuttalAuthor
                                                     }
-                                                    className={styles.rebuttalCloseBtn}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleVote(debate.id, "author");
+                                                    }}
+                                                    className={`${styles.voteButton} ${styles.voteLeft}`}
                                                 >
-                                                    ❌
+                                                    {debate.author} ({debate.authorVotes})
                                                 </button>
 
+                                                <span className={styles.vs}>VS</span>
+
+                                                <button
+                                                    disabled={
+                                                        debate.isClosed ||
+                                                        currentUser?.username === debate.author ||
+                                                        currentUser?.username === debate.rebuttalAuthor
+                                                    }
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleVote(debate.id, "rebuttal");
+                                                    }}
+                                                    className={`${styles.voteButton} ${styles.voteRight}`}
+                                                >
+                                                    {debate.rebuttalAuthor} ({debate.rebuttalVotes})
+                                                </button>
+                                            </div>
+                                        </>
+                                    )}
+
+                                    {/* ✅ 마감된 토론 */}
+                                    {activeTab === "closed" && (
+                                        <>
+                                            <div className={styles.rebuttalBox}>
+                                                <h4>🗣️ {debate.rebuttalTitle}</h4>
+                                                <p>{debate.rebuttalContent}</p>
+                                                <p className={styles.rebuttalMeta}>- {debate.rebuttalAuthor}</p>
+                                            </div>
+
+                                            <div className={styles.closedSection}>
+                                                <h4>🕛 마감된 토론</h4>
+
+                                                {/* ✅ draw일 때 처리 추가 */}
+                                                {debate.winner === "draw" ? (
+                                                    <p>🤝 무승부입니다!</p>
+                                                ) : (
+                                                    <p>
+                                                        🏆 승자:{" "}
+                                                        {debate.winner === "author"
+                                                            ? debate.author
+                                                            : debate.rebuttalAuthor}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </>
+                                    )}
+
+                                    {/* ✅ 댓글 */}
+                                    <div className={styles.commentSection}>
+                                        <h3 className={styles.commentTitle}>
+                                            <MessageSquare className="w-4 h-4" /> 댓글 (
+                                            {debate.comments?.length || 0})
+                                        </h3>
+
+                                        <div className={styles.commentList}>
+                                            {debate.comments?.map((c) => (
+                                                <div key={c.id} className={styles.commentItem}>
+                                                    <span className={styles.commentAuthor}>{c.author}:</span>{" "}
+                                                    {c.text}
+
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setShowReplyInput({
+                                                                ...showReplyInput,
+                                                                [c.id]: !showReplyInput[c.id],
+                                                            });
+                                                        }}
+                                                        className={styles.replyButton}
+                                                    >
+                                                        💬 답글
+                                                    </button>
+
+                                                    {showReplyInput[c.id] && (
+                                                        <div
+                                                            className={styles.replyInputGroup}
+                                                            onClick={(e) => e.stopPropagation()}
+                                                        >
+                                                            <input
+                                                                type="text"
+                                                                placeholder="답글을 입력하세요..."
+                                                                value={replyInputs[c.id] || ""}
+                                                                onChange={(e) =>
+                                                                    setReplyInputs({
+                                                                        ...replyInputs,
+                                                                        [c.id]: e.target.value,
+                                                                    })
+                                                                }
+                                                                className={styles.replyInput}
+                                                            />
+                                                            <button
+                                                                onClick={() => handleReplySubmit(debate.id, c.id)}
+                                                                className={styles.replySubmit}
+                                                            >
+                                                                등록
+                                                            </button>
+                                                        </div>
+                                                    )}
+
+                                                    {c.replies?.map((r) => (
+                                                        <div key={r.id} className={styles.replyItem}>
+                                                            <span className={styles.replyAuthor}>↳ {r.author}:</span>{" "}
+                                                            {r.text}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        {currentUser && (
+                                            <div
+                                                className={styles.commentInputGroup}
+                                                onClick={(e) => e.stopPropagation()}
+                                            >
                                                 <input
-                                                    type="text"
-                                                    placeholder="반박 제목"
-                                                    value={rebuttalInputs[debate.id]?.title || ""}
+                                                    value={commentInputs[debate.id] || ""}
                                                     onChange={(e) =>
-                                                        setRebuttalInputs({
-                                                            ...rebuttalInputs,
-                                                            [debate.id]: {
-                                                                ...rebuttalInputs[debate.id],
-                                                                title: e.target.value,
-                                                            },
-                                                        })
+                                                        handleCommentChange(debate.id, e.target.value)
                                                     }
-                                                    className={styles.rebuttalInput}
-                                                />
-                                                <textarea
-                                                    placeholder="반박 내용을 입력해주세요"
-                                                    value={rebuttalInputs[debate.id]?.content || ""}
-                                                    onChange={(e) =>
-                                                        setRebuttalInputs({
-                                                            ...rebuttalInputs,
-                                                            [debate.id]: {
-                                                                ...rebuttalInputs[debate.id],
-                                                                content: e.target.value,
-                                                            },
-                                                        })
-                                                    }
-                                                    className={styles.rebuttalTextarea}
+                                                    placeholder="댓글을 입력하세요..."
+                                                    className={styles.commentInput}
                                                 />
                                                 <button
-                                                    onClick={() => handleRebuttalSubmit(debate.id)}
-                                                    className={styles.rebuttalSubmit}
+                                                    onClick={() => handleCommentSubmit(debate.id)}
+                                                    className={styles.commentSubmit}
                                                 >
                                                     등록
                                                 </button>
                                             </div>
-                                        )
-                                    )}
-                                </div>
-                            )}
-
-                            {/* ✅ 반박중 (투표) */}
-                            {activeTab === "rebutted" && (
-                                <>
-                                    {debate.rebuttalAt && !debate.isClosed && (
-                                        <p style={{ textAlign: "right", fontWeight: 600 }}>
-                                            🕒 {getRemainingTime(debate)}
-                                        </p>
-                                    )}
-
-                                    <div className={styles.rebuttalBox}>
-                                        <h4>🗣️ {debate.rebuttalTitle}</h4>
-                                        <p>{debate.rebuttalContent}</p>
-                                        <p className={styles.rebuttalMeta}>- {debate.rebuttalAuthor}</p>
-                                    </div>
-
-                                    <div className={styles.voteSection}>
-                                        <button
-                                            disabled={
-                                                debate.isClosed ||
-                                                currentUser?.username === debate.author ||
-                                                currentUser?.username === debate.rebuttalAuthor
-                                            }
-                                            onClick={() => handleVote(debate.id, "author")}
-                                            className={styles.voteButton}
-                                        >
-                                            {debate.author} ({debate.authorVotes})
-                                        </button>
-
-                                        <span className={styles.vs}>VS</span>
-
-                                        <button
-                                            disabled={
-                                                debate.isClosed ||
-                                                currentUser?.username === debate.author ||
-                                                currentUser?.username === debate.rebuttalAuthor
-                                            }
-                                            onClick={() => handleVote(debate.id, "rebuttal")}
-                                            className={styles.voteButton}
-                                        >
-                                            {debate.rebuttalAuthor} ({debate.rebuttalVotes})
-                                        </button>
-                                    </div>
-                                </>
-                            )}
-
-                            {/* ✅ 마감된 토론 */}
-                            {activeTab === "closed" && (
-                                <>
-                                    <div className={styles.rebuttalBox}>
-                                        <h4>🗣️ {debate.rebuttalTitle}</h4>
-                                        <p>{debate.rebuttalContent}</p>
-                                        <p className={styles.rebuttalMeta}>- {debate.rebuttalAuthor}</p>
-                                    </div>
-
-                                    <div className={styles.closedSection}>
-                                        <h4>🕛 마감된 토론</h4>
-
-                                        {/* ✅ draw일 때 처리 추가 */}
-                                        {debate.winner === "draw" ? (
-                                            <p>🤝 무승부입니다!</p>
-                                        ) : (
-                                            <p>
-                                                🏆 승자:{" "}
-                                                {debate.winner === "author"
-                                                    ? debate.author
-                                                    : debate.rebuttalAuthor}
-                                            </p>
                                         )}
                                     </div>
                                 </>
                             )}
-
-                            {/* ✅ 댓글 */}
-                            <div className={styles.commentSection}>
-                                <h3 className={styles.commentTitle}>
-                                    <MessageSquare className="w-4 h-4" /> 댓글 (
-                                    {debate.comments?.length || 0})
-                                </h3>
-
-                                <div className={styles.commentList}>
-                                    {debate.comments?.map((c) => (
-                                        <div key={c.id} className={styles.commentItem}>
-                                            <span className={styles.commentAuthor}>{c.author}:</span>{" "}
-                                            {c.text}
-
-                                            <button
-                                                onClick={() =>
-                                                    setShowReplyInput({
-                                                        ...showReplyInput,
-                                                        [c.id]: !showReplyInput[c.id],
-                                                    })
-                                                }
-                                                className={styles.replyButton}
-                                            >
-                                                💬 답글
-                                            </button>
-
-                                            {showReplyInput[c.id] && (
-                                                <div className={styles.replyInputGroup}>
-                                                    <input
-                                                        type="text"
-                                                        placeholder="답글을 입력하세요..."
-                                                        value={replyInputs[c.id] || ""}
-                                                        onChange={(e) =>
-                                                            setReplyInputs({
-                                                                ...replyInputs,
-                                                                [c.id]: e.target.value,
-                                                            })
-                                                        }
-                                                        className={styles.replyInput}
-                                                    />
-                                                    <button
-                                                        onClick={() => handleReplySubmit(debate.id, c.id)}
-                                                        className={styles.replySubmit}
-                                                    >
-                                                        등록
-                                                    </button>
-                                                </div>
-                                            )}
-
-                                            {c.replies?.map((r) => (
-                                                <div key={r.id} className={styles.replyItem}>
-                                                    <span className={styles.replyAuthor}>
-                                                        ↳ {r.author}:
-                                                    </span>{" "}
-                                                    {r.text}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    ))}
-                                </div>
-
-                                {currentUser && (
-                                    <div className={styles.commentInputGroup}>
-                                        <input
-                                            value={commentInputs[debate.id] || ""}
-                                            onChange={(e) =>
-                                                handleCommentChange(debate.id, e.target.value)
-                                            }
-                                            placeholder="댓글을 입력하세요..."
-                                            className={styles.commentInput}
-                                        />
-                                        <button
-                                            onClick={() => handleCommentSubmit(debate.id)}
-                                            className={styles.commentSubmit}
-                                        >
-                                            등록
-                                        </button>
-
-                                    </div>
-                                )}
-                            </div>
                         </div>
                     ))}
-
                 </div>
-
             )}
+
             {/* ✅ 페이지네이션 */}
             <div className={styles.pagination}>
                 {Array.from(
@@ -691,7 +723,6 @@ const DebateBoard = () => {
                 ))}
             </div>
         </div>
-
     );
 };
 

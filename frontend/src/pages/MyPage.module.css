@@ -165,4 +165,20 @@ button {
     background-color: #f0f0f0;
     color: #888;
 }
+.debateHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.debateContent {
+    background: #fafafa;
+    border-radius: 10px;
+    padding: 10px 15px;
+    margin-top: 8px;
+    color: #333;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
 
