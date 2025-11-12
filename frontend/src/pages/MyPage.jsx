@@ -35,14 +35,34 @@ const MyPage = () => {
         try {
             const res = await axios.get("/api/debates");
             const filtered = res.data.filter((d) => d.author === username);
+
+            // ✅ 상태 우선순위 정의
+            const getStatusRank = (debate) => {
+                if (debate.isClosed) return 2; // 마감된 토론
+                if (debate.rebuttalTitle) return 1; // 반박중
+                return 0; // 반박해보세요
+            };
+
+            // ✅ 정렬: 반박해보세요 → 반박중 → 마감 + 최신순
             filtered.sort((a, b) => {
-                if (a.isClosed === b.isClosed) return b.id - a.id;
-                return a.isClosed ? 1 : -1;
+                const diff = getStatusRank(a) - getStatusRank(b);
+                if (diff !== 0) return diff; // 상태순 우선
+                return new Date(b.createdAt) - new Date(a.createdAt); // 같은 상태면 최신순
             });
+
             setMyDebates(filtered);
         } catch (err) {
             console.error("❌ 내 토론 불러오기 실패:", err);
         }
+    };
+
+
+
+    /** ✅ 상태 색상 반환 */
+    const getStatusColor = (debate) => {
+        if (debate.isClosed) return "#888"; // 회색
+        if (debate.rebuttalTitle) return "#e67e22"; // 주황
+        return "#27ae60"; // 초록
     };
 
     /** ✅ 이메일 인증번호 전송 */
@@ -82,7 +102,12 @@ const MyPage = () => {
             console.error("인증 실패:", err);
         }
     };
-
+// ✅ 토론 상태 구분 함수
+    const getDebateStatus = (debate) => {
+        if (debate.isClosed) return "마감된 토론";
+        if (debate.rebuttalTitle) return "반박중";
+        return "반박해보세요";
+    };
     /** ✅ 회원정보 수정 */
     const handleUpdate = async () => {
         if (!editForm.nickname.trim()) return alert("닉네임을 입력해주세요.");
@@ -239,9 +264,31 @@ const MyPage = () => {
                                         className={styles.debateHeader}
                                         onClick={() => toggleExpand(debate.id)}
                                     >
-                                        <h4>{debate.title}</h4>
+                                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
+                                            {/* 제목 + 상태표시 */}
+                                            <div>
+                                                <h4 style={{ display: "inline", marginRight: "8px" }}>{debate.title}</h4>
+                                                <span
+                                                    style={{
+                                                        color: getStatusColor(debate),
+                                                        fontSize: "0.9rem",
+                                                        fontWeight: "bold",
+                                                    }}
+                                                >
+                                     [{getDebateStatus(debate)}]
+                                  </span>
+                                            </div>
+
+                                            {/* 작성일 표시 */}
+                                            <div style={{ fontSize: "0.8rem", color: "#999" }}>
+                                                🕓 {new Date(debate.createdAt).toLocaleString("ko-KR")}
+                                            </div>
+                                        </div>
+
+                                        {/* 펼치기/닫기 화살표 */}
                                         <span>{expandedId === debate.id ? "▲" : "▼"}</span>
                                     </div>
+
 
                                     {expandedId === debate.id && (
                                         <div className={styles.debateContent}>
