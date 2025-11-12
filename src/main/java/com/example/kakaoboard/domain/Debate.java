@@ -1,5 +1,6 @@
 package com.example.kakaoboard.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
@@ -9,6 +10,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -25,14 +27,15 @@ public class Debate {
     private String author;
 
     private String winner; // "author", "rebuttal", or "draw"
+
     @Column(nullable = false)
     private String category; // ✅ 게임, 사회, 연애, 스포츠, 기타
+
     // ✅ 반박 정보
     private String rebuttalTitle;
     private String rebuttalContent;
     private String rebuttalAuthor;
     private LocalDateTime rebuttalAt; // 반박 등록 시각
-
 
     // ✅ 투표 관련
     private int authorVotes = 0;
@@ -58,9 +61,16 @@ public class Debate {
     private int likes = 0;
     private int dislikes = 0;
 
-    @JsonManagedReference("debate-comments") // 👈 이름 부여 (Comment와 쌍)
+    // ✅ 댓글 (순환참조 방지용)
     @OneToMany(mappedBy = "debate", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference(value = "debate-comments") // ✅ ← 이게 올바른 위치
+
     private List<Comment> comments = new ArrayList<>();
+
+    // ✅ 대댓글 (Reply)
+    @OneToMany(mappedBy = "debate", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference(value = "debate-replies")
+    private List<Reply> replies = new ArrayList<>();
 
     @PrePersist
     public void prePersist() {

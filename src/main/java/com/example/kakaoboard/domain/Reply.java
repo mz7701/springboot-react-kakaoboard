@@ -21,15 +21,17 @@ public class Reply {
     private String text;
     private LocalDateTime createdAt;
 
+    /** ✅ Debate 연결 */
     @JsonBackReference("debate-replies")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "debate_id")
     private Debate debate;
 
+    /** ✅ 부모 댓글 연결 (Comment와 매핑) */
     @JsonBackReference("comment-replies")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "comment_id")
-    private Comment parent;
+    private Comment parentComment;
 
     @PrePersist
     public void prePersist() {

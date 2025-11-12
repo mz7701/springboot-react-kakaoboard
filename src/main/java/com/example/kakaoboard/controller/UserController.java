@@ -87,7 +87,6 @@ public class UserController {
             return ResponseEntity.internalServerError().body("메일 전송 실패: " + e.getMessage());
         }
     }
-
     /** ✅ 인증번호 검증 */
     @PostMapping("/verify-code")
     public ResponseEntity<?> verifyResetCode(@RequestParam String email, @RequestParam String code) {

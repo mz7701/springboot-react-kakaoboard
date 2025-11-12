@@ -9,29 +9,43 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Comment {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String author;
     private String text;
-    private LocalDateTime createdAt;
+    private String ipAddress;
+    private LocalDateTime createdAt = LocalDateTime.now();
 
-    // Debate ↔ Comment
-    @JsonBackReference("debate-comments")
+    /** ✅ Debate와 연결 */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "debate_id")
+    @JsonBackReference("debate-comments")
     private Debate debate;
 
-    // ✅ Comment ↔ Reply (대댓글은 별도 엔티티)
-    @JsonManagedReference("comment-replies")
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Reply> replies = new ArrayList<>();
+    /** ✅ 부모 댓글 (자기 참조) */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    @JsonBackReference("comment-replies")
+    private Comment parent;
 
-    @PrePersist
-    public void prePersist() {
-        this.createdAt = LocalDateTime.now();
+    /** ✅ 자식 댓글 (무한 대댓글 구조) */
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("id ASC")
+    @JsonManagedReference("comment-replies")
+    private List<Comment> replies = new ArrayList<>();
+
+    /** ✅ 편의 메서드 */
+    public void addReply(Comment reply) {
+        replies.add(reply);
+        reply.setParent(this);
     }
 }

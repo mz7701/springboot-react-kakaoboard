@@ -5,7 +5,7 @@ import styles from "./CreateDebatePage.module.css";
 
 // ✅ axios 기본 설정 (같은 네트워크에서 접근 가능하도록 IP 기반)
 axios.defaults.baseURL = "http://192.168.0.21:8080"; // ⚠️ 본인 서버 IP로 변경
-axios.defaults.headers.post["Content-Type"] = "application/json";
+
 
 const CreateDebatePage = () => {
     const [title, setTitle] = useState("");
@@ -34,12 +34,18 @@ const CreateDebatePage = () => {
 
         setLoading(true);
         try {
-            await axios.post("/api/debates", {
-                title,
-                content,
-                author: currentUser.username,
-                category,
-            });
+            await axios.post(
+                "/api/debates",
+                {
+                    title,
+                    content,
+                    author: currentUser.username,
+                    category,
+                },
+                {
+                    headers: { "Content-Type": "application/json; charset=UTF-8" },
+                }
+            );
 
             alert("✅ 토론이 성공적으로 등록되었습니다!");
             if (window.confirm("내가 쓴 글로 이동하시겠습니까?")) {

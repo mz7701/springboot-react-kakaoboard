@@ -11,9 +11,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.util.stream.Collectors;
+import java.util.*;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
+import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 @RequiredArgsConstructor
@@ -23,17 +24,31 @@ public class DebateService {
     private final CommentRepository commentRepository;
     private final ReplyRepository replyRepository;
 
-    /** ✅ 모든 토론 조회 */
+    // ✅ 공통 IP 추출 유틸 (여기로 옮기기)
+    private String getClientIp(HttpServletRequest request) {
+        String ip = request.getHeader("X-Forwarded-For");
+        if (ip == null || ip.isEmpty()) ip = request.getRemoteAddr();
+        if (ip.contains(",")) ip = ip.split(",")[0].trim();
+        if ("0:0:0:0:0:0:0:1".equals(ip)) ip = "127.0.0.1";
+        return ip;
+    }
+    /**
+     * ✅ 모든 토론 조회
+     */
     public List<Debate> findAll() {
         return debateRepository.findAll();
     }
 
-    /** ✅ 새 토론 생성 */
+    /**
+     * ✅ 새 토론 생성
+     */
     public Debate createDebate(Debate debate) {
         return debateRepository.save(debate);
     }
 
-    /** ✅ 좋아요 */
+    /**
+     * ✅ 좋아요
+     */
     public Debate like(Long id) {
         return debateRepository.findById(id).map(d -> {
             d.setLikes(d.getLikes() + 1);
@@ -41,7 +56,9 @@ public class DebateService {
         }).orElse(null);
     }
 
-    /** ✅ 싫어요 */
+    /**
+     * ✅ 싫어요
+     */
     public Debate dislike(Long id) {
         return debateRepository.findById(id).map(d -> {
             d.setDislikes(d.getDislikes() + 1);
@@ -49,31 +66,56 @@ public class DebateService {
         }).orElse(null);
     }
 
-    /** ✅ 댓글 추가 */
-    public Comment addComment(Long debateId, Comment comment) {
+    /**
+     * ✅ 댓글 추가
+     */
+    public Comment addComment(Long debateId, Comment comment, HttpServletRequest request) {
         Debate debate = debateRepository.findById(debateId)
-                .orElseThrow(() -> new RuntimeException("Debate not found"));
+                .orElseThrow(() -> new RuntimeException("토론을 찾을 수 없습니다."));
         comment.setDebate(debate);
+        comment.setCreatedAt(LocalDateTime.now());
+
+
+
+        comment.setIpAddress(getClientIp(request));
+
+
+
         return commentRepository.save(comment);
     }
 
-    /** ✅ 대댓글 추가 (별도 Reply 엔티티로 저장) */
-    public Reply addReply(Long debateId, Long parentId, Reply reply) {
+    /** ✅ 대댓글 추가 (이제 Comment 기반으로 처리) */
+    /**
+     * ✅ 대댓글 추가 (IP까지 저장)
+     */
+    public Comment addReply(Long debateId, Long parentId, Comment reply, HttpServletRequest request) {
         Debate debate = debateRepository.findById(debateId)
-                .orElseThrow(() -> new RuntimeException("Debate not found"));
+                .orElseThrow(() -> new RuntimeException("토론을 찾을 수 없습니다."));
+
         Comment parent = commentRepository.findById(parentId)
-                .orElseThrow(() -> new RuntimeException("Parent comment not found"));
+                .orElseThrow(() -> new RuntimeException("부모 댓글을 찾을 수 없습니다."));
 
         reply.setDebate(debate);
         reply.setParent(parent);
+        reply.setCreatedAt(LocalDateTime.now());
 
-        return replyRepository.save(reply);
+
+        reply.setIpAddress(getClientIp(request));
+
+
+        return commentRepository.save(reply);
     }
 
-    /** ✅ 토론 삭제 */
+    /**
+     * ✅ 토론 삭제
+     */
     public void deleteById(Long id) {
         debateRepository.deleteById(id);
     }
+
+    /**
+     * ✅ 승자 계산
+     */
     public void updateWinner(Debate debate) {
         if (debate.getAuthorVotes() > debate.getRebuttalVotes()) {
             debate.setWinner("author");
@@ -84,15 +126,17 @@ public class DebateService {
         }
         debateRepository.save(debate);
     }
-    /** ✅ 자동 마감 기능 1분마다 검사) */
-    @Scheduled(fixedRate = 60000) // 60초마다 검사
+
+    /**
+     * ✅ 자동 마감 기능 (1분마다 검사)
+     */
+    @Scheduled(fixedRate = 60000)
     public void closeExpiredDebates() {
         List<Debate> debates = debateRepository.findAll();
         LocalDateTime now = LocalDateTime.now();
 
         for (Debate d : debates) {
             if (d.getRebuttalAt() != null && !d.isClosed()) {
-                // ✅ 반박 후 12시간 지나면 자동 마감
                 if (d.getRebuttalAt().plusHours(12).isBefore(now)) {
                     d.setClosed(true);
                     d.setClosedAt(now);
@@ -103,30 +147,27 @@ public class DebateService {
         }
     }
 
-    /** ✅ 투표 기능 */
-    /** ✅ 제3자 1회 투표 전용 기능 */
-    /** ✅ 제3자 여러명 투표 가능 / 단, 아이디당 1회 제한 */
+    /**
+     * ✅ 제3자 투표 기능
+     */
     public ResponseEntity<?> vote(Long id, Map<String, String> body) {
-        String type = body.get("type");   // "author" 또는 "rebuttal"
-        String voter = body.get("voter"); // 로그인한 username
+        String type = body.get("type");
+        String voter = body.get("voter");
 
         Debate debate = debateRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("토론을 찾을 수 없습니다."));
 
-        // ✅ 1️⃣ 본인(A,B)은 투표 불가
         if (voter.equals(debate.getAuthor()) || voter.equals(debate.getRebuttalAuthor())) {
             return ResponseEntity.badRequest().body("본인은 투표할 수 없습니다!");
         }
 
-        // ✅ 2️⃣ 제3자(C,D,E...)는 투표 가능하되, 아이디당 1회 제한
         if (debate.getVoters() == null) {
-            debate.setVoters(new java.util.ArrayList<>());
+            debate.setVoters(new ArrayList<>());
         }
         if (debate.getVoters().contains(voter)) {
             return ResponseEntity.badRequest().body("이미 이 토론에 투표하셨습니다!");
         }
 
-        // ✅ 3️⃣ 투표 반영
         switch (type) {
             case "author" -> debate.setAuthorVotes(debate.getAuthorVotes() + 1);
             case "rebuttal" -> debate.setRebuttalVotes(debate.getRebuttalVotes() + 1);
@@ -135,11 +176,50 @@ public class DebateService {
             }
         }
 
-        // ✅ 4️⃣ 투표자 저장 (아이디 기록)
         debate.getVoters().add(voter);
         debateRepository.save(debate);
 
         return ResponseEntity.ok("✅ 투표 완료!");
+    }
+
+    // DebateService.java 안에 추가
+    public Comment addReplyAsComment(Long debateId, Long parentId, Comment reply) {
+        Debate debate = debateRepository.findById(debateId)
+                .orElseThrow(() -> new RuntimeException("토론을 찾을 수 없습니다."));
+        Comment parent = commentRepository.findById(parentId)
+                .orElseThrow(() -> new RuntimeException("부모 댓글을 찾을 수 없습니다."));
+
+        reply.setDebate(debate);
+        reply.setParent(parent);
+        reply.setCreatedAt(LocalDateTime.now());
+        parent.addReply(reply); // ✅ 부모 댓글에 직접 추가
+        return commentRepository.save(reply);
+    }
+
+    /** ✅ 댓글 트리 (중복 없는 무한 대댓글 완전 지원) */
+    public List<Comment> getCommentTree(Long debateId) {
+        // 1️⃣ 부모 댓글만 가져옴
+        List<Comment> roots = commentRepository.findByDebateIdAndParentIsNull(debateId);
+
+        // 2️⃣ 각각의 부모 댓글에 하위 댓글 재귀적으로 채우기
+        for (Comment root : roots) {
+            fillRepliesRecursively(root);
+        }
+
+        // 3️⃣ 시간 순 정렬
+        roots.sort(Comparator.comparing(Comment::getCreatedAt));
+        return roots;
+    }
+
+    /** ✅ 재귀적으로 모든 하위 댓글 로딩 */
+    private void fillRepliesRecursively(Comment comment) {
+        List<Comment> replies = commentRepository.findByParentId(comment.getId());
+        replies.sort(Comparator.comparing(Comment::getCreatedAt));
+        comment.setReplies(replies);
+
+        for (Comment reply : replies) {
+            fillRepliesRecursively(reply);
+        }
     }
 
 }

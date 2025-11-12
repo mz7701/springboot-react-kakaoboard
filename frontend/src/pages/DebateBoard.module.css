@@ -567,3 +567,46 @@
     transform: scale(1.05);
     background: linear-gradient(135deg, #ff4040, #ff1e1e);
 }
+
+.commentIp {
+    color: #888;
+    font-size: 0.85rem;
+    margin-left: 4px;
+}
+
+.commentAuthor:hover {
+    text-decoration: underline;
+}
+.commentItem {
+    font-size: 14px;
+    line-height: 1.45;
+    margin-top: 8px;
+}
+.commentAuthor { font-weight: 600; }
+.commentIp { color: #8a8a8a; margin-left: 6px; }
+.commentDate { color: #aaa; margin-left: 6px; font-size: 12px; }
+.replyButton {
+    margin-left: 10px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+.replyInputGroup {
+    display: flex;
+    gap: 6px;
+    margin-top: 6px;
+}
+.replyInput {
+    flex: 1;
+    padding: 6px 8px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+}
+.replySubmit {
+    padding: 6px 10px;
+    border: 1px solid #ddd;
+    background: #f7f7f7;
+    border-radius: 6px;
+    cursor: pointer;
+}
+

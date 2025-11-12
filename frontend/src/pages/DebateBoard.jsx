@@ -1,10 +1,19 @@
+axios.defaults.baseURL = "http://192.168.0.21:8080";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Trash2, MessageSquare } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import styles from "./DebateBoard.module.css";
 
-axios.defaults.headers.post["Content-Type"] = "application/json";
+function stringToColor(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return `hsl(${Math.abs(hash) % 360}, 70%, 50%)`;
+}
+
+
 
 const DebateBoard = () => {
     const [debates, setDebates] = useState([]);
@@ -27,7 +36,7 @@ const DebateBoard = () => {
     const itemsPerPage = 10; // 페이지당 10개 (원하면 나중에 UI로 변경 가능)
     const [searchTerm, setSearchTerm] = useState("");
     const [currentTab, setCurrentTab] = useState("all");
-
+    const [comments, setComments] = useState({});
     // ✅ 제목 클릭 시 펼침/접힘 토글용 (추가)
     const [expandedDebateId, setExpandedDebateId] = useState(null);
 
@@ -35,6 +44,14 @@ const DebateBoard = () => {
         fetchDebates();
     }, []);
 
+    const fetchComments = async (debateId) => {
+        try {
+            const res = await axios.get(`/api/debates/${debateId}/comments/tree`);
+            setComments((prev) => ({ ...prev, [debateId]: res.data }));
+        } catch (err) {
+            console.error("댓글 불러오기 실패:", err);
+        }
+    };
     // ✅ 남은시간 계산 함수
     const getRemainingTime = (debate) => {
         if (!debate.rebuttalAt || debate.isClosed) return null;
@@ -69,7 +86,10 @@ const DebateBoard = () => {
 
         // 3초마다 주기적으로 갱신
         const interval = setInterval(() => {
-            fetchDebates(false); // 👈 탭 상태 변경 방지용 인자
+            fetchDebates(false);
+            if (expandedDebateId) {
+                fetchComments(expandedDebateId); // ✅ 펼쳐진 카드의 댓글 트리도 최신화
+            }// 👈 탭 상태 변경 방지용 인자
         }, 3000);
 
         return () => clearInterval(interval);
@@ -77,7 +97,7 @@ const DebateBoard = () => {
 
     const fetchDebates = async (shouldAutoSwitch = true) => {
         try {
-            const res = await axios.get("http://192.168.0.21:8080/api/debates");
+            const res = await axios.get("/api/debates");
             const data = Array.isArray(res.data) ? res.data.reverse() : [];
             setDebates(data);
 
@@ -94,7 +114,7 @@ const DebateBoard = () => {
     const handleDelete = async (id) => {
         if (!window.confirm("정말 삭제하시겠습니까?")) return;
         try {
-            await axios.delete(`http://192.168.0.21:8080/api/debates/${id}`);
+            await axios.delete(`/api/debates/${id}`);
             alert("🗑️ 삭제되었습니다.");
             fetchDebates();
         } catch (err) {
@@ -109,14 +129,11 @@ const DebateBoard = () => {
         if (!input?.title || !input?.content) return alert("제목과 내용을 입력하세요!");
 
         try {
-            await axios.post(
-                `http://192.168.0.21:8080/api/debates/${debateId}/rebuttal`,
-                {
-                    title: input.title,
-                    content: input.content,
-                    author: currentUser?.username || "익명",
-                }
-            );
+            await axios.post(`/api/debates/${debateId}/rebuttal`, {
+                title: input.title,
+                content: input.content,
+                author: currentUser?.username || "익명",
+            });
             alert("반박이 등록되었습니다!");
             setShowRebuttalInput({ ...showRebuttalInput, [debateId]: false });
             fetchDebates();
@@ -128,7 +145,7 @@ const DebateBoard = () => {
     const handleVote = async (debateId, type) => {
         if (!requireLogin()) return;
         try {
-            await axios.post(`http://192.168.0.21:8080/api/debates/${debateId}/vote`, {
+            await axios.post(`/api/debates/${debateId}/vote`, {
                 type,
                 voter: currentUser?.username,
             });
@@ -154,14 +171,12 @@ const DebateBoard = () => {
 
         if (!text || !text.trim()) return alert("댓글을 입력하세요!");
         try {
-            await axios.post(
-                `http://192.168.0.21:8080/api/debates/${debateId}/comments`,
-                {
-                    author: currentUser?.username || "익명",
-                    text,
-                }
-            );
+            await axios.post(`/api/debates/${debateId}/comments`, {
+                author: currentUser?.username || "익명",
+                text,
+            });
             setCommentInputs({ ...commentInputs, [debateId]: "" });
+            await fetchComments(debateId);   // ✅ 등록 직후 트리 갱신
             fetchDebates();
         } catch (err) {
             console.error("댓글 등록 실패:", err);
@@ -174,14 +189,12 @@ const DebateBoard = () => {
         if (!text || !text.trim()) return alert("대댓글을 입력하세요!");
 
         try {
-            await axios.post(
-                `http://192.168.0.21:8080/api/debates/${debateId}/comments/${parentId}/reply`,
-                {
-                    author: currentUser?.username || "익명",
-                    text,
-                }
-            );
+            await axios.post(`/api/debates/${debateId}/comments/${parentId}/reply`, {
+                author: currentUser?.username || "익명",
+                text,
+            });
             setReplyInputs({ ...replyInputs, [parentId]: "" });
+            await fetchComments(debateId);   // ✅ 등록 직후 트리 갱신
             await fetchDebates();
         } catch (err) {
             console.error("대댓글 등록 실패:", err);
@@ -209,6 +222,99 @@ const DebateBoard = () => {
     const indexOfLast = currentPage * itemsPerPage;
     const indexOfFirst = indexOfLast - itemsPerPage;
     const currentDebates = filteredDebates.slice(indexOfFirst, indexOfLast);
+
+    // ✅ 무한 대댓글 + 공개 IP 표시 + 중복 방지
+    const renderComments = (debateId, comments, depth = 0) => {
+        if (!Array.isArray(comments) || comments.length === 0) return null;
+
+        // 중복 댓글 방지 (id 기준)
+        const uniqueComments = Array.from(
+            new Map(comments.map((c) => [c.id, c])).values()
+        );
+
+        return uniqueComments.map((c) => (
+            <div
+                key={c.id}
+                className={styles.commentItem}
+                style={{
+                    marginLeft: depth * 20,
+                    borderLeft: depth > 0 ? "2px solid #ccc" : "none",
+                    paddingLeft: 8,
+                    marginTop: 6,
+                }}
+            >
+      <span
+          className={styles.commentAuthor}
+          onClick={(e) => {
+              e.stopPropagation();
+              setShowReplyInput({ ...showReplyInput, [c.id]: true });
+              setReplyInputs({ ...replyInputs, [c.id]: `@${c.author} ` });
+          }}
+          style={{
+              cursor: "pointer",
+              color: stringToColor(c.author || "익명"),
+              fontWeight: 600,
+          }}
+      >
+        {depth > 0 ? "↳ " : ""}
+          {c.author}
+      </span>
+
+                {/* ✅ 공개 IP 그대로 표시 */}
+                <span className={styles.commentIp}>
+        {" "}
+                    ({c.ipAddress || "IP 정보 없음"})
+      </span>
+
+                {/* 날짜 표시 */}
+                {c.createdAt && (
+                    <span className={styles.commentDate}>
+          {" "}
+                        · {new Date(c.createdAt).toLocaleString()}
+        </span>
+                )}
+
+                : {c.text}
+
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        setShowReplyInput((prev) => ({ ...prev, [c.id]: !prev[c.id] }));
+                    }}
+                    className={styles.replyButton}
+                >
+                    💬 답글
+                </button>
+
+                {showReplyInput[c.id] && (
+                    <div className={styles.replyInputGroup} onClick={(e) => e.stopPropagation()}>
+                        <input
+                            type="text"
+                            placeholder="답글을 입력하세요..."
+                            value={replyInputs[c.id] || ""}
+                            onChange={(e) =>
+                                setReplyInputs({
+                                    ...replyInputs,
+                                    [c.id]: e.target.value,
+                                })
+                            }
+                            className={styles.replyInput}
+                        />
+                        <button
+                            onClick={() => handleReplySubmit(debateId, c.id)}
+                            className={styles.replySubmit}
+                        >
+                            등록
+                        </button>
+                    </div>
+                )}
+
+                {Array.isArray(c.replies) && c.replies.length > 0 &&
+                    renderComments(debateId, c.replies, depth + 1)}
+            </div>
+        ));
+    };
+
 
     return (
         <div className={styles.container}>
@@ -293,9 +399,10 @@ const DebateBoard = () => {
 
                     {hoveredTab === "unrebutted" && (
                         <div className={styles.categoryDropdown}>
-                            {["게임", "사회", "연애", "스포츠", "기타"].map((cat) => (
+                            {["게임", "사회", "연애", "스포츠", "기타"].map((cat, index) => (
                                 <button
-                                    key={cat}
+                                    key={`unrebutted-${cat}-${index}`} // ✅ key 고유값 추가
+
                                     onClick={() => {
                                         setSelectedCategory(cat);
                                         setActiveTab("unrebutted");
@@ -333,9 +440,9 @@ const DebateBoard = () => {
 
                     {hoveredTab === "rebutted" && (
                         <div className={styles.categoryDropdown}>
-                            {["게임", "사회", "연애", "스포츠", "기타"].map((cat) => (
+                            {["게임", "사회", "연애", "스포츠", "기타"].map((cat,index) => (
                                 <button
-                                    key={cat}
+                                    key={`rebutted-${cat}-${index}`} // ✅ key 고유값 추가
                                     onClick={() => {
                                         setSelectedCategory(cat);
                                         setActiveTab("rebutted");
@@ -373,9 +480,9 @@ const DebateBoard = () => {
 
                     {hoveredTab === "closed" && (
                         <div className={styles.categoryDropdown}>
-                            {["게임", "사회", "연애", "스포츠", "기타"].map((cat) => (
+                            {["게임", "사회", "연애", "스포츠", "기타"].map((cat,index) => (
                                 <button
-                                    key={cat}
+                                    key={`closed-${cat}-${index}`} // ✅ key 고유값 추가
                                     onClick={() => {
                                         setSelectedCategory(cat);
                                         setActiveTab("closed");
@@ -434,9 +541,11 @@ const DebateBoard = () => {
                             <div className={styles.cardHeader}>
                                 <h2
                                     className={styles.cardTitle}
-                                    onClick={() =>
-                                        setExpandedDebateId(expandedDebateId === debate.id ? null : debate.id)
-                                    }
+                                    onClick={() => {
+                                        const newId = expandedDebateId === debate.id ? null : debate.id;
+                                        setExpandedDebateId(newId);
+                                        if (newId) fetchComments(debate.id); // ✅ 댓글 트리 불러오기
+                                    }}
                                     style={{ cursor: "pointer" }}
                                 >
                                     {debate.title}
@@ -618,62 +727,12 @@ const DebateBoard = () => {
                                     <div className={styles.commentSection}>
                                         <h3 className={styles.commentTitle}>
                                             <MessageSquare className="w-4 h-4" /> 댓글 (
-                                            {debate.comments?.length || 0})
+                                            {comments[debate.id]?.length || 0})
                                         </h3>
-
                                         <div className={styles.commentList}>
-                                            {debate.comments?.map((c) => (
-                                                <div key={c.id} className={styles.commentItem}>
-                                                    <span className={styles.commentAuthor}>{c.author}:</span>{" "}
-                                                    {c.text}
+                                            {renderComments(debate.id, comments[debate.id] || [])}
 
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            setShowReplyInput({
-                                                                ...showReplyInput,
-                                                                [c.id]: !showReplyInput[c.id],
-                                                            });
-                                                        }}
-                                                        className={styles.replyButton}
-                                                    >
-                                                        💬 답글
-                                                    </button>
 
-                                                    {showReplyInput[c.id] && (
-                                                        <div
-                                                            className={styles.replyInputGroup}
-                                                            onClick={(e) => e.stopPropagation()}
-                                                        >
-                                                            <input
-                                                                type="text"
-                                                                placeholder="답글을 입력하세요..."
-                                                                value={replyInputs[c.id] || ""}
-                                                                onChange={(e) =>
-                                                                    setReplyInputs({
-                                                                        ...replyInputs,
-                                                                        [c.id]: e.target.value,
-                                                                    })
-                                                                }
-                                                                className={styles.replyInput}
-                                                            />
-                                                            <button
-                                                                onClick={() => handleReplySubmit(debate.id, c.id)}
-                                                                className={styles.replySubmit}
-                                                            >
-                                                                등록
-                                                            </button>
-                                                        </div>
-                                                    )}
-
-                                                    {c.replies?.map((r) => (
-                                                        <div key={r.id} className={styles.replyItem}>
-                                                            <span className={styles.replyAuthor}>↳ {r.author}:</span>{" "}
-                                                            {r.text}
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            ))}
                                         </div>
 
                                         {currentUser && (
