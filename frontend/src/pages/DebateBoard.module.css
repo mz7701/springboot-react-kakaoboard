@@ -1,9 +1,28 @@
+/* 🎨 기본 색상 변수 */
+:root {
+    --blue: #007bff;
+    --blue-light: #00a2ff;
+    --yellow: #ffd43b;
+    --yellow-light: #ffe17d;
+    --red: #ff5b5b;
+    --green: #2ecc71;
+    --gray-bg: #f9fafc;
+    --gray: #888;
+    --text: #222;
+    --radius: 12px;
+    --shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+    --transition: all 0.25s ease;
+}
+
 /* ✅ 전체 컨테이너 */
 .container {
-    max-width: 900px;
+    max-width: 960px;
     margin: 0 auto;
     padding: 1.5rem;
     font-family: "Noto Sans KR", sans-serif;
+    color: var(--text);
+    background: linear-gradient(180deg, #f4f6ff, #ffffff);
+    min-height: 100vh;
 }
 
 /* ✅ 헤더 */
@@ -11,13 +30,13 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
     margin-bottom: 1.2rem;
 }
 
 .title {
     font-size: 1.8rem;
-    font-weight: 700;
-    color: #222;
+    font-weight: 800;
 }
 
 .userInfo {
@@ -25,72 +44,77 @@
 }
 
 .username {
-    font-weight: 600;
-    color: #444;
+    font-weight: 700;
+    color: var(--text);
 }
 
 .exp {
+    color: var(--gray);
     font-size: 0.9rem;
-    color: #888;
 }
 
 /* ✅ 새 토론 등록 버튼 */
 .postButton {
-    background: linear-gradient(135deg, #007bff, #00a2ff);
-    color: #fff;
+    background: linear-gradient(135deg, var(--blue), var(--blue-light));
+    color: white;
     border: none;
-    border-radius: 10px;
+    border-radius: var(--radius);
     padding: 10px 18px;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
-    transition: all 0.2s ease-in-out;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow);
+    transition: var(--transition);
     margin-bottom: 1rem;
 }
 
 .postButton:hover {
     transform: translateY(-2px);
-    background: linear-gradient(135deg, #0062d1, #0097ff);
+    filter: brightness(1.1);
 }
 
 /* ✅ 탭 버튼 */
 .tabContainer {
     display: flex;
     justify-content: center;
-    margin-bottom: 1.2rem;
     gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
 }
 
 .tabButton {
-    background: #f1f1f1;
+    background: #f2f3f6;
     border: none;
     border-radius: 8px;
     padding: 8px 18px;
-    font-weight: 600;
-    color: #555;
+    font-weight: 700;
+    color: #444;
     cursor: pointer;
-    transition: 0.2s;
+    transition: var(--transition);
 }
 
 .tabButton:hover {
-    background: #ffe8a3;
+    background: #fff2a1;
 }
 
 .activeTab {
-    background: linear-gradient(135deg, #ffd43b, #ffda6a);
+    background: linear-gradient(135deg, var(--yellow), var(--yellow-light));
     color: #222;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow);
 }
 
 /* ✅ 토론 카드 */
 .card {
-    background: #fff;
-    border-radius: 14px;
+    background: white;
+    border-radius: 16px;
     padding: 20px;
     margin-bottom: 1.2rem;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
+    box-shadow: var(--shadow);
     border: 1px solid #eee;
-    position: relative;
+    transition: var(--transition);
+}
+
+.card:hover {
+    transform: translateY(-3px);
 }
 
 .cardHeader {
@@ -101,29 +125,27 @@
 
 .cardTitle {
     font-size: 1.2rem;
-    font-weight: 600;
-    color: #333;
+    font-weight: 700;
 }
 
 .cardContent {
     margin: 0.8rem 0;
-    color: #444;
-    line-height: 1.5;
+    color: #333;
+    line-height: 1.6;
 }
 
 .cardMeta {
     font-size: 0.9rem;
     color: #777;
-    margin-bottom: 0.6rem;
 }
 
 /* ✅ 삭제 버튼 */
 .deleteButton {
     background: none;
     border: none;
-    color: #ff6b6b;
+    color: var(--red);
     cursor: pointer;
-    transition: 0.2s;
+    transition: var(--transition);
 }
 
 .deleteButton:hover {
@@ -131,107 +153,140 @@
     color: #ff1e1e;
 }
 
-/* ✅ 반박 영역 */
-.rebuttalArea {
-    margin-top: 1rem;
-    text-align: right;
-}
-
 /* ✅ 반박 버튼 */
 .rebuttalButton {
-    background: linear-gradient(135deg, #ffb700, #ffdd55);
+    background: linear-gradient(135deg, #ffc107, #ffe588);
     border: none;
-    color: #222;
-    font-weight: 600;
+    color: #333;
+    font-weight: 700;
     padding: 8px 14px;
-    border-radius: 8px;
+    border-radius: 10px;
     cursor: pointer;
-    transition: all 0.2s ease-in-out;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow);
+    transition: var(--transition);
 }
 
 .rebuttalButton:hover {
-    background: linear-gradient(135deg, #ffc800, #ffe98f);
     transform: translateY(-2px);
+    filter: brightness(1.05);
 }
 
 /* ✅ 반박 입력 폼 */
 .rebuttalForm {
     position: relative;
-    background: #fffbe9;
-    border-radius: 12px;
-    padding: 20px 22px 60px;
-    width: 90%;
-    max-width: 600px;
-    margin-top: 10px;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
-    animation: fadeIn 0.3s ease-in-out;
-    border: 1px solid #f0e2a4;
-    margin-left: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(14px) saturate(180%);
+    border-radius: 18px;
+    padding: 1.4rem;
+    border: 1px solid rgba(200, 200, 200, 0.3);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    max-width: 650px;
+    margin: 1.2rem auto;
+    animation: fadeUp 0.35s ease-in-out;
 }
-
+@media (max-width: 600px) {
+    .rebuttalForm {
+        padding: 1rem;
+        max-width: 90%;
+    }
+    .rebuttalInput,
+    .rebuttalTextarea {
+        font-size: 14px;
+        padding: 10px 12px;
+    }
+    .rebuttalSubmit {
+        font-size: 14px;
+        padding: 8px 16px;
+    }
+}
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 .rebuttalCloseBtn {
     position: absolute;
-    top: 8px;
-    right: 10px;
-    background: none;
+    top: 12px;
+    right: 12px;
+    background: rgba(255, 255, 255, 0.5);
     border: none;
-    color: #ff6b81;
-    font-size: 20px;
-    font-weight: bold;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ff4d4d;
+    font-size: 18px;
     cursor: pointer;
     transition: all 0.25s ease;
+    box-shadow: 0 3px 6px rgba(255, 0, 0, 0.15);
 }
-
 .rebuttalCloseBtn:hover {
-    color: #ff1744;
-    transform: scale(1.1);
+    transform: rotate(90deg) scale(1.1);
+    background: rgba(255, 0, 0, 0.1);
 }
-
 .rebuttalInput {
-    width: 100%;
-    border: 1px solid #ddd;
-    outline: none;
-    border-radius: 8px;
-    padding: 12px 14px;
+    width: 95%;
+    border: 1px solid rgba(210, 210, 210, 0.8);
+    border-radius: 10px;        /* 🔹 기존 12px → 10px : 폼과 딱 맞게 */
+    padding: 10px 12px;         /* 🔹 12px → 10px : 위아래 균형 맞춤 */
     font-size: 15px;
-    margin-bottom: 10px;
-    background: #fff;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+    outline: none;
+    background: rgba(255, 255, 255, 0.95);
+    box-sizing: border-box;     /* ✅ 폼 경계와 크기 일치 */
+    transition: all 0.25s ease;
+}
+.rebuttalInput:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
 }
 
+/* ✅ 내용 textarea */
 .rebuttalTextarea {
-    width: 100%;
-    border: 1px solid #ddd;
-    outline: none;
-    border-radius: 8px;
-    padding: 12px 14px;
+    width: 95%;
+    height: 120px;              /* 🔹 130px → 120px : 폼 비율 조정 */
+    border: 1px solid rgba(210, 210, 210, 0.8);
+    border-radius: 10px;        /* 🔹 동일하게 맞춤 */
+    padding: 10px 12px;         /* 🔹 input과 동일한 여백 */
     font-size: 15px;
-    height: 120px;
-    background: #fff;
+    background: rgba(255, 255, 255, 0.95);
     resize: none;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+    outline: none;
+    box-sizing: border-box;
+    transition: all 0.25s ease;
+}
+.rebuttalTextarea:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
 }
 
+/* ✅ 등록 버튼 */
 .rebuttalSubmit {
-    position: absolute;
-    bottom: 14px;
-    right: 20px;
-    background: linear-gradient(135deg, #007bff, #00a2ff);
-    color: white;
+    align-self: flex-end;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: #fff;
     font-weight: 600;
     border: none;
-    border-radius: 8px;
-    padding: 8px 18px;
+    border-radius: 12px;
+    padding: 10px 20px;
     cursor: pointer;
     font-size: 15px;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
-    transition: 0.2s ease;
+    box-shadow: 0 5px 12px rgba(59, 130, 246, 0.3);
+    transition: all 0.25s ease;
 }
-
 .rebuttalSubmit:hover {
-    background: linear-gradient(135deg, #0062d1, #008cff);
     transform: translateY(-2px);
+    background: linear-gradient(135deg, #2563eb, #1e40af);
 }
 
 /* ✅ 반박 표시 박스 */
@@ -239,13 +294,13 @@
     margin-top: 1rem;
     padding: 15px;
     background: #f3f6ff;
-    border-left: 5px solid #4a90e2;
+    border-left: 5px solid var(--blue);
     border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow);
 }
 
 .rebuttalBox h4 {
-    color: #1e4ea3;
+    color: var(--blue);
     margin-bottom: 5px;
 }
 
@@ -270,10 +325,10 @@
     border: none;
     border-radius: 10px;
     padding: 10px 18px;
-    font-weight: 600;
-    color: #1e4ea3;
+    font-weight: 700;
+    color: #0046c9;
     cursor: pointer;
-    transition: 0.2s;
+    transition: var(--transition);
     min-width: 120px;
 }
 
@@ -283,12 +338,12 @@
 }
 
 .voteButton:disabled {
-    opacity: 0.5;
+    opacity: 0.6;
     cursor: not-allowed;
 }
 
 .vs {
-    font-weight: 700;
+    font-weight: 800;
     font-size: 1.1rem;
     color: #333;
 }
@@ -315,11 +370,11 @@
 
 /* ✅ 댓글 */
 .commentSection {
-    margin-top: 1.2rem;
+    margin-top: 1rem;
 }
 
 .commentTitle {
-    font-weight: 600;
+    font-weight: 700;
     margin-bottom: 0.6rem;
     color: #333;
 }
@@ -337,11 +392,12 @@
     font-size: 0.95rem;
     margin-bottom: 5px;
     color: #444;
+    line-height: 1.5;
 }
 
 .commentAuthor {
-    font-weight: 600;
-    color: #007bff;
+    font-weight: 700;
+    color: var(--blue);
 }
 
 .commentInputGroup {
@@ -358,34 +414,24 @@
 }
 
 .commentSubmit {
-    background: linear-gradient(135deg, #007bff, #00a2ff);
+    background: linear-gradient(135deg, var(--blue), var(--blue-light));
     color: white;
     border: none;
     border-radius: 8px;
     padding: 8px 14px;
     cursor: pointer;
-    transition: 0.2s;
+    transition: var(--transition);
 }
 
 .commentSubmit:hover {
     transform: translateY(-2px);
 }
 
-/* ✅ 애니메이션 */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-5px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+/* ✅ 대댓글 (reply) */
 .replyButton {
     background: none;
     border: none;
-    color: #007bff;
+    color: var(--blue);
     font-size: 13px;
     margin-left: 10px;
     cursor: pointer;
@@ -394,6 +440,7 @@
 .replyInputGroup {
     display: flex;
     margin: 6px 0 0 24px;
+    gap: 8px;
 }
 
 .replyInput {
@@ -409,9 +456,15 @@
     color: white;
     border: none;
     border-radius: 6px;
-    margin-left: 8px;
     padding: 6px 10px;
     cursor: pointer;
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+.replySubmit:hover {
+    transform: translateY(-2px);
+    background: #0056b3;
 }
 
 .replyItem {
@@ -420,81 +473,8 @@
     color: #555;
     padding: 4px 0;
 }
-.userArea {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
 
-.loginBtn {
-    background: #3b82f6;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background 0.2s;
-}
-
-.loginBtn:hover {
-    background: #2563eb;
-}
-
-.logoutBtn {
-    background: #ef4444;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background 0.2s;
-}
-
-.logoutBtn:hover {
-    background: #dc2626;
-}
-/**/
-.tabWrapper {
-    position: relative;
-    display: inline-block;
-}
-
-.categoryDropdown {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    display: flex;
-    gap: 8px;
-    background: white;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 8px 10px;
-    z-index: 10;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.categoryItem {
-    padding: 6px 10px;
-    border: none;
-    background: #f3f4f6;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-.categoryItem:hover {
-    background: #2563eb;
-    color: white;
-}
-
-.activeCategory {
-    background: #2563eb;
-    color: white;
-}
-/*페이지 1 2 3*/
-/* 페이지네이션 스타일 */
+/* ✅ 페이지네이션 */
 .pagination {
     margin: 16px 0;
     text-align: center;
@@ -508,6 +488,7 @@
     border-radius: 6px;
     cursor: pointer;
     font-size: 13px;
+    transition: var(--transition);
 }
 
 .pageBtn:hover {
@@ -515,12 +496,12 @@
 }
 
 .activePage {
-    background-color: #2b6ef2;
+    background-color: var(--blue);
     color: white;
-    border-color: #2b6ef2;
+    border-color: var(--blue);
 }
 
-/*검색파트*/
+/* ✅ 검색 입력 */
 .searchInput {
     margin-left: 1rem;
     padding: 6px 10px;
@@ -528,85 +509,91 @@
     border: 1px solid #ccc;
     font-size: 14px;
 }
+
 .searchInput:focus {
     outline: none;
-    border-color: #333;
-}
-.card.cardExpanded {
-    border: 2px solid #5b7cff;
-    background: #f7f9ff;
+    border-color: var(--blue);
 }
 
-
-
-/*사과*/
-.tabContainer {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 16px;
+/* ✅ 애니메이션 */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-.tabWrapper {
-    position: relative;
+/* ✅ 반응형 */
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+    .tabContainer {
+        flex-wrap: wrap;
+    }
+    .voteSection {
+        flex-direction: column;
+    }
+    .voteButton {
+        width: 100%;
+    }
+    .commentInputGroup {
+        flex-direction: column;
+    }
+    .commentSubmit {
+        width: 100%;
+    }
 }
-
-.appleButton {
-    margin-left: auto; /* 오른쪽 끝으로 밀기 */
-    background: linear-gradient(135deg, #ff6b6b, #ff4040);
-    color: white;
+/* ✅ 로그인 버튼 (민트-블루 그라데이션, 반박버튼 스타일 기반) */
+.loginBtn {
+    background: linear-gradient(135deg, #00b4ff, #4dd0e1);
+    color: #fff;
     border: none;
-    border-radius: 10px;
-    padding: 8px 16px;
+    border-radius: 12px;
+    padding: 10px 20px;
+    font-weight: 700;
+    font-size: 15px;
     cursor: pointer;
-    font-weight: bold;
-    transition: all 0.2s ease-in-out;
+    box-shadow: 0 4px 8px rgba(0, 180, 255, 0.25);
+    transition: all 0.25s ease-in-out;
 }
 
-.appleButton:hover {
-    transform: scale(1.05);
-    background: linear-gradient(135deg, #ff4040, #ff1e1e);
+.loginBtn:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(135deg, #0096e0, #26c6da);
+    box-shadow: 0 6px 14px rgba(0, 180, 255, 0.35);
 }
 
-.commentIp {
-    color: #888;
-    font-size: 0.85rem;
-    margin-left: 4px;
-}
-
-.commentAuthor:hover {
-    text-decoration: underline;
-}
-.commentItem {
-    font-size: 14px;
-    line-height: 1.45;
-    margin-top: 8px;
-}
-.commentAuthor { font-weight: 600; }
-.commentIp { color: #8a8a8a; margin-left: 6px; }
-.commentDate { color: #aaa; margin-left: 6px; font-size: 12px; }
-.replyButton {
-    margin-left: 10px;
-    background: transparent;
+/* ✅ 로그아웃 버튼 (반박 버튼 느낌, 딸기-레드톤) */
+.logoutBtn {
+    background: linear-gradient(135deg, #ff7070, #ff4d4d);
+    color: #fff;
     border: none;
+    border-radius: 12px;
+    padding: 10px 20px;
+    font-weight: 700;
+    font-size: 15px;
     cursor: pointer;
-}
-.replyInputGroup {
-    display: flex;
-    gap: 6px;
-    margin-top: 6px;
-}
-.replyInput {
-    flex: 1;
-    padding: 6px 8px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-}
-.replySubmit {
-    padding: 6px 10px;
-    border: 1px solid #ddd;
-    background: #f7f7f7;
-    border-radius: 6px;
-    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(255, 77, 77, 0.25);
+    transition: all 0.25s ease-in-out;
 }
 
+.logoutBtn:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(135deg, #ff4d4d, #ff3030);
+    box-shadow: 0 6px 14px rgba(255, 77, 77, 0.35);
+}
+
+/* ✅ 모바일 반응형 */
+@media (max-width: 600px) {
+    .loginBtn,
+    .logoutBtn {
+        padding: 8px 16px;
+        font-size: 14px;
+        border-radius: 10px;
+    }
+}

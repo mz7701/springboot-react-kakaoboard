@@ -1,98 +1,114 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import styles from "./MyPage.module.css";
 import CommentSection from "../components/CommentSection";
 
+// ✅ 네트워크 고정
 axios.defaults.baseURL = "http://192.168.0.21:8080";
 axios.defaults.headers.post["Content-Type"] = "application/json";
+
+// ✅ 날짜 포맷 유틸
+const formatKST = (iso) => {
+    if (!iso) return "-";
+    try {
+        return new Date(iso).toLocaleString("ko-KR", { hour12: false });
+    } catch {
+        return iso;
+    }
+};
+
+// ✅ 토론 상태 텍스트/색상
+const getDebateStatusText = (d) =>
+    d.isClosed ? "마감된 토론" : d.rebuttalTitle ? "반박중" : "반박해보세요";
+const getDebateStatusColor = (d) =>
+    d.isClosed ? "#888" : d.rebuttalTitle ? "#e67e22" : "#27ae60";
+
+// ✅ 상태 우선순위(정렬용): 반박해보세요(0) → 반박중(1) → 마감(2)
+const statusRank = (d) => (d.isClosed ? 2 : d.rebuttalTitle ? 1 : 0);
 
 const MyPage = () => {
     const [currentUser, setCurrentUser] = useState(null);
     const [activeTab, setActiveTab] = useState("info");
+
+    // 정보 수정 폼
     const [editForm, setEditForm] = useState({ nickname: "", email: "", password: "" });
-    const [myDebates, setMyDebates] = useState([]);
-    const [expandedId, setExpandedId] = useState(null);
+    const [confirmPassword, setConfirmPassword] = useState("");
+
+    // 인증 관련
     const [verified, setVerified] = useState(false);
     const [verificationCode, setVerificationCode] = useState("");
     const [emailSent, setEmailSent] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [confirmPassword, setConfirmPassword] = useState("");
 
-    /** ✅ 로그인 유저 불러오기 */
+    // 내 글/UI
+    const [myDebates, setMyDebates] = useState([]);
+    const [expandedId, setExpandedId] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [sending, setSending] = useState(false);
+    const [verifying, setVerifying] = useState(false);
+
+    // ✅ 로그인 유저 로드
     useEffect(() => {
-        const stored = localStorage.getItem("user");
-        if (stored) {
-            const user = JSON.parse(stored);
-            setCurrentUser(user);
-            setEditForm({ nickname: user.username, email: user.email || "", password: "" });
-            fetchMyDebates(user.username);
-        }
+        const raw = localStorage.getItem("user");
+        if (!raw) return;
+        const user = JSON.parse(raw);
+        setCurrentUser(user);
+        setEditForm({ nickname: user.username, email: user.email || "", password: "" });
+        fetchMyDebates(user.username);
     }, []);
 
-    /** ✅ 내가 쓴 토론 불러오기 */
+    // ✅ 내가 쓴 토론 불러오기 (상태 우선 + 최신순)
     const fetchMyDebates = async (username) => {
         if (!username) return;
         try {
             const res = await axios.get("/api/debates");
-            const filtered = res.data.filter((d) => d.author === username);
+            const mine = (Array.isArray(res.data) ? res.data : []).filter((d) => d.author === username);
 
-            // ✅ 상태 우선순위 정의
-            const getStatusRank = (debate) => {
-                if (debate.isClosed) return 2; // 마감된 토론
-                if (debate.rebuttalTitle) return 1; // 반박중
-                return 0; // 반박해보세요
-            };
-
-            // ✅ 정렬: 반박해보세요 → 반박중 → 마감 + 최신순
-            filtered.sort((a, b) => {
-                const diff = getStatusRank(a) - getStatusRank(b);
-                if (diff !== 0) return diff; // 상태순 우선
-                return new Date(b.createdAt) - new Date(a.createdAt); // 같은 상태면 최신순
+            mine.sort((a, b) => {
+                const s = statusRank(a) - statusRank(b);
+                if (s !== 0) return s;
+                // createdAt 없을 경우 id 기준으로 fallback
+                const ad = a.createdAt ? new Date(a.createdAt).getTime() : a.id ?? 0;
+                const bd = b.createdAt ? new Date(b.createdAt).getTime() : b.id ?? 0;
+                return bd - ad;
             });
 
-            setMyDebates(filtered);
+            setMyDebates(mine);
         } catch (err) {
             console.error("❌ 내 토론 불러오기 실패:", err);
         }
     };
 
-
-
-    /** ✅ 상태 색상 반환 */
-    const getStatusColor = (debate) => {
-        if (debate.isClosed) return "#888"; // 회색
-        if (debate.rebuttalTitle) return "#e67e22"; // 주황
-        return "#27ae60"; // 초록
-    };
-
-    /** ✅ 이메일 인증번호 전송 */
+    // ✅ 이메일 인증번호 전송 (정보수정용: 기존 가입여부 상관X)
     const handleSendCode = async () => {
         if (!editForm.email) return alert("이메일을 입력해주세요.");
+        setSending(true);
         try {
-            const res = await axios.post("http://192.168.0.21:8080/api/auth/send-code-edit", null, {
+            const res = await axios.post("/api/auth/send-code-edit", null, {
                 params: { email: editForm.email },
             });
-
             if (res.status === 200) {
-                alert("인증번호가 전송되었습니다!");
                 setEmailSent(true);
+                alert("인증번호가 전송되었습니다!");
             }
         } catch (err) {
             console.error("❌ 인증번호 전송 실패:", err);
-            alert("이메일 전송 중 오류가 발생했습니다.");
+            // 가입 이메일이라도 수정용은 허용해야 하므로, 서버가 400을 주지 않도록 백엔드 이미 분리해둠.
+            alert(err.response?.data || "이메일 전송 중 오류가 발생했습니다.");
+        } finally {
+            setSending(false);
         }
     };
 
-    /** ✅ 인증번호 검증 */
+    // ✅ 인증번호 검증 (정보수정용 전용 엔드포인트 사용)
     const handleVerifyCode = async () => {
         if (!verificationCode) return alert("인증번호를 입력해주세요.");
+        setVerifying(true);
         try {
-            const res = await axios.post("http://192.168.0.21:8080/api/auth/verify-code-edit", null, {
+            const res = await axios.post("/api/auth/verify-code-edit", null, {
                 params: { email: editForm.email, code: verificationCode },
             });
-
-
-            if (typeof res.data === "string" && res.data.includes("성공")) {
+            const ok = typeof res.data === "string" ? res.data.includes("성공") : !!res.data;
+            if (ok) {
                 setVerified(true);
                 alert("✅ 이메일 인증 완료!");
             } else {
@@ -100,45 +116,59 @@ const MyPage = () => {
             }
         } catch (err) {
             console.error("인증 실패:", err);
+            alert(err.response?.data || "인증 중 오류가 발생했습니다.");
+        } finally {
+            setVerifying(false);
         }
     };
-// ✅ 토론 상태 구분 함수
-    const getDebateStatus = (debate) => {
-        if (debate.isClosed) return "마감된 토론";
-        if (debate.rebuttalTitle) return "반박중";
-        return "반박해보세요";
-    };
-    /** ✅ 회원정보 수정 */
+
+    // ✅ 비번 규칙: 영문+숫자+특수문자 포함 8자 이상
+    const pwRegex = useMemo(
+        () => /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/,
+        []
+    );
+
+    // ✅ 회원정보 수정
+    // 백엔드: UserController
+    //   - (A) /api/users/update/{id}  ← id path 사용 버전
+    //   - (B) /api/users/update       ← body로 id/currentEmail/newEmail 등 보내는 버전
+    // 아래는 (A) 기준으로 구현했으니, 네 현재 백엔드와 맞추어 사용!
     const handleUpdate = async () => {
         if (!editForm.nickname.trim()) return alert("닉네임을 입력해주세요.");
         if (!verified) return alert("이메일 인증을 완료해주세요.");
-        if (editForm.password !== confirmPassword) {
-            return alert("비밀번호가 일치하지 않습니다.");
-        }
-        if (editForm.password && !/^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/.test(editForm.password)) {
-            return alert("비밀번호는 영어, 숫자, 특수문자를 포함해 8자 이상이어야 합니다.");
+
+        // 비밀번호 입력 시 확인 & 규칙 체크
+        if (editForm.password || confirmPassword) {
+            if (editForm.password !== confirmPassword) {
+                return alert("비밀번호가 일치하지 않습니다.");
+            }
+            if (!pwRegex.test(editForm.password)) {
+                return alert("비밀번호는 영어, 숫자, 특수문자를 포함해 8자 이상이어야 합니다.");
+            }
         }
 
+        if (!currentUser) return alert("로그인이 필요합니다.");
+
+        setLoading(true);
         try {
-            setLoading(true);
-            const res = await axios.put(
-                `/api/users/update/${currentUser.id}`,
-                {
-                    username: editForm.nickname,
-                    email: editForm.email,
-                    password: editForm.password || null,
-                },
-                { headers: { "Content-Type": "application/json" } }
-            );
-
+            // ✅ (A) PathVariable 버전: /api/users/update/{id}
+            //    백엔드에서 id로 유저 찾아 username/email/password 업데이트
+            const res = await axios.put(`/api/users/update/${currentUser.id}`, {
+                username: editForm.nickname,
+                email: editForm.email,           // 새 이메일
+                password: editForm.password || null,
+            });
 
             alert("✅ 회원정보가 수정되었습니다.");
             localStorage.setItem("user", JSON.stringify(res.data));
             setCurrentUser(res.data);
             setVerified(false);
+            setEmailSent(false);
+            setVerificationCode("");
+            setConfirmPassword("");
         } catch (err) {
             console.error("❌ 회원정보 수정 실패:", err);
-            alert("수정 중 오류가 발생했습니다.");
+            alert(err.response?.data || "수정 중 오류가 발생했습니다.");
         } finally {
             setLoading(false);
         }
@@ -151,6 +181,7 @@ const MyPage = () => {
             {/* ✅ 왼쪽 탭 (Sidebar) */}
             <aside className={styles.sidebar}>
                 <h2 className={styles.sidebarTitle}>마이페이지</h2>
+
                 <button
                     className={`${styles.tabButton} ${activeTab === "info" ? styles.active : ""}`}
                     onClick={() => setActiveTab("info")}
@@ -177,9 +208,15 @@ const MyPage = () => {
                 {activeTab === "info" && currentUser && (
                     <section className={styles.infoSection}>
                         <h3>👤 내 정보</h3>
-                        <p><b>닉네임:</b> {currentUser.username}</p>
-                        <p><b>이메일:</b> {currentUser.email}</p>
-                        <p><b>EXP:</b> {currentUser.exp || 0}</p>
+                        <p>
+                            <b>닉네임:</b> {currentUser.username}
+                        </p>
+                        <p>
+                            <b>이메일:</b> {currentUser.email}
+                        </p>
+                        <p>
+                            <b>EXP:</b> {currentUser.exp || 0}
+                        </p>
                     </section>
                 )}
 
@@ -187,6 +224,7 @@ const MyPage = () => {
                 {activeTab === "edit" && (
                     <section className={styles.editSection}>
                         <h3>✏️ 정보 수정</h3>
+
                         <div className={styles.inputGroup}>
                             <label>닉네임</label>
                             <input
@@ -196,8 +234,6 @@ const MyPage = () => {
                             />
                         </div>
 
-
-
                         <div className={styles.inputGroup}>
                             <label>이메일</label>
                             <input
@@ -206,8 +242,13 @@ const MyPage = () => {
                                 onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
                             />
                             {!verified && (
-                                <button onClick={handleSendCode} className={styles.smallButton}>
-                                    인증번호 전송
+                                <button
+                                    onClick={handleSendCode}
+                                    className={styles.smallButton}
+                                    disabled={sending}
+                                    title="수정용 인증 메일을 보냅니다"
+                                >
+                                    {sending ? "전송 중..." : "인증번호 전송"}
                                 </button>
                             )}
                         </div>
@@ -220,8 +261,12 @@ const MyPage = () => {
                                     value={verificationCode}
                                     onChange={(e) => setVerificationCode(e.target.value)}
                                 />
-                                <button onClick={handleVerifyCode} className={styles.smallButton}>
-                                    인증 확인
+                                <button
+                                    onClick={handleVerifyCode}
+                                    className={styles.smallButton}
+                                    disabled={verifying}
+                                >
+                                    {verifying ? "확인 중..." : "인증 확인"}
                                 </button>
                             </div>
                         )}
@@ -232,7 +277,7 @@ const MyPage = () => {
                                 type="password"
                                 value={editForm.password}
                                 onChange={(e) => setEditForm({ ...editForm, password: e.target.value })}
-                                placeholder="영문+숫자 8자 이상"
+                                placeholder="영문+숫자+특수문자 8자 이상"
                             />
                         </div>
                         <div className={styles.inputGroup}>
@@ -245,7 +290,11 @@ const MyPage = () => {
                             />
                         </div>
 
-                        <button onClick={handleUpdate} disabled={loading} className={styles.updateButton}>
+                        <button
+                            onClick={handleUpdate}
+                            disabled={loading}
+                            className={styles.updateButton}
+                        >
                             {loading ? "수정 중..." : "수정하기"}
                         </button>
                     </section>
@@ -260,35 +309,29 @@ const MyPage = () => {
                         ) : (
                             myDebates.map((debate) => (
                                 <div key={debate.id} className={styles.debateCard}>
-                                    <div
-                                        className={styles.debateHeader}
-                                        onClick={() => toggleExpand(debate.id)}
-                                    >
-                                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
-                                            {/* 제목 + 상태표시 */}
-                                            <div>
-                                                <h4 style={{ display: "inline", marginRight: "8px" }}>{debate.title}</h4>
-                                                <span
-                                                    style={{
-                                                        color: getStatusColor(debate),
-                                                        fontSize: "0.9rem",
-                                                        fontWeight: "bold",
-                                                    }}
-                                                >
-                                     [{getDebateStatus(debate)}]
-                                  </span>
-                                            </div>
-
-                                            {/* 작성일 표시 */}
-                                            <div style={{ fontSize: "0.8rem", color: "#999" }}>
-                                                🕓 {new Date(debate.createdAt).toLocaleString("ko-KR")}
-                                            </div>
+                                    <div className={styles.debateHeader} onClick={() => toggleExpand(debate.id)}>
+                                        {/* 제목 + 상태 */}
+                                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                            <h4 style={{ margin: 0 }}>{debate.title}</h4>
+                                            <span
+                                                style={{
+                                                    color: getDebateStatusColor(debate),
+                                                    fontSize: "0.9rem",
+                                                    fontWeight: 700,
+                                                }}
+                                            >
+                        [{getDebateStatusText(debate)}]
+                      </span>
                                         </div>
 
-                                        {/* 펼치기/닫기 화살표 */}
+                                        {/* 작성일 */}
+                                        <div style={{ fontSize: "0.85rem", color: "#999" }}>
+                                            🕓 {formatKST(debate.createdAt)}
+                                        </div>
+
+                                        {/* 화살표 */}
                                         <span>{expandedId === debate.id ? "▲" : "▼"}</span>
                                     </div>
-
 
                                     {expandedId === debate.id && (
                                         <div className={styles.debateContent}>
@@ -309,9 +352,7 @@ const MyPage = () => {
                                                     ) : (
                                                         <p>
                                                             🏆 승자:{" "}
-                                                            {debate.winner === "author"
-                                                                ? debate.author
-                                                                : debate.rebuttalAuthor}
+                                                            {debate.winner === "author" ? debate.author : debate.rebuttalAuthor}
                                                         </p>
                                                     )}
                                                 </div>
@@ -321,7 +362,7 @@ const MyPage = () => {
                                             <CommentSection
                                                 debateId={debate.id}
                                                 currentUser={currentUser}
-                                                refresh={() => fetchMyDebates(currentUser.username)}
+                                                refresh={() => fetchMyDebates(currentUser?.username)}
                                             />
                                         </div>
                                     )}
