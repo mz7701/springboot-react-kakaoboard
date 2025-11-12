@@ -5,7 +5,7 @@ import com.example.kakaoboard.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 @Service
@@ -73,33 +73,36 @@ public class UserService {
     /**
      * ✅ 회원정보 수정 (비밀번호 확인 후 닉네임/이메일 변경)
      */
-    public User updateUser(String email, String password, String newUsername, String newEmail) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("해당 이메일의 사용자가 존재하지 않습니다."));
+    @Transactional
+    public User updateUser(Long id, String email, String password, String username, String newEmail) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-        // ✅ 비밀번호 검증
-        if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new IllegalArgumentException("비밀번호가 올바르지 않습니다.");
+        // ✅ 닉네임 수정
+        if (username != null && !username.isBlank()) {
+            user.setUsername(username);
         }
 
-        // ✅ 닉네임 중복 검사
-        if (!user.getUsername().equals(newUsername) &&
-                userRepository.findByUsername(newUsername).isPresent()) {
-            throw new IllegalArgumentException("이미 존재하는 닉네임입니다.");
+        // ✅ 이메일 수정 (null일 때 기존 유지)
+        if (newEmail != null && !newEmail.isBlank()) {
+            user.setEmail(newEmail);
+        } else {
+            System.out.println("⚠️ 이메일 변경 요청 없음 — 기존 이메일 유지: " + user.getEmail());
         }
 
-        // ✅ 이메일 중복 검사
-        if (!user.getEmail().equals(newEmail) &&
-                userRepository.findByEmail(newEmail).isPresent()) {
-            throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
+        // ✅ 비밀번호 수정 (입력된 경우만 암호화)
+        if (password != null && !password.isBlank()) {
+            user.setPassword(passwordEncoder.encode(password));
         }
 
-        // ✅ 수정 반영
-        user.setUsername(newUsername);
-        user.setEmail(newEmail);
+        // ✅ 기존 email이 null이 아닌지 한번 더 체크 (방어 코드)
+        if (user.getEmail() == null) {
+            throw new IllegalStateException("❌ 이메일 값이 비어있습니다. 업데이트 불가");
+        }
 
         return userRepository.save(user);
     }
+
 
     /**
      * ✅ 비밀번호 유효성 검사

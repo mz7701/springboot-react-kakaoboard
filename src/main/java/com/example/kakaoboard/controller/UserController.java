@@ -15,7 +15,8 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/users")  // ✅ 정확히 이 경로여야 React와 일치
+@CrossOrigin(origins = {"http://localhost:3000", "http://192.168.0.21:3000"})
 @RequiredArgsConstructor
 public class UserController {
 
@@ -26,10 +27,11 @@ public class UserController {
     private final PasswordEncoder passwordEncoder;
 
     /** ✅ 회원정보 수정 */
-    @PutMapping("/update")
-    public ResponseEntity<?> updateUser(@RequestBody UpdateRequest request) {
+    @PutMapping("/update/{id}")
+    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody UpdateRequest request) {
         try {
             User updated = userService.updateUser(
+                    id,
                     request.email,
                     request.password,
                     request.username,

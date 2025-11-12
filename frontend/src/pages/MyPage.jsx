@@ -16,6 +16,7 @@ const MyPage = () => {
     const [verificationCode, setVerificationCode] = useState("");
     const [emailSent, setEmailSent] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [confirmPassword, setConfirmPassword] = useState("");
 
     /** ✅ 로그인 유저 불러오기 */
     useEffect(() => {
@@ -48,7 +49,10 @@ const MyPage = () => {
     const handleSendCode = async () => {
         if (!editForm.email) return alert("이메일을 입력해주세요.");
         try {
-            const res = await axios.post("/api/users/send-code", { email: editForm.email });
+            const res = await axios.post("http://192.168.0.21:8080/api/auth/send-code-edit", null, {
+                params: { email: editForm.email },
+            });
+
             if (res.status === 200) {
                 alert("인증번호가 전송되었습니다!");
                 setEmailSent(true);
@@ -63,11 +67,12 @@ const MyPage = () => {
     const handleVerifyCode = async () => {
         if (!verificationCode) return alert("인증번호를 입력해주세요.");
         try {
-            const res = await axios.post("/api/users/verify-code", {
-                email: editForm.email,
-                code: verificationCode,
+            const res = await axios.post("http://192.168.0.21:8080/api/auth/verify-code-edit", null, {
+                params: { email: editForm.email, code: verificationCode },
             });
-            if (res.data === true || res.status === 200) {
+
+
+            if (typeof res.data === "string" && res.data.includes("성공")) {
                 setVerified(true);
                 alert("✅ 이메일 인증 완료!");
             } else {
@@ -82,8 +87,11 @@ const MyPage = () => {
     const handleUpdate = async () => {
         if (!editForm.nickname.trim()) return alert("닉네임을 입력해주세요.");
         if (!verified) return alert("이메일 인증을 완료해주세요.");
-        if (editForm.password && !/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/.test(editForm.password)) {
-            return alert("비밀번호는 영어와 숫자를 포함해 8자 이상이어야 합니다.");
+        if (editForm.password !== confirmPassword) {
+            return alert("비밀번호가 일치하지 않습니다.");
+        }
+        if (editForm.password && !/^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/.test(editForm.password)) {
+            return alert("비밀번호는 영어, 숫자, 특수문자를 포함해 8자 이상이어야 합니다.");
         }
 
         try {
@@ -97,6 +105,7 @@ const MyPage = () => {
                 },
                 { headers: { "Content-Type": "application/json" } }
             );
+
 
             alert("✅ 회원정보가 수정되었습니다.");
             localStorage.setItem("user", JSON.stringify(res.data));
@@ -162,6 +171,8 @@ const MyPage = () => {
                             />
                         </div>
 
+
+
                         <div className={styles.inputGroup}>
                             <label>이메일</label>
                             <input
@@ -197,6 +208,15 @@ const MyPage = () => {
                                 value={editForm.password}
                                 onChange={(e) => setEditForm({ ...editForm, password: e.target.value })}
                                 placeholder="영문+숫자 8자 이상"
+                            />
+                        </div>
+                        <div className={styles.inputGroup}>
+                            <label>비밀번호 확인</label>
+                            <input
+                                type="password"
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                placeholder="비밀번호를 다시 입력하세요"
                             />
                         </div>
 

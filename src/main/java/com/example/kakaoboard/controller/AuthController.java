@@ -47,6 +47,29 @@ public class AuthController {
                     .body("서버 내부 오류: " + e.getMessage());
         }
     }
+    @PostMapping("/verify-code-edit")
+    public ResponseEntity<String> verifyCodeForEdit(
+            @RequestParam String email,
+            @RequestParam String code
+    ) {
+        boolean valid = verificationService.verifyCode(email, code);
+        if (valid) {
+            return ResponseEntity.ok("✅ 수정용 이메일 인증 성공");
+        } else {
+            return ResponseEntity.badRequest().body("❌ 인증 실패 (번호 불일치 또는 만료)");
+        }
+    }
+
+    @PostMapping("/send-code-edit")
+    public ResponseEntity<String> sendVerificationCodeForEdit(@RequestParam String email) {
+        try {
+            // 회원가입용 중복체크는 건너뛴다
+            verificationService.createVerificationCode(email);
+            return ResponseEntity.ok("✅ 수정용 인증 메일 발송 완료");
+        } catch (MessagingException e) {
+            return ResponseEntity.internalServerError().body("❌ 이메일 전송 실패: " + e.getMessage());
+        }
+    }
 
     // ✅ 인증번호 검증
     @PostMapping("/verify-code")
