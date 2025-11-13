@@ -184,3 +184,58 @@
 .childRow .nickname {
     color: #bef264; /* 연초록: 루트랑 확실히 다른 느낌 */
 }
+
+/* 🔔 입력창 위 멘션 안내 바 */
+.mentionBar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(79, 70, 229, 0.18); /* 연보라 하이라이트 */
+    border-radius: 6px;
+    padding: 4px 8px;
+    margin-bottom: 6px;
+    font-size: 0.78rem;
+    color: #c7d2fe;
+}
+
+.mentionLabel {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mentionClear {
+    border: none;
+    background: transparent;
+    font-size: 0.75rem;
+    cursor: pointer;
+    color: #9ca3af;
+}
+
+.mentionClear:hover {
+    color: #fca5a5;
+}
+
+/* 댓글 줄 안에서 보이는 멘션 태그 (@닉네임) */
+.mentionTag {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: rgba(79, 70, 229, 0.25);
+    color: #e5e7eb;
+    font-size: 0.78rem;
+    font-weight: 600;
+    margin-right: 6px;
+}
+
+/* 멘션 모드일 때 입력창 강조 */
+.newTextareaMention {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.7);
+}
+
+/* 선택된 타겟 줄 약간 하이라이트(선택 안 해도 되면 삭제 가능) */
+.activeRow {
+    background: rgba(30, 64, 175, 0.45);
+}

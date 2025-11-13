@@ -471,14 +471,14 @@
 
 /* 수정 폼 */
 .debateEditArea {
-    margin-top: 14px;
-    padding: 14px;
+    margin-top: 16px;
+    padding: 16px 18px;   /* 안쪽 여백 살짝 키우기 */
     border-radius: 16px;
     background: rgba(15, 23, 42, 0.85);
     border: 1px solid rgba(148, 163, 184, 0.6);
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;            /* 위아래 요소 간 간격 */
 }
 
 .debateEditInput,
@@ -486,19 +486,20 @@
     width: 100%;
     border-radius: 10px;
     border: 1px solid rgba(148, 163, 184, 0.8);
-    background: rgba(15, 23, 42, 0.9);
-    color: var(--text-main);
-    padding: 8px 10px;
+    background: rgba(15, 23, 42, 0.95);   /* 짙은 남색 배경 */
+    color: #f9fafb;                       /* ✨ 입력 글자 완전 흰색에 가깝게 */
+    padding: 6px 3px;                  /* 위아래 여유 조금 더 */
     font-size: 0.9rem;
     outline: none;
     transition: 0.2s;
 }
 
-.debateEditInput:focus,
-.debateEditTextarea:focus {
-    border-color: var(--accent-light);
-    box-shadow: 0 0 0 1px var(--accent-glow);
+/* placeholder도 회색 대신 밝은 회색으로 */
+.debateEditInput::placeholder,
+.debateEditTextarea::placeholder {
+    color: rgba(209, 213, 219, 0.9);      /* 밝은 회색 */
 }
+
 
 .debateEditTextarea {
     min-height: 100px;

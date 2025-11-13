@@ -164,28 +164,62 @@ const DebateBoard = () => {
         }
     };
 
-    const handleCommentChange = (debateId, text) => {
-        setCommentInputs({ ...commentInputs, [debateId]: text });
+    // ✅ 댓글 입력 내용 변경 (디시 스타일 멘션 보호)
+    const handleCommentChange = (debateId, value) => {
+        const target = replyTargets[debateId]; // { id, author } | undefined
+
+        if (target) {
+            const prefix = `@${target.author} `;
+
+            // 🔒 멘션 모드인데, 입력값이 prefix로 시작 안 하면 = 멘션을 건드린 것
+            if (!value.startsWith(prefix)) {
+                // 맨 앞 단어(@닉 or 닉네임) 통째로 제거해서 일반 댓글로 전환
+                const bodyOnly = value.replace(/^@?\S+\s*/, "");
+                setReplyTargets((prev) => ({
+                    ...prev,
+                    [debateId]: undefined,      // 멘션 모드 해제
+                }));
+                setCommentInputs((prev) => ({
+                    ...prev,
+                    [debateId]: bodyOnly,       // 멘션 날리고 본문만 남김
+                }));
+                return;
+            }
+        }
+
+        // 멘션은 유지되고, 뒤에 내용만 수정하는 경우
+        setCommentInputs((prev) => ({
+            ...prev,
+            [debateId]: value,
+        }));
     };
 
+
+    // ✅ 댓글/대댓글 등록
     const handleCommentSubmit = async (debateId) => {
-        const textBody = (commentInputs[debateId] || "").trim();
         if (!requireLogin()) return;
 
-        if (!textBody) {
+        const raw = (commentInputs[debateId] || "").trim();
+        if (!raw) {
             alert("댓글을 입력하세요!");
             return;
         }
 
         const target = replyTargets[debateId]; // { id, author } | undefined
         const isReply = !!target;
+        let finalText = raw;
 
-        // ✅ 최종 전송 텍스트: @닉네임 + 본문
-        const finalText = isReply ? `@${target.author} ${textBody}` : textBody;
+        if (isReply) {
+            const prefix = `@${target.author} `;
+            if (!raw.startsWith(prefix)) {
+                // 혹시라도 앞부분이 꼬였으면 그냥 일반 댓글로 처리
+                finalText = raw;
+            }
+        }
 
         try {
             if (isReply) {
-                // 대댓글
+                // ✅ 여기! 특정 댓글의 대댓글로 전송
                 await axios.post(
                     `/api/debates/${debateId}/comments/${target.id}/reply`,
                     {
@@ -201,7 +235,7 @@ const DebateBoard = () => {
                 });
             }
 
-            // 입력창/타겟 초기화
+            // 입력값 + 타겟 초기화
             setCommentInputs((prev) => ({ ...prev, [debateId]: "" }));
             setReplyTargets((prev) => ({ ...prev, [debateId]: undefined }));
 
@@ -212,8 +246,6 @@ const DebateBoard = () => {
             alert("댓글 등록 중 오류가 발생했습니다.");
         }
     };
-
-
 
     // ✨ 댓글 삭제 (본인 것만)
     const handleCommentDelete = async (debateId, comment) => {
@@ -283,20 +315,27 @@ const DebateBoard = () => {
                 contentText = mentionMatch[2] || "";
             }
 
-            // 🟣 줄 클릭 → 답글 타겟만 설정 (입력창에는 본문만)
             const handleRowClick = () => {
                 if (!requireLogin()) return;
 
+                // 1) 어떤 댓글에 다는지 저장
                 setReplyTargets((prev) => ({
                     ...prev,
-                    [debateId]: { id: c.id, author },   // ✅ 여기서 {id, author} 저장
+                    [debateId]: { id: c.id, author },  // 클릭한 댓글 id + 작성자 닉
                 }));
 
-                setCommentInputs((prev) => ({
-                    ...prev,
-                    [debateId]: prev[debateId] || "",   // 멘션은 입력창에 넣지 않음
-                }));
+                // 2) 입력창 맨 앞에 @닉네임 고정으로 세팅
+                setCommentInputs((prev) => {
+                    // 혹시 기존에 쓰던 본문이 있다면, 맨 앞 단어(@닉 등)만 제거하고 뒤는 살려서 이어붙임
+                    const prevBody = (prev[debateId] || "").replace(/^@?\S+\s*/, "");
+                    return {
+                        ...prev,
+                        [debateId]: `@${author} ${prevBody}`,
+                    };
+                });
             };
+
+
 
             return (
                 <React.Fragment key={c.id}>
@@ -349,7 +388,7 @@ const DebateBoard = () => {
                                     }}
                                     className={styles.commentDeleteButton}
                                 >
-                                    🗑 삭제
+                                    X
                                 </button>
                             )}
                         </div>
@@ -800,20 +839,28 @@ const DebateBoard = () => {
                                                 className={styles.commentInputGroup}
                                                 onClick={(e) => e.stopPropagation()}
                                             >
-                                                {/* ⭐ 멘션 배지: 수정 불가, X로만 해제 */}
+                                                {/* 🔔 멘션 모드 안내 바 (디시 느낌) */}
                                                 {replyTargets[debate.id]?.author && (
                                                     <div className={styles.mentionBar}>
                 <span className={styles.mentionLabel}>
-                    @{replyTargets[debate.id].author} 님에게 답글 작성 중
+                    ↪ @{replyTargets[debate.id].author} 님에게 답글 작성 중
                 </span>
                                                         <button
                                                             type="button"
                                                             className={styles.mentionClear}
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
+                                                                // 멘션 모드 해제 + 입력값에서 맨 앞 단어 제거
                                                                 setReplyTargets((prev) => ({
                                                                     ...prev,
                                                                     [debate.id]: undefined,
+                                                                }));
+                                                                setCommentInputs((prev) => ({
+                                                                    ...prev,
+                                                                    [debate.id]: (prev[debate.id] || "").replace(
+                                                                        /^@?\S+\s*/,
+                                                                        ""
+                                                                    ),
                                                                 }));
                                                             }}
                                                         >
@@ -832,7 +879,11 @@ const DebateBoard = () => {
                                                             ? "답글 내용을 입력하세요..."
                                                             : "댓글을 입력하세요..."
                                                     }
-                                                    className={styles.commentInput}
+                                                    className={`${styles.commentInput} ${
+                                                        replyTargets[debate.id]?.author
+                                                            ? styles.commentInputMention
+                                                            : ""
+                                                    }`}
                                                 />
                                                 <button
                                                     onClick={() => handleCommentSubmit(debate.id)}
@@ -842,6 +893,8 @@ const DebateBoard = () => {
                                                 </button>
                                             </div>
                                         )}
+
+
 
                                     </div>
                                 </>

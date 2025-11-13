@@ -262,5 +262,51 @@ public class DebateController {
         commentRepository.delete(opt.get());
         return ResponseEntity.ok("댓글 삭제 완료");
     }
+    /** ✅ 토론 수정 (마이페이지에서 사용)
+     *  - 반박중이거나 마감된 토론은 수정 불가
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateDebate(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> body
+    ) {
+        try {
+            Optional<Debate> opt = debateRepository.findById(id);
+            if (opt.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+
+            Debate debate = opt.get();
+
+            // 🔒 반박중 / 마감된 토론은 수정 금지
+            if (debate.isClosed() || debate.getRebuttalTitle() != null) {
+                return ResponseEntity
+                        .badRequest()
+                        .body("반박중이거나 마감된 토론은 수정할 수 없습니다.");
+            }
+
+            String title = body.get("title");
+            String content = body.get("content");
+
+            if (title == null || title.trim().isEmpty()
+                    || content == null || content.trim().isEmpty()) {
+                return ResponseEntity
+                        .badRequest()
+                        .body("제목과 내용을 모두 입력해주세요.");
+            }
+
+            // ✏️ 실제 수정
+            debate.setTitle(title.trim());
+            debate.setContent(content.trim());
+            debateRepository.save(debate);
+
+            return ResponseEntity.ok(debate);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity
+                    .internalServerError()
+                    .body("토론 수정 중 오류가 발생했습니다: " + e.getMessage());
+        }
+    }
 
 }
