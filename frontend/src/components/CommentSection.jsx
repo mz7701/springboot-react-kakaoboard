@@ -8,6 +8,9 @@ const CommentSection = ({ debateId, currentUser }) => {
     const [replyInputs, setReplyInputs] = useState({});
     const [mentionTarget, setMentionTarget] = useState(null);
 
+    // 🔽 추가: 댓글 영역 열림/닫힘 상태
+    const [isOpen, setIsOpen] = useState(false);
+    const MAX_INDENT = 3;
     /** ✅ 댓글 트리 불러오기 */
     const fetchComments = async () => {
         try {
@@ -52,7 +55,7 @@ const CommentSection = ({ debateId, currentUser }) => {
                 {
                     author: currentUser?.username || "익명",
                     text,
-                    parentId, // ✅ 부모 댓글 ID를 body에 포함
+                    parentId, // ✅ 부모 댓글 ID
                 }
             );
             setReplyInputs((prev) => ({ ...prev, [parentId]: "" }));
@@ -88,7 +91,7 @@ const CommentSection = ({ debateId, currentUser }) => {
     const renderComment = (node, depth = 0) => {
         const author = node.author?.trim() || "익명";
         const text = node.text?.trim();
-        if (!text) return null; // 내용 없는 댓글 무시
+        if (!text) return null;
 
         return (
             <div
@@ -98,20 +101,20 @@ const CommentSection = ({ debateId, currentUser }) => {
             >
                 {/* 상단 정보 */}
                 <div className={styles.commentHeader}>
-          <span
-              className={styles.author}
-              onClick={() => handleMentionClick(author, node.id)}
-          >
-            {author}
-          </span>
+                    <span
+                        className={styles.author}
+                        onClick={() => handleMentionClick(author, node.id)}
+                    >
+                        {author}
+                    </span>
                     {node.ipAddress ? (
                         <span className={styles.ip}> ({node.ipAddress})</span>
                     ) : (
                         <span className={styles.ip}> (IP 미확인)</span>
                     )}
                     <span className={styles.time}>
-            {new Date(node.createdAt).toLocaleString("ko-KR")}
-          </span>
+                        {new Date(node.createdAt).toLocaleString("ko-KR")}
+                    </span>
                 </div>
 
                 {/* 댓글 본문 */}
@@ -163,39 +166,54 @@ const CommentSection = ({ debateId, currentUser }) => {
                     node.replies
                         .filter((child) => !child.parent || child.parent.id === node.id)
                         .map((child) => renderComment(child, depth + 1))}
-
             </div>
         );
     };
 
-
-    /** ✅ 루트 댓글만 렌더링 (중복 방지) */
+    /** ✅ 루트 댓글만 렌더링 */
     const rootComments = Array.isArray(comments)
-        ? comments.filter((c) => !c.parent) // 부모가 없는 댓글만 루트로
+        ? comments.filter((c) => !c.parent)
         : [];
-
 
     return (
         <div className={styles.commentSection}>
-            <h3>💬 댓글</h3>
+            {/* 🔽 여기 클릭하면 열리고 닫힘 */}
+            <button
+                type="button"
+                className={styles.commentToggle}
+                onClick={() => setIsOpen((prev) => !prev)}
+            >
+                <span className={styles.commentToggleLeft}>
+                    💬 댓글
+                    {rootComments.length > 0 && (
+                        <span className={styles.commentCount}>
+                            {rootComments.length}
+                        </span>
+                    )}
+                </span>
+                <span className={styles.chevron}>{isOpen ? "▲" : "▼"}</span>
+            </button>
 
-            {/* 댓글 목록 */}
-            {rootComments.length > 0 ? (
-                rootComments.map((c) => renderComment(c))
-            ) : (
-                <p className={styles.noComment}>아직 댓글이 없습니다.</p>
+            {/* 열려 있을 때만 목록 + 입력창 보이게 */}
+            {isOpen && (
+                <>
+                    {rootComments.length > 0 ? (
+                        rootComments.map((c) => renderComment(c))
+                    ) : (
+                        <p className={styles.noComment}>아직 댓글이 없습니다.</p>
+                    )}
+
+                    <div className={styles.addComment}>
+                        <input
+                            type="text"
+                            placeholder="댓글을 입력하세요..."
+                            value={newComment}
+                            onChange={(e) => setNewComment(e.target.value)}
+                        />
+                        <button onClick={handleAddComment}>등록</button>
+                    </div>
+                </>
             )}
-
-            {/* 새 댓글 입력 */}
-            <div className={styles.addComment}>
-                <input
-                    type="text"
-                    placeholder="댓글을 입력하세요..."
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                />
-                <button onClick={handleAddComment}>등록</button>
-            </div>
         </div>
     );
 };

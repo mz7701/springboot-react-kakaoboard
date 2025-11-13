@@ -133,6 +133,15 @@
     color: var(--accent-light);
     margin-bottom: 18px;
 }
+/* 👤 내 정보 내용 텍스트를 완전 흰색 계열로 */
+.infoSection p {
+    color: #f9fafb !important;   /* 닉네임/이메일/EXP 내용 */
+    font-size: 0.95rem;
+}
+
+.infoSection p b {
+    color: #ffffff !important;   /* "닉네임:", "이메일:" 같은 label */
+}
 
 /* 📝 인풋 그룹 */
 .inputGroup {
@@ -145,7 +154,7 @@
 .inputGroup label {
     width: 100px;
     font-weight: 600;
-    color: var(--text-sub);
+    color: #ffffff !important;   /* 완전 흰색으로 고정 */
 }
 
 .inputGroup input {
@@ -163,7 +172,10 @@
     border-color: var(--accent-light);
     box-shadow: 0 0 8px var(--accent-glow);
 }
-
+/* 인풋 placeholder 색도 살짝 밝게 */
+.inputGroup input::placeholder {
+    color: rgba(249, 250, 251, 0.8);   /* 연한 흰색 */
+}
 /* 🎛 버튼 */
 .smallButton,
 .updateButton {
@@ -206,8 +218,11 @@
     padding: 24px;
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
     transition: 0.3s ease;
+    margin-bottom: 18px;            /* ✅ 카드 사이 간격 */
 }
-
+.postSection .debateCard:last-child {
+    margin-bottom: 0;               /* 마지막 카드만 아래 여백 제거 (깔끔용) */
+}
 .debateCard:hover {
     transform: translateY(-3px);
     box-shadow: 0 10px 30px var(--accent-glow);
@@ -219,7 +234,7 @@
     align-items: center;
     cursor: pointer;
     font-weight: 600;
-    color: var(--text-main);
+    color: #f9fafb !important;
 }
 
 .debateHeader:hover {
@@ -231,7 +246,7 @@
     border-top: 1px solid rgba(255, 255, 255, 0.15);
     padding-top: 12px;
     font-size: 0.95rem;
-    color: var(--text-sub);
+    color: #e5e7eb !important;
 }
 
 .rebuttalBox {
@@ -523,4 +538,13 @@
     opacity: 0.6;
     cursor: not-allowed;
     box-shadow: none;
+}
+/* 👤 내 정보 내용 글씨 흰색 계열로 */
+.infoSection p {
+    color: var(--text-main);      /* 거의 흰색 */
+    font-size: 0.95rem;
+}
+
+.infoSection p b {
+    color: #ffffff;               /* 라벨(닉네임:, 이메일:) 더 쨍한 흰색 */
 }
