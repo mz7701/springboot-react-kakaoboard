@@ -43,6 +43,11 @@ const MyPage = () => {
     // 내 글/UI
     const [myDebates, setMyDebates] = useState([]);
     const [expandedId, setExpandedId] = useState(null);
+
+    // ✨ 추가: 토론 수정용 상태
+    const [editDebateId, setEditDebateId] = useState(null);
+    const [editDebateForm, setEditDebateForm] = useState({ title: "", content: "" });
+
     const [loading, setLoading] = useState(false);
     const [sending, setSending] = useState(false);
     const [verifying, setVerifying] = useState(false);
@@ -126,6 +131,77 @@ const MyPage = () => {
             console.error("❌ 내 토론 불러오기 실패:", err);
         }
     };
+    // ✨ 내가 쓴 토론 통계 (개수 표시용)
+    const debateStats = useMemo(() => {
+        const total = myDebates.length;
+        const open = myDebates.filter((d) => !d.isClosed && !d.rebuttalTitle).length;   // 반박해보세요
+        const rebut = myDebates.filter((d) => !d.isClosed && d.rebuttalTitle).length;   // 반박중
+        const closed = myDebates.filter((d) => d.isClosed).length;                      // 마감
+        return { total, open, rebut, closed };
+    }, [myDebates]);
+
+    // ✨ 수정/삭제 가능 여부 (반박해보세요만 true)
+    const canEditDebate = (debate) => !debate.isClosed && !debate.rebuttalTitle;
+    const canDeleteDebate = (debate) => !debate.isClosed && !debate.rebuttalTitle;
+
+    // ✨ 수정 버튼 눌렀을 때
+    const handleDebateEditClick = (debate) => {
+        if (!canEditDebate(debate)) {
+            alert("반박중이거나 마감된 토론은 수정할 수 없습니다.");
+            return;
+        }
+        setEditDebateId(debate.id);
+        setEditDebateForm({
+            title: debate.title || "",
+            content: debate.content || "",
+        });
+    };
+
+    // ✨ 토론 수정 저장
+    const handleDebateUpdate = async (debateId) => {
+        if (!editDebateForm.title.trim() || !editDebateForm.content.trim()) {
+            return alert("제목과 내용을 모두 입력해주세요.");
+        }
+        setLoading(true);
+        try {
+            // ⚠️ 백엔드에 PUT /api/debates/{id} 구현 필요
+            await axios.put(`/api/debates/${debateId}`, {
+                title: editDebateForm.title,
+                content: editDebateForm.content,
+            });
+
+            alert("토론이 수정되었습니다.");
+            setEditDebateId(null);
+            await fetchMyDebates(currentUser?.username);
+        } catch (err) {
+            console.error("❌ 토론 수정 실패:", err);
+            alert(err.response?.data || "토론 수정 중 오류가 발생했습니다.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // ✨ 토론 삭제 (반박중/마감은 삭제 불가)
+    const handleMyDebateDelete = async (debate) => {
+        if (!canDeleteDebate(debate)) {
+            alert("반박중이거나 마감된 토론은 삭제할 수 없습니다.");
+            return;
+        }
+        if (!window.confirm("이 토론을 삭제하시겠습니까?")) return;
+
+        try {
+            await axios.delete(`/api/debates/${debate.id}`);
+            alert("토론이 삭제되었습니다.");
+            if (editDebateId === debate.id) setEditDebateId(null);
+            await fetchMyDebates(currentUser?.username);
+        } catch (err) {
+            console.error("❌ 토론 삭제 실패:", err);
+            alert(err.response?.data || "토론 삭제 중 오류가 발생했습니다.");
+        }
+    };
+
+
+
 
     // ✅ 이메일 인증번호 전송 (정보수정용: 기존 가입여부 상관X)
     const handleSendCode = async () => {
@@ -368,74 +444,207 @@ const MyPage = () => {
                 {/* 내가 쓴 토론 */}
                 {activeTab === "posts" && (
                     <section className={styles.postSection}>
-                        <h3>🧾 내가 쓴 토론</h3>
+                        <div className={styles.postHeaderRow}>
+                            <h3>🧾 내가 쓴 토론</h3>
+                            <div className={styles.postStats}>
+                                <span>총 {debateStats.total}개</span>
+                                <span>🗣 반박해보세요 {debateStats.open}개</span>
+                                <span>⚔ 반박중 {debateStats.rebut}개</span>
+                                <span>🕛 마감 {debateStats.closed}개</span>
+                            </div>
+                        </div>
+
                         {myDebates.length === 0 ? (
                             <p>작성한 토론이 없습니다.</p>
                         ) : (
-                            myDebates.map((debate) => (
-                                <div key={debate.id} className={styles.debateCard}>
-                                    <div className={styles.debateHeader} onClick={() => toggleExpand(debate.id)}>
-                                        {/* 제목 + 상태 */}
-                                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                                            <h4 style={{ margin: 0 }}>{debate.title}</h4>
-                                            <span
-                                                style={{
-                                                    color: getDebateStatusColor(debate),
-                                                    fontSize: "0.9rem",
-                                                    fontWeight: 700,
-                                                }}
-                                            >
-                        [{getDebateStatusText(debate)}]
-                      </span>
+                            myDebates.map((debate) => {
+                                const statusText = getDebateStatusText(debate);
+                                const canEdit = canEditDebate(debate);
+                                const canDelete = canDeleteDebate(debate);
+
+                                return (
+                                    <div key={debate.id} className={styles.debateCard}>
+                                        {/* 카드 헤더 */}
+                                        <div
+                                            className={styles.debateHeader}
+                                            onClick={() => toggleExpand(debate.id)}
+                                        >
+                                            <div className={styles.debateHeaderLeft}>
+                                                <h4 className={styles.debateTitle}>{debate.title}</h4>
+                                                <span
+                                                    className={`${styles.statusBadge} ${
+                                                        debate.isClosed
+                                                            ? styles.statusClosed
+                                                            : debate.rebuttalTitle
+                                                                ? styles.statusRebutted
+                                                                : styles.statusOpen
+                                                    }`}
+                                                >
+                                    {statusText}
+                                </span>
+                                            </div>
+
+                                            <div className={styles.debateHeaderRight}>
+                                <span className={styles.debateDate}>
+                                    🕓 {formatKST(debate.createdAt)}
+                                </span>
+                                                <span className={styles.chevron}>
+                                    {expandedId === debate.id ? "▲" : "▼"}
+                                </span>
+                                            </div>
                                         </div>
 
-                                        {/* 작성일 */}
-                                        <div style={{ fontSize: "0.85rem", color: "#999" }}>
-                                            🕓 {formatKST(debate.createdAt)}
-                                        </div>
+                                        {/* 펼쳐진 내용 */}
+                                        {expandedId === debate.id && (
+                                            <div className={styles.debateContent}>
+                                                <p className={styles.debateText}>{debate.content}</p>
 
-                                        {/* 화살표 */}
-                                        <span>{expandedId === debate.id ? "▲" : "▼"}</span>
-                                    </div>
-
-                                    {expandedId === debate.id && (
-                                        <div className={styles.debateContent}>
-                                            <p>{debate.content}</p>
-
-                                            {debate.rebuttalTitle && (
-                                                <div className={styles.rebuttalBox}>
-                                                    <h4>🗣️ {debate.rebuttalTitle}</h4>
-                                                    <p>{debate.rebuttalContent}</p>
-                                                    <p className={styles.rebuttalMeta}>- {debate.rebuttalAuthor}</p>
-                                                </div>
-                                            )}
-
-                                            {debate.isClosed && (
-                                                <div className={styles.resultBox}>
-                                                    {debate.winner === "draw" ? (
-                                                        <p>🤝 무승부</p>
-                                                    ) : (
-                                                        <p>
-                                                            🏆 승자:{" "}
-                                                            {debate.winner === "author" ? debate.author : debate.rebuttalAuthor}
+                                                {debate.rebuttalTitle && (
+                                                    <div className={styles.rebuttalBox}>
+                                                        <h4>🗣️ {debate.rebuttalTitle}</h4>
+                                                        <p>{debate.rebuttalContent}</p>
+                                                        <p className={styles.rebuttalMeta}>
+                                                            - {debate.rebuttalAuthor}
                                                         </p>
-                                                    )}
-                                                </div>
-                                            )}
+                                                    </div>
+                                                )}
 
-                                            {/* ✅ 댓글 섹션 */}
-                                            <CommentSection
-                                                debateId={debate.id}
-                                                currentUser={currentUser}
-                                                refresh={() => fetchMyDebates(currentUser?.username)}
-                                            />
-                                        </div>
-                                    )}
-                                </div>
-                            ))
+                                                {debate.isClosed && (
+                                                    <div className={styles.resultBox}>
+                                                        {debate.winner === "draw" ? (
+                                                            <p>🤝 무승부</p>
+                                                        ) : (
+                                                            <p>
+                                                                🏆 승자:{" "}
+                                                                {debate.winner === "author"
+                                                                    ? debate.author
+                                                                    : debate.rebuttalAuthor}
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                )}
+
+                                                {/* ✨ 수정/삭제 버튼 영역 */}
+                                                <div className={styles.postActions}>
+                                                    <div className={styles.postMeta}>
+                                        <span className={styles.postCategory}>
+                                            📂 {debate.category || "기타"}
+                                        </span>
+                                                    </div>
+                                                    <div className={styles.postButtonGroup}>
+                                                        {/* 수정 버튼 */}
+                                                        {canEdit ? (
+                                                            <button
+                                                                className={styles.postActionButton}
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    handleDebateEditClick(debate);
+                                                                }}
+                                                            >
+                                                                ✏️ 수정
+                                                            </button>
+                                                        ) : (
+                                                            <button
+                                                                className={`${styles.postActionButton} ${styles.postActionButtonDisabled}`}
+                                                                onClick={(e) => e.stopPropagation()}
+                                                                title="반박중/마감된 토론은 수정할 수 없습니다."
+                                                            >
+                                                                ✏️ 수정 불가
+                                                            </button>
+                                                        )}
+
+                                                        {/* 삭제 버튼 */}
+                                                        {canDelete ? (
+                                                            <button
+                                                                className={`${styles.postActionButton} ${styles.postDeleteButton}`}
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    handleMyDebateDelete(debate);
+                                                                }}
+                                                            >
+                                                                🗑 삭제
+                                                            </button>
+                                                        ) : (
+                                                            <button
+                                                                className={`${styles.postActionButton} ${styles.postActionButtonDisabled}`}
+                                                                onClick={(e) => e.stopPropagation()}
+                                                                title="반박중/마감된 토론은 삭제할 수 없습니다."
+                                                            >
+                                                                🗑 삭제 불가
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                </div>
+
+                                                {/* ✨ 수정 폼 (반박해보세요 글만) */}
+                                                {editDebateId === debate.id && (
+                                                    <div className={styles.debateEditArea}>
+                                                        <input
+                                                            type="text"
+                                                            className={styles.debateEditInput}
+                                                            placeholder="제목을 입력하세요"
+                                                            value={editDebateForm.title}
+                                                            onChange={(e) =>
+                                                                setEditDebateForm((prev) => ({
+                                                                    ...prev,
+                                                                    title: e.target.value,
+                                                                }))
+                                                            }
+                                                            onClick={(e) => e.stopPropagation()}
+                                                        />
+                                                        <textarea
+                                                            className={styles.debateEditTextarea}
+                                                            placeholder="내용을 입력하세요"
+                                                            value={editDebateForm.content}
+                                                            onChange={(e) =>
+                                                                setEditDebateForm((prev) => ({
+                                                                    ...prev,
+                                                                    content: e.target.value,
+                                                                }))
+                                                            }
+                                                            onClick={(e) => e.stopPropagation()}
+                                                        />
+                                                        <div className={styles.editButtonsRow}>
+                                                            <button
+                                                                className={styles.cancelEditButton}
+                                                                type="button"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    setEditDebateId(null);
+                                                                }}
+                                                            >
+                                                                취소
+                                                            </button>
+                                                            <button
+                                                                className={styles.saveEditButton}
+                                                                type="button"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    handleDebateUpdate(debate.id);
+                                                                }}
+                                                                disabled={loading}
+                                                            >
+                                                                {loading ? "저장 중..." : "저장"}
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* ✅ 댓글 섹션 (원래 있던 부분 유지) */}
+                                                <CommentSection
+                                                    debateId={debate.id}
+                                                    currentUser={currentUser}
+                                                    refresh={() => fetchMyDebates(currentUser?.username)}
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })
                         )}
                     </section>
                 )}
+
             </main>
         </div>
     );

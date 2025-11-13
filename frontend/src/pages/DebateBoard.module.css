@@ -789,3 +789,18 @@
 .chatroomButton:active {
     transform: scale(0.97);
 }
+.commentDeleteButton {
+    border: none;
+    background: transparent;
+    font-size: 0.75rem;
+    margin-left: 4px;
+    cursor: pointer;
+    color: #fca5a5;
+    opacity: 0.85;
+    transition: 0.18s ease;
+}
+
+.commentDeleteButton:hover {
+    opacity: 1;
+    transform: translateY(-1px);
+}

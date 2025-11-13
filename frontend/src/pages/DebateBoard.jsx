@@ -123,6 +123,7 @@ const DebateBoard = () => {
         }
     };
 
+
     const handleRebuttalSubmit = async (debateId) => {
         if (!requireLogin()) return;
         const input = rebuttalInputs[debateId];
@@ -200,6 +201,28 @@ const DebateBoard = () => {
             console.error("대댓글 등록 실패:", err);
         }
     };
+    // ✨ 댓글 삭제 (본인 것만)
+    const handleCommentDelete = async (debateId, comment) => {
+        if (!requireLogin()) return;
+
+        if (currentUser?.username !== comment.author) {
+            alert("자신이 작성한 댓글만 삭제할 수 있습니다.");
+            return;
+        }
+
+        if (!window.confirm("댓글을 삭제하시겠습니까?")) return;
+
+        try {
+            // ⚠️ 백엔드에 DELETE /api/debates/{debateId}/comments/{commentId} 구현 필요
+            await axios.delete(`/api/debates/${debateId}/comments/${comment.id}`);
+            await fetchComments(debateId);
+            await fetchDebates();
+        } catch (err) {
+            console.error("댓글 삭제 실패:", err);
+            alert(err.response?.data || "댓글 삭제 중 오류가 발생했습니다.");
+        }
+    };
+
 
     const filteredDebates = debates.filter((d) => {
         const tabMatch =
@@ -285,6 +308,19 @@ const DebateBoard = () => {
                 >
                     💬 답글
                 </button>
+
+                {currentUser?.username === c.author && (
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            handleCommentDelete(debateId, c);
+                        }}
+                        className={styles.commentDeleteButton}
+                    >
+                        🗑 삭제
+                    </button>
+                )}
+
 
                 {showReplyInput[c.id] && (
                     <div className={styles.replyInputGroup} onClick={(e) => e.stopPropagation()}>

@@ -9,7 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import com.example.kakaoboard.repository.CommentRepository;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -25,7 +25,7 @@ public class DebateController {
 
     private final DebateService debateService;
     private final DebateRepository debateRepository;
-
+    private final CommentRepository commentRepository;
     /** ✅ 전체 토론 조회 + 자동 마감 */
     @GetMapping
     public ResponseEntity<List<Debate>> getAllDebates() {
@@ -245,6 +245,22 @@ public class DebateController {
     @GetMapping("/{debateId}/comments/tree")
     public ResponseEntity<List<Comment>> getTree(@PathVariable Long debateId) {
         return ResponseEntity.ok(debateService.getCommentTree(debateId));
+    }
+    /** ✅ 댓글 삭제 (해당 토론에 속한 댓글만 삭제) */
+    @DeleteMapping("/{debateId}/comments/{commentId}")
+    public ResponseEntity<?> deleteComment(
+            @PathVariable Long debateId,
+            @PathVariable Long commentId
+    ) {
+        var opt = commentRepository.findByIdAndDebateId(commentId, debateId);
+
+        if (opt.isEmpty()) {
+            // 요청한 토론에 속한 댓글이 아니거나, 없는 댓글
+            return ResponseEntity.notFound().build();
+        }
+
+        commentRepository.delete(opt.get());
+        return ResponseEntity.ok("댓글 삭제 완료");
     }
 
 }
