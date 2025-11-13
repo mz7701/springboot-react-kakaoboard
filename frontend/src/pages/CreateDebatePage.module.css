@@ -1,17 +1,188 @@
+/* 전체 카드 레이아웃 */
 .container {
-    max-width: 700px;
-    margin: 50px auto;
-    padding: 20px;
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+    max-width: 760px;
+    margin: 60px auto;
+    padding: 28px 30px 26px;
+    background: linear-gradient(135deg, #f9fbff, #f3f4ff);
+    border-radius: 24px;
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
+    border: 1px solid rgba(148, 163, 184, 0.25);
 }
+
+/* 제목 영역 */
+.title {
+    text-align: center;
+    font-size: 1.9rem;
+    font-weight: 800;
+    letter-spacing: 0.03em;
+    margin-bottom: 8px;
+
+    background: linear-gradient(135deg, #2563eb, #fb7185);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+/* 폼 전체 레이아웃 */
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    margin-top: 16px;
+}
+
+
+/* 공통 라벨 */
+.label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 6px;
+}
+
+/* 카테고리 선택 박스 */
+.categoryBox {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px 16px;
+    border-radius: 18px;
+    background: rgba(248, 250, 252, 0.8);
+    border: 1px solid rgba(148, 163, 184, 0.45);
+}
+
+/* 셀렉트 박스 */
+.select {
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(148, 163, 184, 0.8);
+    background: #f9fafb;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: border 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+
+.select:hover {
+    background: #ffffff;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.2);
+}
+
+.select:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);
+}
+
+/* 제목/내용 공통 그룹 */
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+}
+
+/* 텍스트 인풋 & 텍스트에어리어 공통 */
+.input,
+.textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(148, 163, 184, 0.9);
+    font-size: 0.95rem;
+    background: #f9fafb;
+    transition: border 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, transform 0.05s ease;
+}
+
+.input::placeholder,
+.textarea::placeholder {
+    color: #cbd5e1;
+}
+
+.input:focus,
+.textarea:focus {
+    outline: none;
+    background: #ffffff;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.18);
+    transform: translateY(-1px);
+}
+
+/* 내용 칸 */
+.textarea {
+    height: 220px;
+    resize: none;
+    line-height: 1.5;
+}
+
+/* 제출 버튼 (하단 고급버튼) */
+.submitButton {
+    margin-top: 4px;
+    width: 100%;
+    padding: 12px 18px;
+    border: none;
+    border-radius: 999px;
+
+    background: linear-gradient(135deg, #2563eb, #4f46e5);
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+
+    box-shadow: 0 10px 22px rgba(37, 99, 235, 0.45);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.1s ease;
+}
+.submitButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 30px rgba(37, 99, 235, 0.55);
+    opacity: 0.96;
+}
+
+
+.submitButton:active {
+    transform: scale(0.97);
+    box-shadow: 0 8px 18px rgba(37, 99, 235, 0.4);
+}
+
+/* (필요하면 뒤로가기용 버튼/그룹 유지) */
+.buttonGroup {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.backButton {
+    flex: 1;
+    padding: 10px 0;
+    border-radius: 999px;
+    border: none;
+    background: #e5e7eb;
+    color: #111827;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.backButton:hover {
+    background: #d1d5db;
+    transform: translateY(-1px);
+}
+
 
 .title {
     text-align: center;
-    font-size: 1.8rem;
-    margin-bottom: 20px;
+    font-size: 1.9rem;
+    font-weight: 800;
+    letter-spacing: 0.03em;
+    margin-bottom: 8px;
+
+    background: linear-gradient(135deg, #2563eb, #fb7185);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
 }
+
 
 .input,
 .textarea {
