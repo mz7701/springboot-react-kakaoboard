@@ -500,27 +500,39 @@ const DebateBoard = () => {
                 </div>
             </div>
 
-            {/* 🍎 사과게임 버튼 (항상 탭 옆에 고정) */}
-            <button className={styles.appleButton} onClick={() => navigate("/applegame")}>
-                🍎 사과게임 하러가기
+            {/* 💬 실시간 토론장 버튼 */}
+            <button
+                className={styles.chatroomButton}
+                onClick={() => navigate("/chatroom")}
+            >
+                💬 실시간 토론장 입장하기
             </button>
 
             {/* 카테고리 필터 */}
-            {activeTab !== "closed" && (
-                <div className={styles.categoryFilter}>
-                    {categories.map((cat) => (
-                        <button
-                            key={cat}
-                            onClick={() => setSelectedCategory(cat)}
-                            className={`${styles.categoryBtn} ${
-                                selectedCategory === cat ? styles.activeCategory : ""
-                            }`}
-                        >
-                            {cat}
-                        </button>
-                    ))}
+            <div className={styles.categoryFilter}>
+                {categories.map((cat) => {
+                        const icons = {
+                            전체: "🌏",
+                            게임: "🎮",
+                            사회: "🏙️",
+                            연애: "❤️",
+                            스포츠: "⚽",
+                            기타: "💡",
+                        };
+                        return (
+                            <button
+                                key={cat}
+                                onClick={() => setSelectedCategory(cat)}
+                                className={`${styles.categoryBtn} ${
+                                    selectedCategory === cat ? styles.activeCategory : ""
+                                }`}
+                            >
+                                {icons[cat]} {cat}
+                            </button>
+                        );
+                    })}
                 </div>
-            )}
+
 
             {/* ✅ 토론 목록 */}
             {filteredDebates.length === 0 ? (
@@ -784,5 +796,6 @@ const DebateBoard = () => {
         </div>
     );
 };
+
 
 export default DebateBoard;

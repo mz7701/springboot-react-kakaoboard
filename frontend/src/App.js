@@ -8,6 +8,7 @@ import MyPage from "./pages/MyPage";
 import AppleGamePage from "./pages/AppleGamePage";
 import LoginIDsearch from "./pages/Login-IDsearch";
 import LoginPasswordsearch from "./pages/Login-Passwordsearch";
+import ChatRoom from "./pages/ChatRoom";
 
 export default function App() {
     return (
@@ -15,7 +16,7 @@ export default function App() {
             <Routes>
                 {/* ✅ 기본 루트 */}
                 <Route path="/" element={<Navigate to="/board" />} />
-
+                <Route path="/chatroom" element={<ChatRoom />} />
                 {/* ✅ 주요 페이지 */}
                 <Route path="/board" element={<DebateBoard />} />
                 <Route path="/mypage" element={<MyPage />} />

@@ -21,13 +21,18 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .cors(Customizer.withDefaults()) // ✅ CORS 설정 활성화
-                .csrf(csrf -> csrf.disable())
+                .cors(Customizer.withDefaults()) // ✅ CORS 활성화
+                .csrf(csrf -> csrf.disable())    // ✅ WebSocket 사용 시 CSRF 비활성화
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
+                                // ✅ 기존 API 경로
                                 "/api/auth/**",
                                 "/api/users/**",
-                                "/api/debates/**"
+                                "/api/debates/**",
+                                // ✅ WebSocket 경로 추가
+                                "/ws/**",
+                                "/app/**",
+                                "/topic/**"
                         ).permitAll()
                         .anyRequest().permitAll()
                 )
@@ -43,19 +48,19 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // ✅ React CORS 설정 (localhost & 같은 네트워크 IP 허용)
+    // ✅ React CORS 설정 (localhost + 내부 IP)
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        // ✨ React 앱 주소를 정확히 명시
+        // ✨ React 앱 주소 허용
         config.setAllowedOrigins(List.of(
                 "http://localhost:3000",
                 "http://192.168.0.21:3000"
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true); // ✅ 로그인 인증 포함 허용
+        config.setAllowCredentials(true); // ✅ 쿠키/인증 포함 허용
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
