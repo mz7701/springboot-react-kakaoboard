@@ -804,3 +804,112 @@
     opacity: 1;
     transform: translateY(-1px);
 }
+/* 🧵 댓글 한 줄 레이아웃 (닉네임 | 내용 | 시간) */
+.commentRow {
+    display: grid;
+    grid-template-columns: 140px 1fr 130px; /* 왼쪽 / 가운데 / 오른쪽 */
+    column-gap: 8px;
+    padding: 6px 4px;
+    align-items: flex-start;
+    border-top: 1px solid #eee;
+    font-size: 0.85rem;
+    background-color: #fafafa;
+}
+
+.commentList .commentRow:first-child {
+    border-top: none;
+}
+
+/* 왼쪽: 닉네임 / IP */
+.leftCell {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.commentIp {
+    font-size: 0.7rem;
+    color: #999;
+}
+
+/* 가운데: 내용 + ㄴ 표시 + 답글 */
+.middleCell {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.depthMarker {
+    color: #f59e0b;          /* 노란 느낌 */
+    font-weight: 700;
+    margin-right: 4px;
+    letter-spacing: 1px;
+}
+
+.commentText {
+    color: #444;
+}
+
+/* 오른쪽: 시간 + 삭제 버튼 */
+.rightCell {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+}
+
+/* 🌿 대댓글 줄 (답글)은 살짝 다른 배경 + 초록 닉네임 */
+.childRow {
+    background-color: #f4f5ff;
+}
+
+.childRow .commentAuthor {
+    color: #16a34a; /* 연초록 */
+}
+
+
+
+/* 입력창 위 멘션 바 */
+.mentionBar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #eef2ff;
+    border-radius: 6px;
+    padding: 4px 8px;
+    margin-bottom: 6px;
+    font-size: 0.78rem;
+    color: #4f46e5;
+}
+
+.mentionLabel {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mentionClear {
+    border: none;
+    background: transparent;
+    font-size: 0.75rem;
+    cursor: pointer;
+    color: #9ca3af;
+}
+
+.mentionClear:hover {
+    color: #ef4444;
+}
+
+/* 댓글 줄 안에서 보이는 멘션 태그 */
+.mentionTag {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 6px;
+    border-radius: 999px;
+    background: #eef2ff;
+    color: #4f46e5;
+    font-size: 0.75rem;
+    margin-right: 6px;
+}

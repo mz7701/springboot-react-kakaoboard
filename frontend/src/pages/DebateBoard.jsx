@@ -22,8 +22,9 @@ const DebateBoard = () => {
     const [rebuttalInputs, setRebuttalInputs] = useState({});
     const [showRebuttalInput, setShowRebuttalInput] = useState({});
     const [loading, setLoading] = useState(false);
-    const [replyInputs, setReplyInputs] = useState({});
-    const [showReplyInput, setShowReplyInput] = useState({});
+// ✅ 어떤 댓글에 답글 쓰는지 저장 (디시 스타일)
+    const [replyTargets, setReplyTargets] = useState({});
+
     const [activeTab, setActiveTab] = useState("unrebutted");
     const navigate = useNavigate();
     const [selectedCategory, setSelectedCategory] = useState("전체");
@@ -40,6 +41,7 @@ const DebateBoard = () => {
     // ✅ 제목 클릭 시 펼침/접힘 토글용 (추가)
     const [expandedDebateId, setExpandedDebateId] = useState(null);
 
+    const MAX_COMMENT_INDENT = 4;
     useEffect(() => {
         fetchDebates();
     }, []);
@@ -167,40 +169,52 @@ const DebateBoard = () => {
     };
 
     const handleCommentSubmit = async (debateId) => {
-        const text = commentInputs[debateId];
-        if (!requireLogin()) return; // ✅ 추가
+        const textBody = (commentInputs[debateId] || "").trim();
+        if (!requireLogin()) return;
 
-        if (!text || !text.trim()) return alert("댓글을 입력하세요!");
+        if (!textBody) {
+            alert("댓글을 입력하세요!");
+            return;
+        }
+
+        const target = replyTargets[debateId]; // { id, author } | undefined
+        const isReply = !!target;
+
+        // ✅ 최종 전송 텍스트: @닉네임 + 본문
+        const finalText = isReply ? `@${target.author} ${textBody}` : textBody;
+
         try {
-            await axios.post(`/api/debates/${debateId}/comments`, {
-                author: currentUser?.username || "익명",
-                text,
-            });
-            setCommentInputs({ ...commentInputs, [debateId]: "" });
-            await fetchComments(debateId);   // ✅ 등록 직후 트리 갱신
+            if (isReply) {
+                // 대댓글
+                await axios.post(
+                    `/api/debates/${debateId}/comments/${target.id}/reply`,
+                    {
+                        author: currentUser?.username || "익명",
+                        text: finalText,
+                    }
+                );
+            } else {
+                // 일반 댓글
+                await axios.post(`/api/debates/${debateId}/comments`, {
+                    author: currentUser?.username || "익명",
+                    text: finalText,
+                });
+            }
+
+            // 입력창/타겟 초기화
+            setCommentInputs((prev) => ({ ...prev, [debateId]: "" }));
+            setReplyTargets((prev) => ({ ...prev, [debateId]: undefined }));
+
+            await fetchComments(debateId);
             fetchDebates();
         } catch (err) {
             console.error("댓글 등록 실패:", err);
+            alert("댓글 등록 중 오류가 발생했습니다.");
         }
     };
 
-    const handleReplySubmit = async (debateId, parentId) => {
-        if (!requireLogin()) return;
-        const text = replyInputs[parentId];
-        if (!text || !text.trim()) return alert("대댓글을 입력하세요!");
 
-        try {
-            await axios.post(`/api/debates/${debateId}/comments/${parentId}/reply`, {
-                author: currentUser?.username || "익명",
-                text,
-            });
-            setReplyInputs({ ...replyInputs, [parentId]: "" });
-            await fetchComments(debateId);   // ✅ 등록 직후 트리 갱신
-            await fetchDebates();
-        } catch (err) {
-            console.error("대댓글 등록 실패:", err);
-        }
-    };
+
     // ✨ 댓글 삭제 (본인 것만)
     const handleCommentDelete = async (debateId, comment) => {
         if (!requireLogin()) return;
@@ -246,109 +260,107 @@ const DebateBoard = () => {
     const indexOfFirst = indexOfLast - itemsPerPage;
     const currentDebates = filteredDebates.slice(indexOfFirst, indexOfLast);
 
-    // ✅ 무한 대댓글 + 공개 IP 표시 + 중복 방지
     const renderComments = (debateId, comments, depth = 0) => {
         if (!Array.isArray(comments) || comments.length === 0) return null;
 
-        // 중복 댓글 방지 (id 기준)
         const uniqueComments = Array.from(
             new Map(comments.map((c) => [c.id, c])).values()
         );
 
-        return uniqueComments.map((c) => (
-            <div
-                key={c.id}
-                className={styles.commentItem}
-                style={{
-                    marginLeft: depth * 20,
-                    borderLeft: depth > 0 ? "2px solid #ccc" : "none",
-                    paddingLeft: 8,
-                    marginTop: 6,
-                }}
-            >
-      <span
-          className={styles.commentAuthor}
-          onClick={(e) => {
-              e.stopPropagation();
-              setShowReplyInput({ ...showReplyInput, [c.id]: true });
-              setReplyInputs({ ...replyInputs, [c.id]: `@${c.author} ` });
-          }}
-          style={{
-              cursor: "pointer",
-              color: stringToColor(c.author || "익명"),
-              fontWeight: 600,
-          }}
-      >
-        {depth > 0 ? "↳ " : ""}
-          {c.author}
-      </span>
+        return uniqueComments.map((c) => {
+            const author = c.author || "익명";
+            const isReply = depth > 0;
 
-                {/* ✅ 공개 IP 그대로 표시 */}
-                <span className={styles.commentIp}>
-        {" "}
-                    ({c.ipAddress || "IP 정보 없음"})
-      </span>
+            // 🔹 서버에 저장된 원본 텍스트
+            const rawText = c.text || "";
+            let mentionNick = null;
+            let contentText = rawText;
 
-                {/* 날짜 표시 */}
-                {c.createdAt && (
-                    <span className={styles.commentDate}>
-          {" "}
-                        · {new Date(c.createdAt).toLocaleString()}
-        </span>
-                )}
+            // "@닉네임 내용" 형태면 멘션/본문 분리
+            const mentionMatch = rawText.match(/^@(\S+)\s+(.*)$/);
+            if (mentionMatch) {
+                mentionNick = mentionMatch[1];
+                contentText = mentionMatch[2] || "";
+            }
 
-                : {c.text}
+            // 🟣 줄 클릭 → 답글 타겟만 설정 (입력창에는 본문만)
+            const handleRowClick = () => {
+                if (!requireLogin()) return;
 
-                <button
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        setShowReplyInput((prev) => ({ ...prev, [c.id]: !prev[c.id] }));
-                    }}
-                    className={styles.replyButton}
-                >
-                    💬 답글
-                </button>
+                setReplyTargets((prev) => ({
+                    ...prev,
+                    [debateId]: { id: c.id, author },   // ✅ 여기서 {id, author} 저장
+                }));
 
-                {currentUser?.username === c.author && (
-                    <button
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            handleCommentDelete(debateId, c);
-                        }}
-                        className={styles.commentDeleteButton}
+                setCommentInputs((prev) => ({
+                    ...prev,
+                    [debateId]: prev[debateId] || "",   // 멘션은 입력창에 넣지 않음
+                }));
+            };
+
+            return (
+                <React.Fragment key={c.id}>
+                    <div
+                        className={`${styles.commentRow} ${
+                            isReply ? styles.childRow : ""
+                        }`}
+                        onClick={handleRowClick}
                     >
-                        🗑 삭제
-                    </button>
-                )}
-
-
-                {showReplyInput[c.id] && (
-                    <div className={styles.replyInputGroup} onClick={(e) => e.stopPropagation()}>
-                        <input
-                            type="text"
-                            placeholder="답글을 입력하세요..."
-                            value={replyInputs[c.id] || ""}
-                            onChange={(e) =>
-                                setReplyInputs({
-                                    ...replyInputs,
-                                    [c.id]: e.target.value,
-                                })
-                            }
-                            className={styles.replyInput}
-                        />
-                        <button
-                            onClick={() => handleReplySubmit(debateId, c.id)}
-                            className={styles.replySubmit}
+                        {/* 왼쪽: 작성자 */}
+                        <div className={styles.leftCell}>
+                        <span
+                            className={styles.commentAuthor}
+                            style={{
+                                cursor: "pointer",
+                                color: stringToColor(author),
+                                fontWeight: 600,
+                            }}
                         >
-                            등록
-                        </button>
-                    </div>
-                )}
+                            {author}
+                        </span>
+                            <span className={styles.commentIp}>
+                            ({c.ipAddress || "IP 정보 없음"})
+                        </span>
+                        </div>
 
-                {Array.isArray(c.replies) && c.replies.length > 0 &&
-                    renderComments(debateId, c.replies, depth + 1)}
-            </div>
-        ));
+                        {/* 가운데: 멘션 태그 + 본문 */}
+                        <div className={styles.middleCell}>
+                            {mentionNick && (
+                                <span className={styles.mentionTag}>
+                                @{mentionNick}
+                            </span>
+                            )}
+                            <span className={styles.commentText}>{contentText}</span>
+                        </div>
+
+                        {/* 오른쪽: 시간 + 삭제 */}
+                        <div className={styles.rightCell}>
+                            {c.createdAt && (
+                                <span className={styles.commentDate}>
+                                {new Date(c.createdAt).toLocaleString()}
+                            </span>
+                            )}
+
+                            {currentUser?.username === author && (
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleCommentDelete(debateId, c);
+                                    }}
+                                    className={styles.commentDeleteButton}
+                                >
+                                    🗑 삭제
+                                </button>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* 자식 댓글 재귀 */}
+                    {Array.isArray(c.replies) && c.replies.length > 0 &&
+                        renderComments(debateId, c.replies, depth + 1)}
+                </React.Fragment>
+            );
+        });
     };
 
 
@@ -788,12 +800,38 @@ const DebateBoard = () => {
                                                 className={styles.commentInputGroup}
                                                 onClick={(e) => e.stopPropagation()}
                                             >
+                                                {/* ⭐ 멘션 배지: 수정 불가, X로만 해제 */}
+                                                {replyTargets[debate.id]?.author && (
+                                                    <div className={styles.mentionBar}>
+                <span className={styles.mentionLabel}>
+                    @{replyTargets[debate.id].author} 님에게 답글 작성 중
+                </span>
+                                                        <button
+                                                            type="button"
+                                                            className={styles.mentionClear}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setReplyTargets((prev) => ({
+                                                                    ...prev,
+                                                                    [debate.id]: undefined,
+                                                                }));
+                                                            }}
+                                                        >
+                                                            ✕
+                                                        </button>
+                                                    </div>
+                                                )}
+
                                                 <input
                                                     value={commentInputs[debate.id] || ""}
                                                     onChange={(e) =>
                                                         handleCommentChange(debate.id, e.target.value)
                                                     }
-                                                    placeholder="댓글을 입력하세요..."
+                                                    placeholder={
+                                                        replyTargets[debate.id]?.author
+                                                            ? "답글 내용을 입력하세요..."
+                                                            : "댓글을 입력하세요..."
+                                                    }
                                                     className={styles.commentInput}
                                                 />
                                                 <button
@@ -804,6 +842,7 @@ const DebateBoard = () => {
                                                 </button>
                                             </div>
                                         )}
+
                                     </div>
                                 </>
                             )}
