@@ -54,6 +54,7 @@ const DebateBoard = () => {
             console.error("댓글 불러오기 실패:", err);
         }
     };
+
     // ✅ 남은시간 계산 함수
     const getRemainingTime = (debate) => {
         if (!debate.rebuttalAt || debate.isClosed) return null;
