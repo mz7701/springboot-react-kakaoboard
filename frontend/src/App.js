@@ -34,6 +34,8 @@ export default function App() {
 
                 <Route path="/login/idsearch" element={<LoginIDsearch />} />
                 <Route path="/login/passwordsearch" element={<LoginPasswordsearch />} />
+
+                
             </Routes>
         </Router>
     );

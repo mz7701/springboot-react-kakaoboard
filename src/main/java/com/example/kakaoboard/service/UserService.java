@@ -136,4 +136,17 @@ public class UserService {
 
         System.out.println("✅ 비밀번호 변경 완료 → " + email);
     }
+    // ✅ 비밀번호 확인 후 회원 탈퇴
+    public void deleteUser(Long userId, String rawPassword) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+
+        // 저장된 비밀번호와 비교
+        if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+        userRepository.delete(user);
+    }
+
 }

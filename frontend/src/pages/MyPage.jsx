@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import styles from "./MyPage.module.css";
 import CommentSection from "../components/CommentSection";
 
@@ -46,6 +47,54 @@ const MyPage = () => {
     const [sending, setSending] = useState(false);
     const [verifying, setVerifying] = useState(false);
 
+    const [deleting, setDeleting] = useState(false);   // 🔥 회원탈퇴 로딩 상태
+    const navigate = useNavigate();
+
+    // ✅ 회원 탈퇴
+    // - 이메일 인증 완료(verified === true)
+    // - 비밀번호 & 비밀번호 확인 일치 + 규칙 통과
+    // - 확인창에서 OK 눌러야 실제 삭제
+    const handleDeleteAccount = async () => {
+        if (!currentUser) {
+            return alert("로그인이 필요합니다.");
+        }
+        if (!verified) {
+            return alert("이메일 인증을 먼저 완료해주세요.");
+        }
+        if (!editForm.password || !confirmPassword) {
+            return alert("비밀번호와 비밀번호 확인을 모두 입력해주세요.");
+        }
+        if (editForm.password !== confirmPassword) {
+            return alert("비밀번호가 일치하지 않습니다.");
+        }
+        if (!pwRegex.test(editForm.password)) {
+            return alert("비밀번호는 영어, 숫자, 특수문자를 포함해 8자 이상이어야 합니다.");
+        }
+
+        const ok = window.confirm(
+            "정말로 탈퇴하시겠습니까?\n탈퇴 후에는 모든 정보가 삭제되며 복구가 불가능합니다."
+        );
+        if (!ok) return;
+
+        try {
+            setDeleting(true);
+            // 🔥 백엔드에서 /api/users/delete/{id} 또는 /api/users/{id} DELETE 만들어줘
+            await axios.delete(`/api/users/delete/${currentUser.id}`, {
+                data: { password: editForm.password }, // 서버에서 비번 검증에 사용
+            });
+
+            alert("회원 탈퇴가 완료되었습니다. 이용해 주셔서 감사합니다.");
+            localStorage.removeItem("user");
+            navigate("/"); // 메인 화면으로 이동
+        } catch (err) {
+            console.error("❌ 회원 탈퇴 실패:", err);
+            alert(err.response?.data || "회원 탈퇴 중 오류가 발생했습니다.");
+        } finally {
+            setDeleting(false);
+        }
+    };
+
+    // 🔥 탈퇴 후 리다이렉트
     // ✅ 로그인 유저 로드
     useEffect(() => {
         const raw = localStorage.getItem("user");
@@ -122,9 +171,9 @@ const MyPage = () => {
         }
     };
 
-    // ✅ 비번 규칙: 영문+숫자+특수문자 포함 8자 이상
+    // ✅ 비번 규칙: 영문+숫자 포함 8자 이상 (특수문자 조건 제거)
     const pwRegex = useMemo(
-        () => /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/,
+        () => /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/,
         []
     );
 
@@ -297,8 +346,24 @@ const MyPage = () => {
                         >
                             {loading ? "수정 중..." : "수정하기"}
                         </button>
+
+                        {/* 🔥 회원 탈퇴 영역 */}
+                        <div className={styles.deleteSection}>
+                            <p className={styles.deleteNotice}>
+                                ⚠️ 회원 탈퇴 시 모든 데이터가 영구 삭제되며, 복구가 불가능합니다.
+                            </p>
+                            <button
+                                type="button"
+                                className={styles.deleteButton}
+                                onClick={handleDeleteAccount}
+                                disabled={deleting}
+                            >
+                                {deleting ? "탈퇴 처리 중..." : "회원 탈퇴하기"}
+                            </button>
+                        </div>
                     </section>
                 )}
+
 
                 {/* 내가 쓴 토론 */}
                 {activeTab === "posts" && (

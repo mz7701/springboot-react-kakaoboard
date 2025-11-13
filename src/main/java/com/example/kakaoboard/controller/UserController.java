@@ -6,6 +6,7 @@ import com.example.kakaoboard.service.UserService;
 import com.example.kakaoboard.service.EmailService;
 import com.example.kakaoboard.service.EmailVerificationService;
 import jakarta.mail.MessagingException;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -99,6 +100,23 @@ public class UserController {
         return ResponseEntity.badRequest().body("❌ 인증 실패 (번호 불일치 또는 만료)");
     }
 
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> deleteUser(
+            @PathVariable Long id,
+            @RequestBody(required = false) DeleteUserRequest request
+    ) {
+        String email = request != null ? request.getEmail() : null;
+        String password = request != null ? request.getPassword() : null;
+
+        userService.deleteUser(id, password);
+        return ResponseEntity.ok("회원 탈퇴가 완료되었습니다.");
+    }
+
+    @Data
+    public static class DeleteUserRequest {
+        private String email;
+        private String password;
+    }
 
     /** ✅ 비밀번호 재설정 */
     @PostMapping("/reset-password")
@@ -117,6 +135,9 @@ public class UserController {
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("비밀번호 변경 중 오류: " + e.getMessage());
         }
+
+
+
     }
 
     /** ✅ 내부 DTO */

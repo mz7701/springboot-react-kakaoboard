@@ -29,8 +29,15 @@
     flex-direction: column;
     gap: 18px;
     margin-top: 16px;
+    align-items: stretch;
 }
 
+/* 🔥 한 줄 요소 폭 통일 */
+.categoryBox,
+.inputGroup,
+.submitButton {
+    width: 100%;
+}
 
 /* 공통 라벨 */
 .label {
@@ -49,10 +56,12 @@
     border-radius: 18px;
     background: rgba(248, 250, 252, 0.8);
     border: 1px solid rgba(148, 163, 184, 0.45);
+    box-sizing: border-box;
 }
 
 /* 셀렉트 박스 */
 .select {
+    width: 100%;
     padding: 10px 12px;
     border-radius: 12px;
     border: 1px solid rgba(148, 163, 184, 0.8);
@@ -60,6 +69,7 @@
     font-size: 0.95rem;
     cursor: pointer;
     transition: border 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+    box-sizing: border-box;
 }
 
 .select:hover {
@@ -89,6 +99,7 @@
     border: 1px solid rgba(148, 163, 184, 0.9);
     font-size: 0.95rem;
     background: #f9fafb;
+    box-sizing: border-box;
     transition: border 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, transform 0.05s ease;
 }
 
@@ -131,19 +142,19 @@
     box-shadow: 0 10px 22px rgba(37, 99, 235, 0.45);
     transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.1s ease;
 }
+
 .submitButton:hover {
     transform: translateY(-2px);
     box-shadow: 0 14px 30px rgba(37, 99, 235, 0.55);
     opacity: 0.96;
 }
 
-
 .submitButton:active {
     transform: scale(0.97);
     box-shadow: 0 8px 18px rgba(37, 99, 235, 0.4);
 }
 
-/* (필요하면 뒤로가기용 버튼/그룹 유지) */
+/* (필요하면 뒤로가기용 버튼/그룹) */
 .buttonGroup {
     display: flex;
     justify-content: space-between;
@@ -167,83 +178,4 @@
 .backButton:hover {
     background: #d1d5db;
     transform: translateY(-1px);
-}
-
-
-.title {
-    text-align: center;
-    font-size: 1.9rem;
-    font-weight: 800;
-    letter-spacing: 0.03em;
-    margin-bottom: 8px;
-
-    background: linear-gradient(135deg, #2563eb, #fb7185);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-}
-
-
-.input,
-.textarea {
-    width: 100%;
-    padding: 12px;
-    margin: 10px 0;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 1rem;
-}
-
-.textarea {
-    height: 200px;
-    resize: none;
-}
-
-.buttonGroup {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-}
-
-.backButton,
-.submitButton {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-.backButton {
-    background-color: #ccc;
-}
-
-.submitButton {
-    background-color: #007bff;
-    color: white;
-}
-/*추가 카테로그*/
-.categoryBox {
-    margin-bottom: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-.select {
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    background: #fff;
-    font-size: 16px;
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-.select:hover {
-    border-color: #2563eb;
-}
-
-.label {
-    font-weight: 600;
-    color: #333;
 }

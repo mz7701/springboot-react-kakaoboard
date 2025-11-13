@@ -276,3 +276,45 @@
         padding: 24px;
     }
 }
+/* 🚨 회원 탈퇴 섹션 */
+.deleteSection {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px dashed rgba(248, 113, 113, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+}
+
+.deleteNotice {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.4;
+}
+
+.deleteButton {
+    padding: 10px 18px;
+    border-radius: 999px;
+    border: none;
+    background: linear-gradient(90deg, #ef4444, #f97373);
+    color: #ffffff;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(248, 113, 113, 0.6);
+    transition: 0.25s ease;
+    white-space: nowrap;
+}
+
+.deleteButton:hover:not(:disabled) {
+    transform: translateY(-2px);
+    filter: brightness(1.05);
+}
+
+.deleteButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
