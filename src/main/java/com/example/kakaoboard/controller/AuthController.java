@@ -15,7 +15,15 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
-@CrossOrigin(origins = {"", "http://192.168.0.21:3000"})
+@CrossOrigin(
+        origins = {
+                "http://localhost:3000",
+                "http://192.168.0.21:3000",
+                "https://kakaoboard-frontend.onrender.com"
+        },
+        allowedHeaders = "*",
+        allowCredentials = "true"
+)
 public class AuthController {
 
     private final UserService userService;
