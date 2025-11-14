@@ -31,10 +31,12 @@ spring:
           auth: true
           starttls:
             enable: true
-# ✅ 이메일 발신 주소 (Render 환경변수 EMAIL_FROM 에서 읽음)
-email:
-  from: ${EMAIL_FROM:your-email@example.com}
+# ✅ 이메일 발신 주소 (EmailService 에서 사용하는 경로)
+app:
+  email:
+    from: ${EMAIL_FROM:mz7701@naver.com}   # 네가 실제로 쓰고 싶은 발신 이메일
 
-# ✅ SendGrid API 키 (Render 환경변수 SENDGRID_API_KEY 에서 읽음)
+# ✅ SendGrid API 키 (EmailService 에서 사용하는 경로)
 sendgrid:
-  api-key: ${SENDGRID_API_KEY:dummy}
+  api:
+    key: ${SENDGRID_API_KEY:dummy}

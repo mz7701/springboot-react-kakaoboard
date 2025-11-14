@@ -1,12 +1,13 @@
 package com.example.kakaoboard.service;
 
-import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.util.List;
 import java.util.Map;
@@ -28,77 +29,73 @@ public class EmailService {
      * ✅ 이메일 인증번호 발송
      *  - EmailVerificationService 등에서 이 메서드를 호출해서 사용
      */
-    public void sendVerificationMail(String to, String code) throws MessagingException {
+    public void sendVerificationMail(String to, String code) {
 
         String subject = "[Kakaoboard] 이메일 인증번호 안내";
 
-        // ✅ 예쁜 HTML 템플릿 (코드만 %s로 들어감)
+        // ✅ HTML 템플릿 (코드만 %s로 들어감)
         String htmlContent = """
-        <div style="width:100%%; background-color:#f5f7fa; padding:30px 0; font-family:'Pretendard','Noto Sans KR',Arial,sans-serif;">
-          <div style="max-width:500px; margin:0 auto; background:#ffffff; border-radius:14px; box-shadow:0 4px 20px rgba(0,0,0,0.08); overflow:hidden;">
-            <div style="background:linear-gradient(90deg,#6366f1,#8b5cf6,#ec4899); padding:20px 0; text-align:center; color:#fff;">
-              <h1 style="margin:0; font-size:26px; font-weight:700;">Kakaoboard</h1>
-              <p style="margin:0; font-size:14px; opacity:0.9;">이메일 인증 안내</p>
-            </div>
-            <div style="padding:30px;">
-              <p style="font-size:16px; color:#333;">안녕하세요 👋</p>
-              <p style="font-size:15px; color:#555; margin-bottom:20px;">
-                요청하신 <b>이메일 인증번호</b>는 아래와 같습니다.<br>
-                해당 코드를 입력하여 인증을 완료해주세요.
-              </p>
-              <div style="text-align:center; margin:30px 0;">
-                <div style="display:inline-block; background:#f4f4ff; border:2px dashed #8b5cf6; border-radius:10px; padding:15px 25px;">
-                  <div style="font-size:13px; color:#6b7280; margin-bottom:6px;">이메일 인증번호</div>
-                  <div style="font-size:28px; letter-spacing:4px; font-weight:700; color:#4f46e5;">%s</div>
-                </div>
+        <div style="width:100%%; background-color:#f5f7fa; padding:24px 0; font-family:'Pretendard','Noto Sans KR',Arial,sans-serif;">
+          <div style="max-width:480px; margin:0 auto; background:#ffffff; border-radius:16px; padding:24px 24px 28px; box-shadow:0 10px 30px rgba(15,23,42,0.12);">
+            <div style="text-align:center; margin-bottom:24px;">
+              <div style="display:inline-block; padding:8px 14px; border-radius:999px; background:linear-gradient(135deg,#4f46e5,#ec4899); color:#ffffff; font-size:12px; font-weight:600; letter-spacing:0.04em;">
+                Kakaoboard 이메일 인증
               </div>
-              <p style="font-size:13px; color:#9ca3af;">
-                · 본 코드는 발송 후 30분 동안만 유효합니다.<br>
-                · 본인이 요청하지 않은 경우, 이 메일을 무시해 주세요.
-              </p>
+              <h1 style="margin:16px 0 4px; font-size:22px; font-weight:700; color:#111827;">이메일 인증번호 안내</h1>
+              <p style="margin:0; font-size:13px; color:#6b7280;">아래 인증번호를 입력하여 회원가입을 완료해주세요.</p>
             </div>
-            <div style="background:#fafafa; padding:15px; text-align:center; border-top:1px solid #eee;">
-              <p style="font-size:12px; color:#aaa; margin:0;">
-                © 2025 Kakaoboard | 본 메일은 자동 발송되었습니다.
-              </p>
+            <div style="background:#f9fafb; border-radius:14px; padding:18px 16px; border:1px dashed #c4b5fd; text-align:center;">
+              <div style="font-size:12px; color:#6b7280; margin-bottom:6px;">이메일 인증번호</div>
+              <div style="font-size:30px; font-weight:700; letter-spacing:6px; color:#4f46e5;">%s</div>
+              <p style="margin:10px 0 0; font-size:12px; color:#9ca3af;">본 코드는 발급 후 30분 동안만 유효합니다.</p>
             </div>
+            <p style="margin:24px 0 0; font-size:11px; line-height:1.6; color:#9ca3af;">
+              본 메일은 발신전용으로 회신되지 않습니다.<br/>
+              본인이 요청하지 않은 경우, 이 메일은 무시하셔도 됩니다.
+            </p>
           </div>
         </div>
-        """.formatted(code);
+        """;
 
-        // ✅ SendGrid API로 보낼 JSON 바디
+        // ✅ SendGrid API 바디
         Map<String, Object> body = Map.of(
                 "personalizations", List.of(
-                        Map.of(
-                                "to", List.of(Map.of("email", to)),
-                                "subject", subject
-                        )
+                        Map.of("to", List.of(Map.of("email", to)))
                 ),
-                "from", Map.of(
-                        "email", fromEmail,
-                        "name", "Kakaoboard"
-                ),
+                "from", Map.of("email", fromEmail),
+                "subject", subject,
                 "content", List.of(
                         Map.of(
                                 "type", "text/html",
-                                "value", htmlContent
+                                "value", String.format(htmlContent, code)
                         )
                 )
         );
 
-        // ✅ WebClient로 SendGrid Mail Send API 호출
-        WebClient client = WebClient.builder()
-                .baseUrl("https://api.sendgrid.com/v3")
-                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + sendGridApiKey)
-                .build();
+        try {
+            WebClient client = WebClient.builder()
+                    .baseUrl("https://api.sendgrid.com/v3")
+                    .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + sendGridApiKey)
+                    .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                    .build();
 
-        client.post()
-                .uri("/mail/send")
-                .bodyValue(body)
-                .retrieve()
-                .toBodilessEntity()
-                .block(); // 간단히 동기 호출
+            client.post()
+                    .uri("/mail/send")
+                    .bodyValue(body)
+                    .retrieve()
+                    .toBodilessEntity()
+                    .block(); // 동기 호출
 
-        log.info("✅ 이메일 인증코드 전송 완료 → {} / 코드: {}", to, code);
+            log.info("✅ 이메일 인증코드 전송 완료 → {} / 코드: {}", to, code);
+
+        } catch (WebClientResponseException e) {
+            // 🔥 SendGrid에서 4xx/5xx 떨어져도 여기서만 처리 → 위로 안 올라감
+            log.error("❌ SendGrid 요청 실패 - status: {}, body: {}",
+                    e.getRawStatusCode(), e.getResponseBodyAsString(), e);
+
+        } catch (Exception e) {
+            // 그 외 모든 예외도 여기서 마무리
+            log.error("❌ 이메일 전송 중 알 수 없는 예외 발생", e);
+        }
     }
 }
