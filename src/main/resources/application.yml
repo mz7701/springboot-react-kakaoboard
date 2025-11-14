@@ -6,9 +6,9 @@ spring:
   datasource:
     # 1순위: Render에서 넣어줄 SPRING_DATASOURCE_URL
     # 2순위: (선택) 로컬 Postgres 돌릴 때 쓸 기본값
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/kakaoboard}
-    username: ${SPRING_DATASOURCE_USERNAME:postgres}
-    password: ${SPRING_DATASOURCE_PASSWORD:1234}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://dpg-d4b96qre5dus73eghudg-a:5432/kakaoboard_q87f}
+    username: ${SPRING_DATASOURCE_USERNAME:lee}
+    password: ${SPRING_DATASOURCE_PASSWORD:hgVP2BUBVI9lYHh4mtZpqe1gRErB1dRH}
     driver-class-name: org.postgresql.Driver
 
   jpa:
