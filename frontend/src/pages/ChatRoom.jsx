@@ -4,6 +4,7 @@ import styles from "./ChatRoom.module.css";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 import { API_BASE_URL } from "../api/baseURL";   // 경로는 파일 위치에 따라 ../ 또는 ../../
+import axios from "axios";
 
 axios.defaults.baseURL = API_BASE_URL;
 
