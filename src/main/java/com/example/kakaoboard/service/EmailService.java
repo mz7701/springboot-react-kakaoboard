@@ -21,41 +21,40 @@ public class EmailService {
     @Value("${email.from}")
     private String fromEmail;
 
-    // ✅ application.yml -> sendgrid.api-key  (Render 환경변수 SENDGRID_API_KEY에서 옴)
+    // ✅ application.yml -> sendgrid.api-key
     @Value("${sendgrid.api-key}")
     private String sendGridApiKey;
 
     /**
      * ✅ 이메일 인증번호 발송
-     *  - EmailVerificationService 등에서 이 메서드를 호출해서 사용
      */
     public void sendVerificationMail(String to, String code) {
 
         String subject = "[Kakaoboard] 이메일 인증번호 안내";
 
-        // ✅ HTML 템플릿 (코드만 %s로 들어감)
-        String htmlContent = """
-        <div style="width:100%%; background-color:#f5f7fa; padding:24px 0; font-family:'Pretendard','Noto Sans KR',Arial,sans-serif;">
-          <div style="max-width:480px; margin:0 auto; background:#ffffff; border-radius:16px; padding:24px 24px 28px; box-shadow:0 10px 30px rgba(15,23,42,0.12);">
-            <div style="text-align:center; margin-bottom:24px;">
-              <div style="display:inline-block; padding:8px 14px; border-radius:999px; background:linear-gradient(135deg,#4f46e5,#ec4899); color:#ffffff; font-size:12px; font-weight:600; letter-spacing:0.04em;">
-                Kakaoboard 이메일 인증
-              </div>
-              <h1 style="margin:16px 0 4px; font-size:22px; font-weight:700; color:#111827;">이메일 인증번호 안내</h1>
-              <p style="margin:0; font-size:13px; color:#6b7280;">아래 인증번호를 입력하여 회원가입을 완료해주세요.</p>
-            </div>
-            <div style="background:#f9fafb; border-radius:14px; padding:18px 16px; border:1px dashed #c4b5fd; text-align:center;">
-              <div style="font-size:12px; color:#6b7280; margin-bottom:6px;">이메일 인증번호</div>
-              <div style="font-size:30px; font-weight:700; letter-spacing:6px; color:#4f46e5;">%s</div>
-              <p style="margin:10px 0 0; font-size:12px; color:#9ca3af;">본 코드는 발급 후 30분 동안만 유효합니다.</p>
-            </div>
-            <p style="margin:24px 0 0; font-size:11px; line-height:1.6; color:#9ca3af;">
-              본 메일은 발신전용으로 회신되지 않습니다.<br/>
-              본인이 요청하지 않은 경우, 이 메일은 무시하셔도 됩니다.
-            </p>
-          </div>
-        </div>
-        """;
+        // ✅ Text Block( """ ) 대신 옛날 방식 문자열로 작성
+        // ⚠ String.format 을 쓰기 때문에 100% → 100%% 로 써야 함!!
+        String htmlContent =
+                "<div style=\"width:100%%; background-color:#f5f7fa; padding:24px 0; font-family:'Pretendard','Noto Sans KR',Arial,sans-serif;\">" +
+                        "  <div style=\"max-width:480px; margin:0 auto; background:#ffffff; border-radius:16px; padding:24px 24px 28px; box-shadow:0 10px 30px rgba(15,23,42,0.12);\">" +
+                        "    <div style=\"text-align:center; margin-bottom:24px;\">" +
+                        "      <div style=\"display:inline-block; padding:8px 14px; border-radius:999px; background:linear-gradient(135deg,#4f46e5,#ec4899); color:#ffffff; font-size:12px; font-weight:600; letter-spacing:0.04em;\">" +
+                        "        Kakaoboard 이메일 인증" +
+                        "      </div>" +
+                        "      <h1 style=\"margin:16px 0 4px; font-size:22px; font-weight:700; color:#111827;\">이메일 인증번호 안내</h1>" +
+                        "      <p style=\"margin:0; font-size:13px; color:#6b7280;\">아래 인증번호를 입력하여 회원가입을 완료해주세요.</p>" +
+                        "    </div>" +
+                        "    <div style=\"background:#f9fafb; border-radius:14px; padding:18px 16px; border:1px dashed #c4b5fd; text-align:center;\">" +
+                        "      <div style=\"font-size:12px; color:#6b7280; margin-bottom:6px;\">이메일 인증번호</div>" +
+                        "      <div style=\"font-size:30px; font-weight:700; letter-spacing:6px; color:#4f46e5;\">%s</div>" +
+                        "      <p style=\"margin:10px 0 0; font-size:12px; color:#9ca3af;\">본 코드는 발급 후 30분 동안만 유효합니다.</p>" +
+                        "    </div>" +
+                        "    <p style=\"margin:24px 0 0; font-size:11px; line-height:1.6; color:#9ca3af;\">" +
+                        "      본 메일은 발신전용으로 회신되지 않습니다.<br/>" +
+                        "      본인이 요청하지 않은 경우, 이 메일은 무시하셔도 됩니다." +
+                        "    </p>" +
+                        "  </div>" +
+                        "</div>";
 
         // ✅ SendGrid API 바디
         Map<String, Object> body = Map.of(
