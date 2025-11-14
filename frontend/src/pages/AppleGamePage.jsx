@@ -1,5 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import styles from "./AppleGamePage.module.css";
+import axios from "axios";
+import { API_BASE_URL } from "../api/baseURL";   // 경로는 파일 위치에 따라 ../ 또는 ../../
+
+axios.defaults.baseURL = API_BASE_URL;
 
 const GRID_COLS = 17;
 const GRID_ROWS = 10;

@@ -1,11 +1,14 @@
 import React, { useEffect, useState, useMemo } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import styles from "./MyPage.module.css";
 import CommentSection from "../components/CommentSection";
+import axios from "axios";
+import { API_BASE_URL } from "../api/baseURL";   // 경로는 파일 위치에 따라 ../ 또는 ../../
+
+axios.defaults.baseURL = API_BASE_URL;
 
 // ✅ 네트워크 고정
-axios.defaults.baseURL = "http://192.168.0.21:8080";
+axios.defaults.baseURL = "";
 axios.defaults.headers.post["Content-Type"] = "application/json";
 
 // ✅ 날짜 포맷 유틸

@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom";
 import styles from "./ChatRoom.module.css";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
+import { API_BASE_URL } from "../api/baseURL";   // 경로는 파일 위치에 따라 ../ 또는 ../../
+
+axios.defaults.baseURL = API_BASE_URL;
 
 const ChatRoom = () => {
     const [nickname, setNickname] = useState("");
@@ -28,7 +31,7 @@ const ChatRoom = () => {
     const connectChat = () => {
         if (!nickname.trim()) return alert("닉네임을 입력하세요!");
 
-        const socket = new SockJS("http://192.168.0.21:8080/ws");
+        const socket = new SockJS(`${API_BASE_URL}/ws`);
         const client = new Client({
             webSocketFactory: () => socket,
             reconnectDelay: 5000,

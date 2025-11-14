@@ -20,7 +20,7 @@ dependencies {
     // ✅ BCryptPasswordEncoder 사용 가능
     implementation 'org.springframework.boot:spring-boot-starter-security'
     runtimeOnly 'org.postgresql:postgresql:42.7.3'
-    runtimeOnly 'com.mysql:mysql-connector-j:8.0.33'
+    runtimeOnly 'org.postgresql:postgresql'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

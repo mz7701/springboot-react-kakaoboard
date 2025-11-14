@@ -1,9 +1,12 @@
-axios.defaults.baseURL = "http://192.168.0.21:8080";
+axios.defaults.baseURL = "";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Trash2, MessageSquare } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import styles from "./DebateBoard.module.css";
+import { API_BASE_URL } from "../api/baseURL";   // 경로는 파일 위치에 따라 ../ 또는 ../../
+
+axios.defaults.baseURL = API_BASE_URL;
 
 function stringToColor(str) {
     let hash = 0;

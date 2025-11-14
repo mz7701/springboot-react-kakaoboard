@@ -1,6 +1,10 @@
 import React, { useState } from "react";
-import axios from "axios";
+
 import styles from "./RegisterPage.module.css";
+import axios from "axios";
+import { API_BASE_URL } from "../api/baseURL";   // 경로는 파일 위치에 따라 ../ 또는 ../../
+
+axios.defaults.baseURL = API_BASE_URL;
 
 const RegisterPage = () => {
     const [form, setForm] = useState({
@@ -67,7 +71,7 @@ const RegisterPage = () => {
         setIsCheckingUsername(true);
         try {
             await axios.get(
-                `http://192.168.0.21:8080/api/auth/check-username?username=${form.username}`
+                `/api/auth/check-username?username=${form.username}`
             );
             setErrors((prev) => ({ ...prev, username: "✅ 사용 가능한 아이디입니다." }));
         } catch {
@@ -85,7 +89,7 @@ const RegisterPage = () => {
 
         setSending(true); // ✅ 요청 시작
         try {
-            await axios.post("http://192.168.0.21:8080/api/auth/send-code", null, {
+            await axios.post("/api/auth/send-code", null, {
                 params: { email: form.email },
             });
             setIsCodeSent(true);
@@ -107,7 +111,7 @@ const RegisterPage = () => {
 
         try {
             const res = await axios.post(
-                "http://192.168.0.21:8080/api/auth/verify-code",
+                "/api/auth/verify-code",
                 null,
                 { params: { email: form.email, code: form.code } }
             );
@@ -147,7 +151,7 @@ const RegisterPage = () => {
         }
 
         try {
-            await axios.post("http://192.168.0.21:8080/api/auth/register", form);
+            await axios.post("/api/auth/register", form);
             alert("✅ 회원가입 성공! 로그인 페이지로 이동합니다.");
             window.location.href = "/login";
         } catch (err) {

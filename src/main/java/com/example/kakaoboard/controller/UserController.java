@@ -17,7 +17,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/users")  // ✅ 정확히 이 경로여야 React와 일치
-@CrossOrigin(origins = {"http://localhost:3000", "http://192.168.0.21:3000"})
+@CrossOrigin(origins = {"", "http://192.168.0.21:3000"})
 @RequiredArgsConstructor
 public class UserController {
 

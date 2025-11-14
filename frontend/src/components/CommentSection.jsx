@@ -3,6 +3,10 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import styles from "./CommentSection.module.css";
 
+import { API_BASE_URL } from "../api/baseURL";   // 경로는 파일 위치에 따라 ../ 또는 ../../
+
+axios.defaults.baseURL = API_BASE_URL;
+
 const MAX_INDENT = 4; // ㄴ 들여쓰기 최대 단계
 
 const CommentSection = ({ debateId, currentUser }) => {

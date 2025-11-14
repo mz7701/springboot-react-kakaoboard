@@ -1,6 +1,10 @@
 // 📁 src/components/CommentItem.jsx
 import React from "react";
 import styles from "./CommentSection.module.css";
+import axios from "axios";
+import { API_BASE_URL } from "../api/baseURL";   // 경로는 파일 위치에 따라 ../ 또는 ../../
+
+axios.defaults.baseURL = API_BASE_URL;
 
 const CommentItem = ({ comment, onReply }) => {
     return (

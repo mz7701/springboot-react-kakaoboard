@@ -1,7 +1,11 @@
 import React, { useState } from "react";
-import axios from "axios";
+
 import { useNavigate } from "react-router-dom";
 import styles from "./Login-Passwordsearch.module.css";
+import axios from "axios";
+import { API_BASE_URL } from "../api/baseURL";   // 경로는 파일 위치에 따라 ../ 또는 ../../
+
+axios.defaults.baseURL = API_BASE_URL;
 
 const LoginPasswordsearch = () => {
     const [form, setForm] = useState({
@@ -26,7 +30,7 @@ const LoginPasswordsearch = () => {
         }
         try {
             // ⚠️ 백엔드에서는 @RequestParam String email → params로 전달해야 함
-            await axios.post("http://192.168.0.21:8080/api/users/send-code", null, {
+            await axios.post("/api/users/send-code", null, {
                 params: { email: form.email },
             });
             setIsCodeSent(true);
@@ -45,7 +49,7 @@ const LoginPasswordsearch = () => {
         }
 
         try {
-            await axios.post("http://192.168.0.21:8080/api/users/verify-code", null, {
+            await axios.post("/api/users/verify-code", null, {
                 params: { email: form.email, code: form.code },
             });
             setVerified(true);
@@ -67,7 +71,7 @@ const LoginPasswordsearch = () => {
 
         try {
             // ⚠️ 백엔드 UserController는 POST로 /reset-password 사용
-            await axios.post("http://192.168.0.21:8080/api/users/reset-password", {
+            await axios.post("/api/users/reset-password", {
                 email: form.email,
                 newPassword: form.newPw,
             });

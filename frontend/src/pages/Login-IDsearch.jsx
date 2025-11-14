@@ -3,6 +3,10 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import styles from "./Login-IDsearch.module.css";
 
+import { API_BASE_URL } from "../api/baseURL";   // 경로는 파일 위치에 따라 ../ 또는 ../../
+
+axios.defaults.baseURL = API_BASE_URL;
+
 const LoginIDsearch = () => {
     const [email, setEmail] = useState("");
     const [code, setCode] = useState("");
@@ -19,7 +23,7 @@ const LoginIDsearch = () => {
         }
         try {
             // ⚠️ 백엔드에서 @RequestParam 사용하므로 params로 전송해야 함
-            await axios.post("http://192.168.0.21:8080/api/users/send-code", null, {
+            await axios.post("/api/users/send-code", null, {
                 params: { email },
             });
             setIsCodeSent(true);
@@ -36,7 +40,7 @@ const LoginIDsearch = () => {
         if (!code.trim()) return alert("인증번호를 입력하세요.");
         try {
             // ⚠️ 백엔드 verify-code도 @RequestParam → params로 전송
-            await axios.post("http://192.168.0.21:8080/api/users/verify-code", null, {
+            await axios.post("/api/users/verify-code", null, {
                 params: { email, code },
             });
 
@@ -44,7 +48,7 @@ const LoginIDsearch = () => {
 
             // ✅ 인증 완료 후 아이디 조회
             const usernameRes = await axios.post(
-                `http://192.168.0.21:8080/api/users/find-username?email=${email}`
+                `"/api/users/find-username?email=${email}`
             );
             setUsername(usernameRes.data);
         } catch (err) {

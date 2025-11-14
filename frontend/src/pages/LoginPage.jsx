@@ -1,8 +1,12 @@
 
 import React, { useState } from "react";
-import axios from "axios";
+
 import { useNavigate } from "react-router-dom";
 import styles from "./LoginPage.module.css"; // ★ CSS 모듈 import
+import axios from "axios";
+import { API_BASE_URL } from "../api/baseURL";   // 경로는 파일 위치에 따라 ../ 또는 ../../
+
+axios.defaults.baseURL = API_BASE_URL;
 
 const LoginPage = () => {
     const [form, setForm] = useState({ username: "", password: "" });
@@ -21,7 +25,7 @@ const LoginPage = () => {
         setIsLoading(true);
         setErrMsg("");
         try {
-            const res = await axios.post("http://192.168.0.21:8080/api/auth/login", form);
+            const res = await axios.post("/api/auth/login", form);
             localStorage.setItem("user", JSON.stringify(res.data));
             alert("✅ 로그인 성공!");
             navigate("/board");
@@ -33,7 +37,7 @@ const LoginPage = () => {
     };
 
     const handleKakaoLogin = () => {
-        window.location.href = "http://192.168.0.21:8080/oauth2/authorization/kakao"
+        window.location.href = "/oauth2/authorization/kakao"
     };
 
     return (
