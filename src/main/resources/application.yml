@@ -1,9 +1,11 @@
 server:
-  # Railway에서 PORT 환경변수를 던져줌. 없으면 8080으로 실행
-  port: ${PORT:8080}
+  # Railway 내부에서 8080으로 듣게 고정
+  port: 8080
 
 spring:
   datasource:
+    # ✅ 캡처에 있던 DATABASE_URL 기준으로 그대로 하드코딩
+    # postgresql://postgres:비번@postgres.railway.internal:5432/railway
     url: jdbc:postgresql://postgres.railway.internal:5432/railway
     username: postgres
     password: WAndZdRtcMKmipHHTUJDRrmqtnAOsNAX
@@ -11,7 +13,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: update   # 필요에 따라 validate / none 등으로 나중에 바꿀 수 있음
     show-sql: true
     properties:
       hibernate:
@@ -20,8 +22,8 @@ spring:
   mail:
     host: smtp.naver.com
     port: 587
-    username: ${NAVER_MAIL_ID:mz7701@naver.com}
-    password: ${NAVER_MAIL_PW:5J9QSR7UHLEU}
+    username: mz7701@naver.com        # 여기도 하드코딩 버전
+    password: 5J9QSR7UHLEU            # 네이버 SMTP 비번 그대로
     properties:
       mail:
         smtp:
@@ -29,10 +31,9 @@ spring:
           starttls:
             enable: true
 
-
 email:
-  from: ${EMAIL_FROM:${NAVER_MAIL_ID:mz7701@naver.com}}
+  from: mz7701@naver.com
 
-# 이름은 sendgrid지만, 실제로는 Brevo/다른 서비스 써도 상관 없음. 그냥 더미값.
+# 그냥 더미 값 (실제로 안 써도 됨)
 sendgrid:
-  api-key: ${SENDGRID_API_KEY:dummy}
+  api-key: dummy
