@@ -19,17 +19,20 @@ spring:
       hibernate:
         format_sql: true
 
+spring:
   mail:
     host: smtp.naver.com
-    port: 587
-    username: mz7701@naver.com        # 여기도 하드코딩 버전
-    password: 5J9QSR7UHLEU            # 네이버 SMTP 비번 그대로
+    port: 465           # ✅ 587 → 465
+    username: mz7701@naver.com
+    password: 5J9QSR7UHLEU
     properties:
       mail:
         smtp:
           auth: true
+          ssl:
+            enable: true     # ✅ SSL 직접 사용
           starttls:
-            enable: true
+            enable: false    # ✅ 465 쓸 땐 보통 STARTTLS 끔
 
 email:
   from: mz7701@naver.com
