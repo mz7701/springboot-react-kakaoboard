@@ -16,14 +16,13 @@ spring:
     show-sql: true
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
 
   mail:
     host: smtp.naver.com
     port: 587
     username: ${NAVER_MAIL_ID:mz7701@naver.com}
-    password: ${NAVER_MAIL_PW:5J9QSR7UHLEU}   # 실제로는 Railway Variables에 넣어두는 게 안전
+    password: ${NAVER_MAIL_PW:5J9QSR7UHLEU}
     properties:
       mail:
         smtp:
@@ -37,6 +36,6 @@ spring:
 email:
   from: ${EMAIL_FROM:${NAVER_MAIL_ID:mz7701@naver.com}}
 
-# 이름은 sendgrid지만, 실제로는 Brevo/다른 SMTP 쓰고 싶으면 여긴 무시해도 됨
+# 이름은 sendgrid지만, 실제로는 Brevo/다른 서비스 써도 상관 없음. 그냥 더미값.
 sendgrid:
   api-key: ${SENDGRID_API_KEY:dummy}
