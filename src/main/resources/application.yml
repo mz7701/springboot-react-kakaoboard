@@ -1,14 +1,14 @@
 server:
-  # Railway에서도 PORT 환경변수 씀 (없으면 8080)
+  # Render에서 PORT라는 환경변수를 던져줌. 없으면 8080으로 실행
   port: ${PORT:8080}
-  address: 0.0.0.0
 
 spring:
   datasource:
-    # Render DB “External Database URL”을 SPRING_DATASOURCE_URL에 넣어서 사용
-    url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
+    # 1순위: Render에서 넣어줄 SPRING_DATASOURCE_URL
+    # 2순위: (선택) 로컬 Postgres 돌릴 때 쓸 기본값
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://dpg-d4b96qre5dus73eghudg-a:5432/kakaoboard_q87f}
+    username: ${SPRING_DATASOURCE_USERNAME:lee}
+    password: ${SPRING_DATASOURCE_PASSWORD:hgVP2BUBVI9lYHh4mtZpqe1gRErB1dRH}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -23,8 +23,8 @@ spring:
   mail:
     host: smtp.naver.com
     port: 587
-    username: ${MAIL_USERNAME}
-    password: ${MAIL_PASSWORD}
+    username: mz7701@naver.com
+    password: 5J9QSR7UHLEU
     properties:
       mail:
         smtp:
