@@ -5,9 +5,9 @@ server:
 spring:
   datasource:
     # ✅ Railway Postgres 플러그인 환경변수 사용
-    url: jdbc:postgresql://${PGHOST}:${PGPORT}/${PGDATABASE}
-    username: ${PGUSER}
-    password: ${PGPASSWORD}
+    url: jdbc:postgresql://containers-us-west-123.railway.app:5432/railway
+    username:  postgres
+    password: WAndZdRtcMKmipHHTUJDRrmqtnAOsNAX
     driver-class-name: org.postgresql.Driver
 
   jpa:
