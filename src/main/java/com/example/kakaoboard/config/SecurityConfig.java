@@ -20,56 +20,48 @@ import java.util.List;
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                // ✅ REST API 이라서 CSRF 끔
+                // 🔥 CORS 필터 활성화 (아래 corsConfigurationSource()랑 연결됨)
+                .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
-
-                // ✅ 아래에서 만든 CORS 설정 사용
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-
-                // ✅ URL 권한 설정
                 .authorizeHttpRequests(auth -> auth
-                        // 정적 리소스 / 메인 / 에러
-                        .requestMatchers(
-                                "/", "/error",
-                                "/css/**", "/js/**", "/images/**", "/favicon.ico"
-                        ).permitAll()
-
-                        // ✅ 웹소켓 핸드셰이크 주소 허용 (쓰고 있으면)
-                        .requestMatchers("/ws/**", "/ws-stomp/**").permitAll()
-
-                        // ✅ 인증 관련 API도 일단 전부 허용
+                        // ✅ 인증/회원가입/이메일 전송 등은 모두 허용
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/users/**").permitAll()
-
-                        // ✅ 토론 조회는 누구나 GET 가능
+                        // ✅ 웹소켓 핸드셰이크도 허용
+                        .requestMatchers("/ws/**").permitAll()
+                        // ✅ 토론 목록 조회는 전체 공개
                         .requestMatchers(HttpMethod.GET, "/api/debates/**").permitAll()
-
-                        // ✅ 디버그 단계: 나머지도 전부 허용
+                        // ✅ 나머지도 일단 전부 열어둠 (나중에 JWT 붙이면 막자)
                         .anyRequest().permitAll()
-                )
-
-                .httpBasic(Customizer.withDefaults());
+                );
 
         return http.build();
     }
 
-    // ✅ CORS 설정: 로컬 + Render 프론트 허용
+    // 🔥 진짜 중요한 전역 CORS 설정
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
+        // ✅ 허용할 프론트 도메인들
         config.setAllowedOrigins(List.of(
                 "http://localhost:3000",
                 "http://192.168.0.21:3000",
-                "https://kakaoboard-frontend.onrender.com"  // 🔥 프론트 도메인
+                "https://kakaoboard-frontend.onrender.com"  // Render 프론트
         ));
+
+        // ✅ 허용 메서드
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+
+        // ✅ 모든 헤더 허용
         config.setAllowedHeaders(List.of("*"));
+
+        // ✅ 쿠키/인증정보 포함 허용 (JWT 쓸 거면 true 유지)
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        // 모든 경로에 위 CORS 설정 적용
         source.registerCorsConfiguration("/**", config);
         return source;
     }
