@@ -19,7 +19,7 @@ spring:
       hibernate:
         format_sql: true
 
-spring:
+
   mail:
     host: smtp.naver.com
     port: 465           # ✅ 587 → 465
