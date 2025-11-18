@@ -1,11 +1,11 @@
 server:
-  # Render에서 PORT라는 환경변수를 던져줌. 없으면 8080으로 실행
+  # Railway도 PORT 환경변수를 던져줌. 없으면 8080으로 실행
   port: ${PORT:8080}
 
 spring:
   datasource:
-    # 1순위: Render에서 넣어줄 SPRING_DATASOURCE_URL
-    # 2순위: (선택) 로컬 Postgres 돌릴 때 쓸 기본값
+    # ✅ Render Postgres DB
+    # Railway 환경변수에 SPRING_DATASOURCE_URL/USERNAME/PASSWORD 넣어두면 그걸 우선 사용
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://dpg-d4b96qre5dus73eghudg-a:5432/kakaoboard_q87f}
     username: ${SPRING_DATASOURCE_USERNAME:lee}
     password: ${SPRING_DATASOURCE_PASSWORD:hgVP2BUBVI9lYHh4mtZpqe1gRErB1dRH}
@@ -23,11 +23,18 @@ spring:
   mail:
     host: smtp.naver.com
     port: 587
-    username: mz7701@naver.com
-    password: 5J9QSR7UHLEU
+    username: ${NAVER_MAIL_ID:mz7701@naver.com}     # Railway env
+    password: ${NAVER_MAIL_PW:5J9QSR7UHLEU}         # Railway env (앱 비밀번호)
     properties:
       mail:
         smtp:
           auth: true
           starttls:
             enable: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
+# 메일 From 주소 (기본은 네이버 메일)
+email:
+  from: ${EMAIL_FROM:${NAVER_MAIL_ID:mz7701@naver.com}}
