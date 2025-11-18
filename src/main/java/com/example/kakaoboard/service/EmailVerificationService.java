@@ -16,7 +16,7 @@ public class EmailVerificationService {
 
     private final EmailService emailService;
 
-    // 이메일 → (코드, 만료시간)
+    // 이메일 -> (코드, 만료시간)
     private final Map<String, VerificationInfo> pending = new ConcurrentHashMap<>();
     // 인증 완료된 이메일
     private final Set<String> verifiedEmails = ConcurrentHashMap.newKeySet();
@@ -63,14 +63,28 @@ public class EmailVerificationService {
         return true;
     }
 
+    /**
+     * ✅ 이미 인증 완료된 이메일인지 확인
+     */
     public boolean isVerified(String email) {
         return verifiedEmails.contains(email);
     }
 
+    /**
+     * ✅ 새로 만든 정리 메서드
+     */
     public void clear(String email) {
         verifiedEmails.remove(email);
         pending.remove(email);
         System.out.println("🧹 인증 상태 초기화 → " + email);
+    }
+
+    /**
+     * ✅ 옛 코드 호환용 메서드 (UserService 등에서 사용 중)
+     *    기존에 호출하던 clearVerification(...) 그대로 두려고 만든 래퍼
+     */
+    public void clearVerification(String email) {
+        clear(email);
     }
 
     private static class VerificationInfo {
