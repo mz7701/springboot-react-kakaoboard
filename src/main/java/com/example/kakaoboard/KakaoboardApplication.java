@@ -11,3 +11,4 @@ public class KakaoboardApplication {
         SpringApplication.run(KakaoboardApplication.class, args);
     }
 }
+//시작하기
