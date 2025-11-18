@@ -4,12 +4,11 @@ server:
 
 spring:
   datasource:
-    # ✅ Render Postgres DB
-    # Railway 환경변수에 SPRING_DATASOURCE_URL/USERNAME/PASSWORD 넣어두면 그걸 우선 사용
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://dpg-d4b96qre5dus73eghudg-a:5432/kakaoboard_q87f}
-    username: ${SPRING_DATASOURCE_USERNAME:lee}
-    password: ${SPRING_DATASOURCE_PASSWORD:hgVP2BUBVI9lYHh4mtZpqe1gRErB1dRH}
+    url: jdbc:postgresql://${PGHOST}:${PGPORT}/${PGDATABASE}
+    username: ${PGUSER}
+    password: ${PGPASSWORD}
     driver-class-name: org.postgresql.Driver
+
 
   jpa:
     hibernate:
