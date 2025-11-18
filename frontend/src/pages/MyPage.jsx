@@ -8,7 +8,7 @@ import { API_BASE_URL } from "../api/baseURL";   // 경로는 파일 위치에 �
 axios.defaults.baseURL = API_BASE_URL;
 
 // ✅ 네트워크 고정
-axios.defaults.baseURL = "";
+
 axios.defaults.headers.post["Content-Type"] = "application/json";
 
 // ✅ 날짜 포맷 유틸

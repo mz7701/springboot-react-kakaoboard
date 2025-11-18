@@ -1,4 +1,4 @@
-axios.defaults.baseURL = "";
+
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Trash2, MessageSquare } from "lucide-react";
