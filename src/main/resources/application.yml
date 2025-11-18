@@ -1,14 +1,14 @@
 server:
-  # Railway도 PORT 환경변수를 던져줌. 없으면 8080으로 실행
+  # Railway에서 PORT 환경변수를 던져줌. 없으면 8080으로 실행
   port: ${PORT:8080}
 
 spring:
   datasource:
+    # ✅ Railway Postgres 플러그인 환경변수 사용
     url: jdbc:postgresql://${PGHOST}:${PGPORT}/${PGDATABASE}
     username: ${PGUSER}
     password: ${PGPASSWORD}
     driver-class-name: org.postgresql.Driver
-
 
   jpa:
     hibernate:
@@ -22,8 +22,8 @@ spring:
   mail:
     host: smtp.naver.com
     port: 587
-    username: ${NAVER_MAIL_ID:mz7701@naver.com}     # Railway env
-    password: ${NAVER_MAIL_PW:5J9QSR7UHLEU}         # Railway env (앱 비밀번호)
+    username: ${NAVER_MAIL_ID:mz7701@naver.com}
+    password: ${NAVER_MAIL_PW:5J9QSR7UHLEU}   # 실제로는 Railway Variables에 넣어두는 게 안전
     properties:
       mail:
         smtp:
@@ -34,6 +34,9 @@ spring:
           timeout: 5000
           writetimeout: 5000
 
-# 메일 From 주소 (기본은 네이버 메일)
 email:
   from: ${EMAIL_FROM:${NAVER_MAIL_ID:mz7701@naver.com}}
+
+# 이름은 sendgrid지만, 실제로는 Brevo/다른 SMTP 쓰고 싶으면 여긴 무시해도 됨
+sendgrid:
+  api-key: ${SENDGRID_API_KEY:dummy}
