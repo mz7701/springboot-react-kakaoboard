@@ -26,7 +26,7 @@ const LoginPasswordsearch = () => {
         }
         try {
             // ⚠️ 백엔드에서는 @RequestParam String email → params로 전달해야 함
-            await axios.post("http://192.168.0.189:8080/api/users/send-code", null, {
+            await axios.post("http://192.168.0.80:8080/api/users/send-code", null, {
                 params: { email: form.email },
             });
             setIsCodeSent(true);
@@ -45,7 +45,7 @@ const LoginPasswordsearch = () => {
         }
 
         try {
-            await axios.post("http://192.168.0.189:8080/api/users/verify-code", null, {
+            await axios.post("http://192.168.0.80:8080/api/users/verify-code", null, {
                 params: { email: form.email, code: form.code },
             });
             setVerified(true);
@@ -67,7 +67,7 @@ const LoginPasswordsearch = () => {
 
         try {
             // ⚠️ 백엔드 UserController는 POST로 /reset-password 사용
-            await axios.post("http://192.168.0.189:8080/api/users/reset-password", {
+            await axios.post("http://192.168.0.80:8080/api/users/reset-password", {
                 email: form.email,
                 newPassword: form.newPw,
             });

@@ -5,7 +5,7 @@ import styles from "./MyPage.module.css";
 import CommentSection from "../components/CommentSection";
 
 // ✅ 네트워크 고정
-axios.defaults.baseURL = "http://192.168.0.189:8080";
+axios.defaults.baseURL = "http://192.168.0.80:8080";
 axios.defaults.headers.post["Content-Type"] = "application/json";
 
 // ✅ 날짜 포맷 유틸

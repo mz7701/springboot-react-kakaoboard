@@ -21,7 +21,7 @@ const LoginPage = () => {
         setIsLoading(true);
         setErrMsg("");
         try {
-            const res = await axios.post("http://192.168.0.189:8080/api/auth/login", form);
+            const res = await axios.post("http://192.168.0.80:8080/api/auth/login", form);
             localStorage.setItem("user", JSON.stringify(res.data));
             alert("✅ 로그인 성공!");
             navigate("/board");
@@ -33,7 +33,7 @@ const LoginPage = () => {
     };
 
     const handleKakaoLogin = () => {
-        window.location.href = "http://192.168.0.189:8080/oauth2/authorization/kakao"
+        window.location.href = "http://192.168.0.80:8080/oauth2/authorization/kakao"
     };
 
     return (

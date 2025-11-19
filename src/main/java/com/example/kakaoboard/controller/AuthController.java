@@ -15,7 +15,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
-@CrossOrigin(origins = {"http://localhost:3000", "http://192.168.0.189:3000"})
+@CrossOrigin(origins = {"http://localhost:3000", "http://192.168.0.80:3000"})
 public class AuthController {
 
     private final UserService userService;

@@ -28,7 +28,7 @@ const ChatRoom = () => {
     const connectChat = () => {
         if (!nickname.trim()) return alert("닉네임을 입력하세요!");
 
-        const socket = new SockJS("http://192.168.0.189:8080/ws");
+        const socket = new SockJS("http://192.168.0.80:8080/ws");
         const client = new Client({
             webSocketFactory: () => socket,
             reconnectDelay: 5000,

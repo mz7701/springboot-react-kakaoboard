@@ -4,7 +4,7 @@ import { Trash2, MessageSquare } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import styles from "./DebateBoard.module.css";
 
-axios.defaults.baseURL = "http://192.168.0.189:8080";
+axios.defaults.baseURL = "http://192.168.0.80:8080";
 
 // 색상 랜덤 - 작성자별 고정 색
 function stringToColor(str) {
