@@ -8,7 +8,7 @@ import { API_BASE_URL } from "../api/baseURL";   // 경로는 파일 위치에 �
 axios.defaults.baseURL = API_BASE_URL;
 
 // ✅ axios 기본 설정 (같은 네트워크에서 접근 가능하도록 IP 기반)
-axios.defaults.baseURL = ""; // ⚠️ 본인 서버 IP로 변경
+ // ⚠️ 본인 서버 IP로 변경
 
 
 const CreateDebatePage = () => {
