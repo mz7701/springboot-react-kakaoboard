@@ -5,7 +5,7 @@ import styles from "./MyPage.module.css";
 import CommentSection from "../components/CommentSection";
 
 // ✅ 네트워크 고정
-axios.defaults.baseURL = "http://192.168.0.21:8080";
+axios.defaults.baseURL = "http://192.168.0.189:8080";
 axios.defaults.headers.post["Content-Type"] = "application/json";
 
 // ✅ 날짜 포맷 유틸
@@ -55,67 +55,25 @@ const MyPage = () => {
     const [deleting, setDeleting] = useState(false);   // 🔥 회원탈퇴 로딩 상태
     const navigate = useNavigate();
 
-    const [isDeleteMode, setIsDeleteMode] = useState(false); // 🔥 회원 탈퇴 진행 모드
-    const [deleteReason, setDeleteReason] = useState("");    // 🔥 선택한 탈퇴 사유
-    const [deleteReasonDetail, setDeleteReasonDetail] = useState(""); // 🔥 기타 사유 텍스트
-
-    const [showReasonBox, setShowReasonBox] = useState(false); // 🔥 사유 목록 펼치기/접기
-    // ✅ 상태 우선순위(정렬용): 반박해보세요(0) → 반박중(1) → 마감(2)
-    const statusRank = (d) => (d.isClosed ? 2 : d.rebuttalTitle ? 1 : 0);
-    const DELETE_REASONS = [
-        "서비스 이용 빈도가 낮아서",
-        "더 이상 서비스를 이용할 필요가 없어서",
-        "계정이 너무 많아서 정리하고 싶어서",
-        "서비스에 만족하지 못해서",
-        "개선이 필요한 부분이 많아서",
-        "다른 경쟁 서비스로 이동하기 위해서",
-        "개인정보 유출이 우려되어서",
-        "개인정보 수집 및 이용에 동의할 수 없어서",
-        "불필요한 개인정보를 남기고 싶지 않아서",
-        "기타"
-    ];
     // ✅ 회원 탈퇴
-// - 이메일 인증 완료(verified === true)
-// - 비밀번호 1개만 입력(확인 X)
-// - 탈퇴 사유 선택
-// - 확인창에서 OK 눌러야 실제 삭제 + delete_account 테이블 로그 저장
+    // - 이메일 인증 완료(verified === true)
+    // - 비밀번호 & 비밀번호 확인 일치 + 규칙 통과
+    // - 확인창에서 OK 눌러야 실제 삭제
     const handleDeleteAccount = async () => {
         if (!currentUser) {
-            alert("로그인이 필요합니다.");
-            return;
+            return alert("로그인이 필요합니다.");
         }
-
-        // 혹시라도 탈퇴 모드가 아니면 그냥 무시
-        if (!isDeleteMode) return;
-
         if (!verified) {
-            alert("이메일 인증을 먼저 완료해주세요.");
-            return;
+            return alert("이메일 인증을 먼저 완료해주세요.");
         }
-
-        if (!editForm.password) {
-            alert("비밀번호를 입력해주세요.");
-            return;
+        if (!editForm.password || !confirmPassword) {
+            return alert("비밀번호와 비밀번호 확인을 모두 입력해주세요.");
         }
-
+        if (editForm.password !== confirmPassword) {
+            return alert("비밀번호가 일치하지 않습니다.");
+        }
         if (!pwRegex.test(editForm.password)) {
-            alert("비밀번호는 영어, 숫자, 특수문자를 포함해 8자 이상이어야 합니다.");
-            return;
-        }
-
-        if (!deleteReason) {
-            alert("탈퇴 사유를 선택해주세요.");
-            return;
-        }
-
-// 🔥 기타 선택 시 세부 사유 필수
-        let finalReason = deleteReason;
-        if (deleteReason === "기타") {
-            if (!deleteReasonDetail.trim()) {
-                alert("기타 사유를 입력해주세요.");
-                return;
-            }
-            finalReason = `기타: ${deleteReasonDetail.trim()}`;
+            return alert("비밀번호는 영어, 숫자를 포함해 8자 이상이어야 합니다.");
         }
 
         const ok = window.confirm(
@@ -125,24 +83,14 @@ const MyPage = () => {
 
         try {
             setDeleting(true);
-
-            // 1) 탈퇴 사유 로그 저장
-            await axios.post("/api/delete-account", {
-                userId: currentUser.id,
-                email: editForm.email || currentUser.email,
-                reason: finalReason,   // 🔥 여기!
-            });
-
-
-
-            // 2) 실제 유저 삭제
+            // 🔥 백엔드에서 /api/users/delete/{id} 또는 /api/users/{id} DELETE 만들어줘
             await axios.delete(`/api/users/delete/${currentUser.id}`, {
-                data: { password: editForm.password },
+                data: { password: editForm.password }, // 서버에서 비번 검증에 사용
             });
 
             alert("회원 탈퇴가 완료되었습니다. 이용해 주셔서 감사합니다.");
             localStorage.removeItem("user");
-            navigate("/");
+            navigate("/"); // 메인 화면으로 이동
         } catch (err) {
             console.error("❌ 회원 탈퇴 실패:", err);
             alert(err.response?.data || "회원 탈퇴 중 오류가 발생했습니다.");
@@ -150,7 +98,6 @@ const MyPage = () => {
             setDeleting(false);
         }
     };
-
 
     // 🔥 탈퇴 후 리다이렉트
     // ✅ 로그인 유저 로드
@@ -321,7 +268,7 @@ const MyPage = () => {
                 return alert("비밀번호가 일치하지 않습니다.");
             }
             if (!pwRegex.test(editForm.password)) {
-                return alert("비밀번호는 영어, 숫자를 포함해 8자 이상이어야 합니다.");
+                return alert("비밀번호는 영어, 숫자, 특수문자를 포함해 8자 이상이어야 합니다.");
             }
         }
 
@@ -449,148 +396,47 @@ const MyPage = () => {
                             </div>
                         )}
 
-                        {/* ✅ 비밀번호 (수정 / 탈퇴 공용) */}
                         <div className={styles.inputGroup}>
-                            <label>{isDeleteMode ? "비밀번호 (본인 확인)" : "새 비밀번호"}</label>
+                            <label>새 비밀번호</label>
                             <input
                                 type="password"
                                 value={editForm.password}
                                 onChange={(e) => setEditForm({ ...editForm, password: e.target.value })}
-                                placeholder={
-                                    isDeleteMode
-                                        ? "현재 계정 비밀번호를 입력하세요"
-                                        : "영문+숫자+특수문자 8자 이상"
-                                }
+                                placeholder="영문+숫자+특수문자 8자 이상"
+                            />
+                        </div>
+                        <div className={styles.inputGroup}>
+                            <label>비밀번호 확인</label>
+                            <input
+                                type="password"
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                placeholder="비밀번호를 다시 입력하세요"
                             />
                         </div>
 
-                        {/* ✅ 일반 정보 수정일 때만 비밀번호 확인 + 수정 버튼 노출 */}
-                        {!isDeleteMode && (
-                            <>
-                                <div className={styles.inputGroup}>
-                                    <label>비밀번호 확인</label>
-                                    <input
-                                        type="password"
-                                        value={confirmPassword}
-                                        onChange={(e) => setConfirmPassword(e.target.value)}
-                                        placeholder="비밀번호를 다시 입력하세요"
-                                    />
-                                </div>
-
-                                <button
-                                    onClick={handleUpdate}
-                                    disabled={loading}
-                                    className={styles.updateButton}
-                                >
-                                    {loading ? "수정 중..." : "수정하기"}
-                                </button>
-                            </>
-                        )}
-
-                        {/* 🔥 탈퇴 모드일 때만 '사유 선택' 박스 표시 */}
-                        {isDeleteMode && (
-                            <div className={styles.deleteReasonSection}>
-                                <button
-                                    type="button"
-                                    className={styles.deleteReasonToggle}
-                                    onClick={() => setShowReasonBox((prev) => !prev)}
-                                >
-                                    <span>회원 탈퇴 사유 선택</span>
-                                    <span className={styles.chevron}>
-                {showReasonBox ? "▲" : "▼"}
-            </span>
-                                </button>
-
-                                {showReasonBox && (
-                                    <div className={styles.deleteReasonList}>
-                                        {DELETE_REASONS.map((reason) => (
-                                            <label key={reason} className={styles.deleteReasonItem}>
-                                                <input
-                                                    type="radio"
-                                                    name="deleteReason"
-                                                    value={reason}
-                                                    checked={deleteReason === reason}
-                                                    onChange={(e) => setDeleteReason(e.target.value)}
-                                                />
-                                                <span>{reason}</span>
-                                            </label>
-                                        ))}
-                                    </div>
-                                )}
-                                {/* 🔥 '기타' 선택 시 추가 사유 입력 칸 */}
-                                {deleteReason === "기타" && (
-                                    <textarea
-                                        className={styles.deleteReasonEtcInput}
-                                        placeholder="구체적인 탈퇴 사유를 입력해주세요."
-                                        value={deleteReasonDetail}
-                                        onChange={(e) => setDeleteReasonDetail(e.target.value)}
-                                    />
-                                )}
-
-                                {deleteReason && !showReasonBox && (
-                                    <p className={styles.deleteReasonSelected}>
-                                        선택된 사유: <b>{deleteReason}</b>
-                                    </p>
-                                )}
-                            </div>
-                        )}
+                        <button
+                            onClick={handleUpdate}
+                            disabled={loading}
+                            className={styles.updateButton}
+                        >
+                            {loading ? "수정 중..." : "수정하기"}
+                        </button>
 
                         {/* 🔥 회원 탈퇴 영역 */}
-                        {!isDeleteMode ? (
-                            // 1단계: 탈퇴 모드 전환 버튼
-                            <div className={styles.deleteSection}>
-                                <p className={styles.deleteNotice}>
-                                    ⚠️ 회원 탈퇴 시 모든 데이터가 영구 삭제되며, 복구가 불가능합니다.
-                                </p>
-                                <button
-                                    type="button"
-                                    className={styles.deleteButton}
-                                    onClick={() => {
-                                        setIsDeleteMode(true);
-                                        setDeleteReason("");
-                                        setShowReasonBox(true);
-                                        setDeleteReasonDetail("");
-                                        setEditForm((prev) => ({ ...prev, password: "" }));
-                                        setConfirmPassword("");
-                                    }}
-                                    disabled={deleting}
-                                >
-                                    회원 탈퇴 진행하기
-                                </button>
-                            </div>
-                        ) : (
-                            // 2단계: 사유 선택 후 실제 탈퇴 버튼 + 취소
-                            <div className={styles.deleteSection}>
-                                <p className={styles.deleteNotice}>
-                                    ⚠️ 탈퇴 후에는 모든 정보가 삭제되며 복구가 불가능합니다.
-                                </p>
-                                <div className={styles.deleteButtonGroup}>
-                                    <button
-                                        type="button"
-                                        className={styles.deleteCancelButton}
-                                        onClick={() => {
-                                            setIsDeleteMode(false);
-                                            setDeleteReason("");
-                                            setDeleteReasonDetail("");
-                                            setShowReasonBox(false);
-                                            setEditForm((prev) => ({ ...prev, password: "" }));
-                                        }}
-                                        disabled={deleting}
-                                    >
-                                        취소
-                                    </button>
-                                    <button
-                                        type="button"
-                                        className={styles.deleteButton}
-                                        onClick={handleDeleteAccount}
-                                        disabled={deleting}
-                                    >
-                                        {deleting ? "탈퇴 처리 중..." : "정말 탈퇴하기"}
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-
+                        <div className={styles.deleteSection}>
+                            <p className={styles.deleteNotice}>
+                                ⚠️ 회원 탈퇴 시 모든 데이터가 영구 삭제되며, 복구가 불가능합니다.
+                            </p>
+                            <button
+                                type="button"
+                                className={styles.deleteButton}
+                                onClick={handleDeleteAccount}
+                                disabled={deleting}
+                            >
+                                {deleting ? "탈퇴 처리 중..." : "회원 탈퇴하기"}
+                            </button>
+                        </div>
                     </section>
                 )}
 

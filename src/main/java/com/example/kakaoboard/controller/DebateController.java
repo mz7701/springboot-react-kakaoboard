@@ -19,7 +19,7 @@ import java.util.*;
 @RequiredArgsConstructor
 @CrossOrigin(origins = {
         "http://localhost:3000",
-        "http://192.168.0.21:3000"
+        "http://192.168.0.189:3000"
 })
 public class DebateController {
 

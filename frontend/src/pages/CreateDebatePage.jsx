@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import styles from "./CreateDebatePage.module.css";
 
 // ✅ axios 기본 설정 (같은 네트워크에서 접근 가능하도록 IP 기반)
-axios.defaults.baseURL = "http://192.168.0.21:8080"; // ⚠️ 본인 서버 IP로 변경
+axios.defaults.baseURL = "http://192.168.0.189:8080"; // ⚠️ 본인 서버 IP로 변경
 
 
 const CreateDebatePage = () => {

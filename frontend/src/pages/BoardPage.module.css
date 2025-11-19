@@ -1,0 +1,28 @@
+.page {
+    display: grid;
+    grid-template-columns: 220px 1fr 260px;  /* 왼쪽 220px / 가운데 자동 / 오른쪽 260px */
+    gap: 20px;
+    padding: 20px;
+    width: 100%;
+    max-width: 1600px;   /* 중앙 콘텐츠가 너무 넓어지는 것 방지 */
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+@media (max-width: 1400px) {
+    .page {
+        grid-template-columns: 200px 1fr 240px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .page {
+        grid-template-columns: 180px 1fr 220px;
+    }
+}
+
+@media (max-width: 900px) {
+    .page {
+        grid-template-columns: 1fr;  /* 모바일에서는 한 줄로 */
+    }
+}

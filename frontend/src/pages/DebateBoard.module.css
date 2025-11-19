@@ -1,120 +1,69 @@
-/* 🎨 기본 색상 변수 */
-:root {
-    --blue: #007bff;
-    --blue-light: #00a2ff;
-    --yellow: #ffd43b;
-    --yellow-light: #ffe17d;
-    --red: #ff5b5b;
-    --green: #2ecc71;
-    --gray-bg: #f9fafc;
-    --gray: #888;
-    --text: #222;
-    --radius: 12px;
-    --shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
-    --transition: all 0.25s ease;
-}
-
-/* ✅ 전체 컨테이너 */
+/* 전체 컨테이너 */
 .container {
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 1.5rem;
-    font-family: "Noto Sans KR", sans-serif;
-    color: var(--text);
-    background: linear-gradient(180deg, #f4f6ff, #ffffff);
-    min-height: 100vh;
-}
-
-/* ✅ 헤더 */
-.header {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    margin-bottom: 1.2rem;
+    flex-direction: column;
+    gap: 20px;
 }
 
-.title {
-    font-size: 1.8rem;
-    font-weight: 800;
-}
-
-.userInfo {
-    text-align: right;
-}
-
-.username {
-    font-weight: 700;
-    color: var(--text);
-}
-
-.exp {
-    color: var(--gray);
-    font-size: 0.9rem;
-}
-
-/* ✅ 새 토론 등록 버튼 */
-.postButton {
-    background: linear-gradient(135deg, var(--blue), var(--blue-light));
-    color: white;
-    border: none;
-    border-radius: var(--radius);
-    padding: 10px 18px;
-    font-weight: 700;
-    cursor: pointer;
-    box-shadow: var(--shadow);
-    transition: var(--transition);
-    margin-bottom: 1rem;
-}
-
-.postButton:hover {
-    transform: translateY(-2px);
-    filter: brightness(1.1);
-}
-
-/* ✅ 탭 버튼 */
-.tabContainer {
+/* 탭 */
+.tabRow {
     display: flex;
+    gap: 12px;
     justify-content: center;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-bottom: 1rem;
+    margin-bottom: 8px;
 }
 
-.tabButton {
-    background: #f2f3f6;
-    border: none;
+.tabBtn {
+    padding: 10px 18px;
+    background: #f2f4f7;
     border-radius: 8px;
-    padding: 8px 18px;
-    font-weight: 700;
-    color: #444;
+    border: none;
     cursor: pointer;
-    transition: var(--transition);
-}
-
-.tabButton:hover {
-    background: #fff2a1;
+    font-size: 14px;
 }
 
 .activeTab {
-    background: linear-gradient(135deg, var(--yellow), var(--yellow-light));
-    color: #222;
-    box-shadow: var(--shadow);
+    background: #ff7a50;
+    color: #fff;
+    font-weight: bold;
 }
 
-/* ✅ 토론 카드 */
+/* 버튼 줄 */
+.buttonRow {
+    display: flex;
+    justify-content: space-between;
+}
+
+.newPostBtn {
+    padding: 10px 18px;
+    background: #1e90ff;
+    color: white;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+}
+
+.chatBtn {
+    padding: 10px 18px;
+    background: #4CAF50;
+    color: white;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+}
+
+/* 카드 */
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
 .card {
     background: white;
-    border-radius: 16px;
-    padding: 20px;
-    margin-bottom: 1.2rem;
-    box-shadow: var(--shadow);
-    border: 1px solid #eee;
-    transition: var(--transition);
-}
-
-.card:hover {
-    transform: translateY(-3px);
+    padding: 18px;
+    border-radius: 12px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
 }
 
 .cardHeader {
@@ -123,798 +72,184 @@
     align-items: center;
 }
 
-.cardTitle {
-    font-size: 1.2rem;
-    font-weight: 700;
+.title {
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
 }
 
-.cardContent {
-    margin: 0.8rem 0;
-    color: #333;
-    line-height: 1.6;
-}
-
-.cardMeta {
-    font-size: 0.9rem;
-    color: #777;
-}
-
-/* ✅ 삭제 버튼 */
-.deleteButton {
+.delBtn {
     background: none;
     border: none;
-    color: var(--red);
     cursor: pointer;
-    transition: var(--transition);
+    color: red;
 }
 
-.deleteButton:hover {
-    transform: scale(1.1);
-    color: #ff1e1e;
-}
-
-/* ✅ 반박 버튼 */
-.rebuttalButton {
-    background: linear-gradient(135deg, #ffc107, #ffe588);
-    border: none;
-    color: #333;
-    font-weight: 700;
-    padding: 8px 14px;
-    border-radius: 10px;
-    cursor: pointer;
-    box-shadow: var(--shadow);
-    transition: var(--transition);
-}
-
-.rebuttalButton:hover {
-    transform: translateY(-2px);
-    filter: brightness(1.05);
-}
-
-/* ✅ 반박 입력 폼 */
-.rebuttalForm {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    background: rgba(255, 255, 255, 0.65);
-    backdrop-filter: blur(14px) saturate(180%);
-    border-radius: 18px;
-    padding: 1.4rem;
-    border: 1px solid rgba(200, 200, 200, 0.3);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-    width: 100%;
-    max-width: 650px;
-    margin: 1.2rem auto;
-    animation: fadeUp 0.35s ease-in-out;
-}
-@media (max-width: 600px) {
-    .rebuttalForm {
-        padding: 1rem;
-        max-width: 90%;
-    }
-    .rebuttalInput,
-    .rebuttalTextarea {
-        font-size: 14px;
-        padding: 10px 12px;
-    }
-    .rebuttalSubmit {
-        font-size: 14px;
-        padding: 8px 16px;
-    }
-}
-@keyframes fadeUp {
-    from {
-        opacity: 0;
-        transform: translateY(15px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-.rebuttalCloseBtn {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    background: rgba(255, 255, 255, 0.5);
-    border: none;
-    border-radius: 50%;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #ff4d4d;
-    font-size: 18px;
-    cursor: pointer;
-    transition: all 0.25s ease;
-    box-shadow: 0 3px 6px rgba(255, 0, 0, 0.15);
-}
-.rebuttalCloseBtn:hover {
-    transform: rotate(90deg) scale(1.1);
-    background: rgba(255, 0, 0, 0.1);
-}
-.rebuttalInput {
-    width: 95%;
-    border: 1px solid rgba(210, 210, 210, 0.8);
-    border-radius: 10px;        /* 🔹 기존 12px → 10px : 폼과 딱 맞게 */
-    padding: 10px 12px;         /* 🔹 12px → 10px : 위아래 균형 맞춤 */
-    font-size: 15px;
-    outline: none;
-    background: rgba(255, 255, 255, 0.95);
-    box-sizing: border-box;     /* ✅ 폼 경계와 크기 일치 */
-    transition: all 0.25s ease;
-}
-.rebuttalInput:focus {
-    border-color: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
-}
-
-/* ✅ 내용 textarea */
-.rebuttalTextarea {
-    width: 95%;
-    height: 120px;              /* 🔹 130px → 120px : 폼 비율 조정 */
-    border: 1px solid rgba(210, 210, 210, 0.8);
-    border-radius: 10px;        /* 🔹 동일하게 맞춤 */
-    padding: 10px 12px;         /* 🔹 input과 동일한 여백 */
-    font-size: 15px;
-    background: rgba(255, 255, 255, 0.95);
-    resize: none;
-    outline: none;
-    box-sizing: border-box;
-    transition: all 0.25s ease;
-}
-.rebuttalTextarea:focus {
-    border-color: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
-}
-
-/* ✅ 등록 버튼 */
-.rebuttalSubmit {
-    align-self: flex-end;
-    background: linear-gradient(135deg, #3b82f6, #2563eb);
-    color: #fff;
-    font-weight: 600;
-    border: none;
-    border-radius: 12px;
-    padding: 10px 20px;
-    cursor: pointer;
-    font-size: 15px;
-    box-shadow: 0 5px 12px rgba(59, 130, 246, 0.3);
-    transition: all 0.25s ease;
-}
-.rebuttalSubmit:hover {
-    transform: translateY(-2px);
-    background: linear-gradient(135deg, #2563eb, #1e40af);
-}
-
-/* 🎯 반박 내용 카드 (반박중 / 마감 둘 다 공용) */
-.rebuttalBox {
-    position: relative;
-    margin-top: 1.2rem;
-    padding: 16px 18px 14px;
-    border-radius: 18px;
-    background: radial-gradient(circle at top left, #eef3ff, #f9fbff);
-    border: 1px solid rgba(148, 163, 184, 0.35);
-    box-shadow: 0 14px 32px rgba(15, 23, 42, 0.15);
-    overflow: hidden;
-}
-/* 왼쪽 포인트 컬러 바 */
-.rebuttalBox::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 4px;
-    height: 100%;
-    background: linear-gradient(180deg, #2563eb, #4f46e5);
-}
-
-
-/* 제목 (🗣️ 반박 제목) */
-.rebuttalBox h4 {
-    margin: 0 0 6px 0;
-    padding-left: 4px;
-    font-size: 0.97rem;
-    font-weight: 700;
-    color: #1d4ed8;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
 /* 본문 */
-.rebuttalBox p {
-    margin: 2px 0;
-    padding-left: 4px;
-    font-size: 0.95rem;
-    color: #111827;
-    line-height: 1.6;
-}
-
-
-/* 작성자 */
-.rebuttalMeta {
-    font-size: 0.85rem;
-    color: #6b7280;
-    text-align: right;
-    margin-top: 8px;
-}
-/* 🕒 남은 시간 뱃지용 (원하면 JSX에서 className으로 사용) */
-.timerBadge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    margin-top: 0.6rem;
-    margin-bottom: 0.2rem;
-    padding: 5px 10px;
-    border-radius: 999px;
-    background: rgba(37, 99, 235, 0.08);
-    color: #1d4ed8;
-    font-size: 0.85rem;
-    font-weight: 600;
-}
-
-/* 🗳 투표 영역 – 중앙 캡슐 카드 */
-.voteSection {
-    margin-top: 1.1rem;
-    display: flex;
-    align-items: stretch;
-    justify-content: center;
-    gap: 14px;
-    padding: 10px 14px;
-    border-radius: 999px;
-    background: linear-gradient(135deg, #f5f7ff, #eef2ff);
-    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.18);
-    max-width: 430px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-/* 기본 버튼 스타일 */
-.voteButton {
-    flex: 1;
-    border: none;
-    border-radius: 999px;
-    padding: 10px 16px;
-    font-weight: 700;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: all 0.25s ease;
-    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.15);
-    white-space: nowrap;
-}
-/* 왼쪽(원글 작성자) 버튼 */
-.voteLeft {
-    background: linear-gradient(135deg, #e0ecff, #bfd3ff);
-    color: #1d4ed8;
-}
-/* 오른쪽(반박자) 버튼 */
-.voteRight {
-    background: linear-gradient(135deg, #ffe3f2, #ffbfd8);
-    color: #be185d;
-}
-
-/* 호버 상태 */
-.voteButton:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.22);
-    filter: brightness(1.03);
-}
-
-/* 비활성화 상태 */
-.voteButton:disabled {
-    opacity: 0.55;
-    cursor: not-allowed;
-    box-shadow: none;
-}
-
-/* 가운데 VS */
-.vs {
-    align-self: center;
-    font-weight: 800;
-    font-size: 0.95rem;
-    color: #6b7280;
-}
-
-/* 🕛 마감된 토론 카드 */
-.closedSection {
-    margin-top: 1.3rem;
-    padding: 16px 18px;
-    border-radius: 18px;
-    background: linear-gradient(135deg, #fdf2ff, #e0f2fe);
-    border: 1px solid rgba(148, 163, 184, 0.4);
-    box-shadow: 0 14px 30px rgba(15, 23, 42, 0.18);
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-/* 제목 줄 */
-.closedSection h4 {
-    margin: 0;
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: #374151;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-/* 결과/승자 텍스트 */
-.closedSection p {
-    margin: 0;
-    font-size: 0.98rem;
-    font-weight: 700;
-    color: #1d4ed8;
-}
-
-/* ✅ 댓글 */
-.commentSection {
-    margin-top: 1rem;
-}
-
-.commentTitle {
-    font-weight: 700;
-    margin-bottom: 0.6rem;
-    color: #333;
-}
-
-.commentList {
-    background: #fafafa;
-    border-radius: 8px;
-    padding: 10px;
-    border: 1px solid #eee;
-    max-height: 200px;
-    overflow-y: auto;
-}
-
-.commentItem {
-    font-size: 0.95rem;
-    margin-bottom: 5px;
-    color: #444;
+.content {
+    margin-top: 12px;
+    font-size: 15px;
     line-height: 1.5;
 }
 
-.commentAuthor {
-    font-weight: 700;
-    color: var(--blue);
-}
-
-.commentInputGroup {
+/* 반박 */
+.rebuttalArea {
+    margin-top: 16px;
     display: flex;
-    margin-top: 0.6rem;
-    gap: 8px;
+    justify-content: flex-end;
 }
 
-.commentInput {
-    flex: 1;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 8px 10px;
-}
-
-.commentSubmit {
-    background: linear-gradient(135deg, var(--blue), var(--blue-light));
-    color: white;
-    border: none;
-    border-radius: 8px;
+.rebuttalBtn {
     padding: 8px 14px;
-    cursor: pointer;
-    transition: var(--transition);
-}
-
-.commentSubmit:hover {
-    transform: translateY(-2px);
-}
-
-/* ✅ 대댓글 (reply) */
-.replyButton {
-    background: none;
-    border: none;
-    color: var(--blue);
-    font-size: 13px;
-    margin-left: 10px;
-    cursor: pointer;
-}
-
-.replyInputGroup {
-    display: flex;
-    margin: 6px 0 0 24px;
-    gap: 8px;
-}
-
-.replyInput {
-    flex: 1;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    padding: 6px 8px;
-    font-size: 14px;
-}
-
-.replySubmit {
-    background: #007bff;
+    background: #ffa54c;
     color: white;
+    border-radius: 8px;
     border: none;
-    border-radius: 6px;
-    padding: 6px 10px;
     cursor: pointer;
-    font-weight: 600;
-    transition: var(--transition);
 }
 
-.replySubmit:hover {
-    transform: translateY(-2px);
-    background: #0056b3;
-}
-
-.replyItem {
-    margin-left: 28px;
-    font-size: 14px;
-    color: #555;
-    padding: 4px 0;
-}
-
-/* ✅ 페이지네이션 */
-.pagination {
-    margin: 16px 0;
-    text-align: center;
-}
-
-.pageBtn {
-    margin: 0 4px;
-    padding: 6px 10px;
-    border: 1px solid #ccc;
-    background-color: #fff;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 13px;
-    transition: var(--transition);
-}
-
-.pageBtn:hover {
-    background-color: #f1f3f8;
-}
-
-.activePage {
-    background-color: var(--blue);
-    color: white;
-    border-color: var(--blue);
-}
-
-/* ✅ 검색 입력 */
-.searchInput {
-    margin-left: 1rem;
-    padding: 6px 10px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    font-size: 14px;
-}
-
-.searchInput:focus {
-    outline: none;
-    border-color: var(--blue);
-}
-
-/* ✅ 애니메이션 */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-5px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* ✅ 반응형 */
-@media (max-width: 768px) {
-    .container {
-        padding: 1rem;
-    }
-    .tabContainer {
-        flex-wrap: wrap;
-    }
-    .voteSection {
-        flex-direction: column;
-    }
-    .voteButton {
-        width: 100%;
-    }
-    .commentInputGroup {
-        flex-direction: column;
-    }
-    .commentSubmit {
-        width: 100%;
-    }
-}
-/* ✅ 로그인 버튼 (민트-블루 그라데이션, 반박버튼 스타일 기반) */
-.loginBtn {
-    background: linear-gradient(135deg, #00b4ff, #4dd0e1);
-    color: #fff;
-    border: none;
-    border-radius: 12px;
-    padding: 10px 20px;
-    font-weight: 700;
-    font-size: 15px;
-    cursor: pointer;
-    box-shadow: 0 4px 8px rgba(0, 180, 255, 0.25);
-    transition: all 0.25s ease-in-out;
-}
-
-.loginBtn:hover {
-    transform: translateY(-2px);
-    background: linear-gradient(135deg, #0096e0, #26c6da);
-    box-shadow: 0 6px 14px rgba(0, 180, 255, 0.35);
-}
-
-/* ✅ 로그아웃 버튼 (반박 버튼 느낌, 딸기-레드톤) */
-.logoutBtn {
-    background: linear-gradient(135deg, #ff7070, #ff4d4d);
-    color: #fff;
-    border: none;
-    border-radius: 12px;
-    padding: 10px 20px;
-    font-weight: 700;
-    font-size: 15px;
-    cursor: pointer;
-    box-shadow: 0 4px 8px rgba(255, 77, 77, 0.25);
-    transition: all 0.25s ease-in-out;
-}
-
-.logoutBtn:hover {
-    transform: translateY(-2px);
-    background: linear-gradient(135deg, #ff4d4d, #ff3030);
-    box-shadow: 0 6px 14px rgba(255, 77, 77, 0.35);
-}
-
-/* ✅ 모바일 반응형 */
-@media (max-width: 600px) {
-    .loginBtn,
-    .logoutBtn {
-        padding: 8px 16px;
-        font-size: 14px;
-        border-radius: 10px;
-    }
-}
-/*일단 /* ✅ 카테고리 버튼 숨기기*/
-.categoryItem {
-    display: none !important;
-}
-/* 🎨 카테고리 버튼 전체 컨테이너 */
-.categoryBar {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 12px;
-    margin: auto 24px;
-    margin-top: -8px;   /* ✅ 위로 살짝 올리기 */
-    margin-bottom: 20px; /* ✅ 아래 간격 살짝 유지 */
-    padding: 12px 20px;
-    border-radius: 14px;
-    background: linear-gradient(145deg, #ffffff, #f6f8ff);
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
-    width: fit-content;
-    max-width: 95%;
-    transition: all 0.3s ease;
-}
-
-/* 📌 각 카테고리 버튼 */
-.categoryBtn {
-    background: white;
-    border: 1px solid #dfe4f5;
-    color: #333;
-    font-weight: 600;
-    font-size: 15px;
-    border-radius: 10px;
-    padding: 8px 18px;
-    cursor: pointer;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.04);
-    transition: all 0.25s ease;
-}
-
-.categoryBtn:hover {
-    background: linear-gradient(135deg, #f5f8ff, #eaf0ff);
-    border-color: #aac3ff;
-    transform: translateY(-2px);
-}
-
-/* ✅ 선택된 버튼 */
-.activeCategory {
-    background: linear-gradient(135deg, #ffeb84, #ffd43b);
-    color: #222;
-    border: none;
-    box-shadow: 0 4px 10px rgba(255, 212, 59, 0.35);
-    transform: translateY(-2px);
-}
-
-/* 📱 반응형 */
-@media (max-width: 600px) {
-    .categoryBar {
-        flex-wrap: wrap;
-        gap: 8px;
-        padding: 10px;
-        margin: 18px auto;
-    }
-
-    .categoryBtn {
-        font-size: 14px;
-        padding: 8px 14px;
-    }
-}
-/* ✅ 카테고리 버튼 전체 줄(전체·게임·사회 등)을 살짝 위로 올리기 */
-.categoryFilter {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 12px;
-    margin-top: -8px;   /* 🔼 위로 8px 올림 */
-    margin-bottom: 16px;
-    transition: all 0.25s ease;
-}
-.chatroomButton {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-
-    padding: 12px 22px;
-    margin-top: 10px;
-    margin-bottom: 15px; /* 🔥 아래 요소와 충돌 방지 */
-
-    background: linear-gradient(135deg, #6eb6ff, #4d8dff);
-    color: #fff;
-
-    border: none;
-    border-radius: 14px;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-    transition: all 0.22s ease-in-out;
-
-    white-space: nowrap;
-
-    display: block;       /* 🔥 겹침 해결 핵심 */
-    width: fit-content;   /* 버튼 크기 고정 */
-}
-
-.chatroomButton:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-    opacity: 0.95;
-}
-
-.chatroomButton:active {
-    transform: scale(0.97);
-}
-.commentDeleteButton {
-    border: none;
-    background: transparent;
-    font-size: 0.75rem;
-    margin-left: 4px;
-    cursor: pointer;
-    color: #fca5a5;
-    opacity: 0.85;
-    transition: 0.18s ease;
-}
-
-.commentDeleteButton:hover {
-    opacity: 1;
-    transform: translateY(-1px);
-}
-/* 🧵 댓글 한 줄 레이아웃 (닉네임 | 내용 | 시간) */
-.commentRow {
-    display: grid;
-    grid-template-columns: 140px 1fr 130px; /* 왼쪽 / 가운데 / 오른쪽 */
-    column-gap: 8px;
-    padding: 6px 4px;
-    align-items: flex-start;
-    border-top: 1px solid #eee;
-    font-size: 0.85rem;
-    background-color: #fafafa;
-}
-
-.commentList .commentRow:first-child {
-    border-top: none;
-}
-
-/* 왼쪽: 닉네임 / IP */
-.leftCell {
+.rebuttalForm {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 10px;
+    margin-top: 10px;
 }
 
-.commentIp {
-    font-size: 0.7rem;
-    color: #999;
+.rebuttalForm input,
+.rebuttalForm textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
 }
 
-/* 가운데: 내용 + ㄴ 표시 + 답글 */
-.middleCell {
+.rebuttalSubmit {
+    align-self: flex-end;
+    padding: 8px 14px;
+    background: #ff7a50;
+    color: #fff;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+}
+
+/* 반박중 */
+.voteBox {
+    margin-top: 12px;
+}
+
+.timer {
+    text-align: right;
+    color: #ff4d4d;
+    font-weight: bold;
+}
+
+.voteSection {
+    margin-top: 12px;
     display: flex;
+    justify-content: center;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 4px;
+    gap: 14px;
 }
 
-.depthMarker {
-    color: #f59e0b;          /* 노란 느낌 */
-    font-weight: 700;
-    margin-right: 4px;
-    letter-spacing: 1px;
+.voteSection button {
+    padding: 8px 14px;
+    background: #eee;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.vs {
+    font-weight: bold;
+    font-size: 18px;
+}
+
+/* 댓글 */
+.commentBox {
+    margin-top: 20px;
+}
+
+.commentTitle {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.commentList {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* 기본 댓글 */
+.commentRow {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+    width: 100%;
+}
+
+.childRow {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+    margin-left: 25px;
+    width: calc(100% - 25px);
+}
+
+/* 🔥 댓글 상단 (작성자 + 삭제 아이콘) */
+.commentHeaderLine {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.author {
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* 🔥 아이콘 삭제 버튼 */
+.commentDelete {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: red;
+    padding: 0;
+}
+
+.commentDelete:hover {
+    opacity: 0.7;
 }
 
 .commentText {
-    color: #444;
+    flex: 1;
 }
 
-/* 오른쪽: 시간 + 삭제 버튼 */
-.rightCell {
+.commentInputBox {
     display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.8rem;
+    gap: 10px;
+    margin-top: 12px;
 }
 
-/* 🌿 대댓글 줄 (답글)은 살짝 다른 배경 + 초록 닉네임 */
-.childRow {
-    background-color: #f4f5ff;
+.commentInputBox input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
 }
 
-.childRow .commentAuthor {
-    color: #16a34a; /* 연초록 */
-}
-
-
-
-/* 입력창 위 멘션 바 */
-.mentionBar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: #eef2ff;
-    border-radius: 6px;
-    padding: 4px 8px;
-    margin-bottom: 6px;
-    font-size: 0.78rem;
-    color: #4f46e5;
-}
-
-.mentionLabel {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.mentionClear {
+.commentSubmit {
+    padding: 8px 14px;
+    background: #1e90ff;
+    color: #fff;
+    border-radius: 8px;
     border: none;
-    background: transparent;
-    font-size: 0.75rem;
     cursor: pointer;
-    color: #9ca3af;
-}
-
-.mentionClear:hover {
-    color: #ef4444;
-}
-
-/* 댓글 줄 안에서 보이는 멘션 태그 */
-.mentionTag {
-    display: inline-flex;
-    align-items: center;
-    padding: 2px 8px;
-    border-radius: 999px;
-    background: rgba(79, 70, 229, 0.12);  /* 보라빛 반투명 */
-    color: #4338ca;
-    font-size: 0.78rem;
-    font-weight: 600;
-    margin-right: 6px;
-}
-.commentInputMention {
-    border-color: #4f46e5;
-    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.18);
 }

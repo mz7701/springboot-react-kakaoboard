@@ -1,0 +1,44 @@
+.sidebar {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.loginBtn {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    background: #ff7a50;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.userBox {
+    margin-bottom: 20px;
+}
+
+.name {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.exp {
+    color: #666;
+}
+
+.hotBox {
+    margin-top: 20px;
+}
+
+.logoutBtn {
+    width: 100%;
+    padding: 10px;
+    background: #ff5252;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 10px;
+}

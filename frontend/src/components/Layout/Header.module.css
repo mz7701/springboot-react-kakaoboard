@@ -1,0 +1,56 @@
+.header {
+    width: 100%;
+    height: 60px;
+    background: #fff;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+/* 🔥 왼쪽 로고 */
+.logo {
+    font-size: 22px;
+    font-weight: bold;
+    color: #ff6b00;
+    min-width: 150px;
+}
+
+/* 🔥 가운데 검색창 완전 정중앙 */
+.searchBox {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.searchBox input {
+    width: 70%;
+    max-width: 600px;
+    height: 36px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    padding: 0 10px;
+}
+
+/* 🔥 오른쪽 */
+.right {
+    min-width: 150px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.loginBtn {
+    padding: 8px 15px;
+    background: #ff735f;
+    color: #fff;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+}
+
+.username {
+    font-weight: bold;
+    color: #444;
+}
