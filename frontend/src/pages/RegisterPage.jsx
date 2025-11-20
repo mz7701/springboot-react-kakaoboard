@@ -45,10 +45,15 @@ const RegisterPage = () => {
 
     /** ✅ 비밀번호 유효성 검사 */
     const validatePasswords = (pw, pwCheck) => {
-        if (!/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/.test(pw)) {
+        // 🔁 영문 + 숫자 최소 1개씩 포함, 길이 8자 이상 (나머지 문자 자유)
+        const pwRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
+
+        if (!pwRegex.test(pw)) {
             setErrors((prev) => ({
                 ...prev,
                 password: "❌ 비밀번호는 8자 이상이며, 영문과 숫자를 포함해야 합니다.",
+                // 형식 자체가 틀리면 일단 확인 비밀번호 에러는 비움
+                passwordCheck: prev.passwordCheck,
             }));
         } else if (pwCheck && pw !== pwCheck) {
             setErrors((prev) => ({
@@ -59,6 +64,7 @@ const RegisterPage = () => {
             setErrors((prev) => ({ ...prev, password: "", passwordCheck: "" }));
         }
     };
+
 
     /** ✅ 아이디 중복 확인 */
     const checkUsername = async () => {

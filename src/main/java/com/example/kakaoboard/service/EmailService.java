@@ -36,30 +36,37 @@ public class EmailService {
 
         String subject = "[Kakaoboard] 이메일 인증번호 안내";
 
-        // ✅ 네가 만든 HTML 템플릿 그대로 사용 (String.format으로 코드만 끼워넣기)
+        // ✅ 새 HTML 템플릿 적용
         String htmlContent =
-                "<div style=\"width:100%%; background-color:#f5f7fa; padding:24px 0; font-family:'Pretendard','Noto Sans KR',Arial,sans-serif;\">" +
-                        "  <div style=\"max-width:480px; margin:0 auto; background:#ffffff; border-radius:16px; padding:24px 24px 28px; box-shadow:0 10px 30px rgba(15,23,42,0.12);\">" +
-                        "    <div style=\"text-align:center; margin-bottom:24px;\">" +
-                        "      <div style=\"display:inline-block; padding:8px 14px; border-radius:999px; background:linear-gradient(135deg,#4f46e5,#ec4899); color:#ffffff; font-size:12px; font-weight:600; letter-spacing:0.04em;\">" +
-                        "        Kakaoboard 이메일 인증" +
+                "<div style=\"width:100%%; background-color:#f5f7fa; padding:40px 0; font-family:'Pretendard','Noto Sans KR',Arial,sans-serif;\">" +
+                        "  <div style=\"max-width:500px; margin:0 auto; background:#ffffff; border-radius:12px; box-shadow:0 4px 20px rgba(0,0,0,0.08); overflow:hidden;\">" +
+                        "    <div style=\"background:linear-gradient(90deg,#6366f1,#8b5cf6,#ec4899); padding:20px 0; text-align:center; color:#fff;\">" +
+                        "      <h1 style=\"margin:0; font-size:26px; font-weight:700;\">Kakaoboard</h1>" +
+                        "      <p style=\"margin:0; font-size:14px; opacity:0.9;\">이메일 인증 안내</p>" +
+                        "    </div>" +
+                        "    <div style=\"padding:30px;\">" +
+                        "      <p style=\"font-size:16px; color:#333;\">안녕하세요 👋</p>" +
+                        "      <p style=\"font-size:15px; color:#555; margin-bottom:20px;\">" +
+                        "        요청하신 <b>이메일 인증번호</b>는 아래와 같습니다.<br>" +
+                        "        해당 코드를 입력하여 인증을 완료해주세요." +
+                        "      </p>" +
+                        "      <div style=\"text-align:center; margin:30px 0;\">" +
+                        "        <div style=\"display:inline-block; background:#f4f6ff; border:2px dashed #8b5cf6; border-radius:10px; padding:15px 25px;\">" +
+                        "          <span style=\"font-size:30px; font-weight:700; letter-spacing:4px; color:#4f46e5;\">%s</span>" +
+                        "        </div>" +
                         "      </div>" +
-                        "      <h1 style=\"margin:16px 0 4px; font-size:22px; font-weight:700; color:#111827;\">이메일 인증번호 안내</h1>" +
-                        "      <p style=\"margin:0; font-size:13px; color:#6b7280;\">아래 인증번호를 입력하여 회원가입을 완료해주세요.</p>" +
+                        "      <p style=\"color:#777; font-size:14px;\">⏰ 유효시간은 <b>30분</b>입니다.</p>" +
+                        "      <p style=\"color:#999; font-size:13px;\">이 요청을 본인이 하지 않았다면 이 메일을 무시해주세요.</p>" +
                         "    </div>" +
-                        "    <div style=\"background:#f9fafb; border-radius:14px; padding:18px 16px; border:1px dashed #c4b5fd; text-align:center;\">" +
-                        "      <div style=\"font-size:12px; color:#6b7280; margin-bottom:6px;\">이메일 인증번호</div>" +
-                        "      <div style=\"font-size:30px; font-weight:700; letter-spacing:6px; color:#4f46e5;\">%s</div>" +
-                        "      <p style=\"margin:10px 0 0; font-size:12px; color:#9ca3af;\">본 코드는 발급 후 30분 동안만 유효합니다.</p>" +
+                        "    <div style=\"background:#fafafa; padding:15px; text-align:center; border-top:1px solid #eee;\">" +
+                        "      <p style=\"font-size:12px; color:#aaa; margin:0;\">" +
+                        "        © 2025 Kakaoboard | 본 메일은 자동 발송되었습니다." +
+                        "      </p>" +
                         "    </div>" +
-                        "    <p style=\"margin:24px 0 0; font-size:11px; line-height:1.6; color:#9ca3af;\">" +
-                        "      본 메일은 발신전용으로 회신되지 않습니다.<br/>" +
-                        "      본인이 요청하지 않은 경우, 이 메일은 무시하셔도 됩니다." +
-                        "    </p>" +
                         "  </div>" +
                         "</div>";
 
-        // ✅ Brevo API용 요청 바디 (SendGrid JSON 아님!)
+        // ✅ Brevo API용 요청 바디
         Map<String, Object> body = Map.of(
                 "sender", Map.of(
                         "email", fromEmail,

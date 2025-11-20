@@ -19,8 +19,11 @@ const LoginPasswordsearch = () => {
     const [verified, setVerified] = useState(false);
     const navigate = useNavigate();
 
-    /** ✅ 비밀번호 정규식 검사 */
-    const isValidPassword = (password) => /^(?=.*[A-Za-z])(?=.*\d).{8,}$/.test(password);
+    /** ✅ 비밀번호 정규식 검사
+     *  영문 + 숫자 최소 1개씩 포함, 길이 8자 이상 (특수문자 포함 가능)
+     */
+    const isValidPassword = (password) =>
+        /^(?=.*[A-Za-z])(?=.*\d).{8,}$/.test(password);
 
     /** ✅ 인증번호 전송 */
     const sendCode = async () => {
