@@ -5,7 +5,7 @@ import com.example.kakaoboard.repository.UserRepository;
 import com.example.kakaoboard.service.UserService;
 import com.example.kakaoboard.service.EmailService;
 import com.example.kakaoboard.service.EmailVerificationService;
-import jakarta.mail.MessagingException;
+
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -79,6 +79,7 @@ public class UserController {
     }
 
     /** ✅ 이메일 인증번호 전송 (아이디/비밀번호 찾기 공용) */
+    /** ✅ 이메일 인증번호 전송 (아이디/비밀번호 찾기 공용) */
     @PostMapping("/send-code")
     public ResponseEntity<?> sendResetCode(@RequestParam String email) {
         try {
@@ -93,11 +94,16 @@ public class UserController {
 
             return ResponseEntity.ok("✅ 인증번호가 이메일로 전송되었습니다.");
 
+            // ✅ 여기! MessagingException 말고 그냥 일반 예외 처리
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.internalServerError().body("메일 전송 실패: " + e.getMessage());
+            return ResponseEntity.internalServerError()
+                    .body("메일 전송 실패: " + e.getMessage());
         }
     }
+
     /** ✅ 인증번호 검증 */
     @PostMapping("/verify-code")
     public ResponseEntity<?> verifyResetCode(@RequestParam String email, @RequestParam String code) {

@@ -5,8 +5,10 @@ import com.example.kakaoboard.repository.UserRepository;
 import com.example.kakaoboard.service.UserService;
 import com.example.kakaoboard.service.EmailVerificationService;
 import com.example.kakaoboard.service.EmailService;
-import jakarta.mail.MessagingException;
+// ✅ MessagingException import 제거 (더 이상 사용 안 함)
+// import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,20 +43,21 @@ public class AuthController {
                         .body("❌ 이미 가입된 이메일입니다. 아이디/비밀번호 찾기를 이용해주세요.");
             }
 
-            // ✅ 인증번호 생성 및 전송
-            verificationService.createVerificationCode(email); // ⚡ 여기서 이미 메일 발송됨
+            // ✅ 인증번호 생성 및 전송 (여기서 이미 메일 발송됨)
+            verificationService.createVerificationCode(email);
+
             return ResponseEntity.ok("✅ 인증 메일 전송 완료!");
 
-        } catch (MessagingException e) {
-            e.printStackTrace();
-            return ResponseEntity.internalServerError()
-                    .body("메일 전송 중 오류가 발생했습니다: " + e.getMessage());
+            // ✅ MessagingException 은 더 이상 안 잡고, 일반 예외로 처리
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError()
-                    .body("서버 내부 오류: " + e.getMessage());
+                    .body("메일 전송 중 오류가 발생했습니다: " + e.getMessage());
         }
     }
+
     @PostMapping("/verify-code-edit")
     public ResponseEntity<String> verifyCodeForEdit(
             @RequestParam String email,
@@ -71,11 +74,16 @@ public class AuthController {
     @PostMapping("/send-code-edit")
     public ResponseEntity<String> sendVerificationCodeForEdit(@RequestParam String email) {
         try {
-            // 회원가입용 중복체크는 건너뛴다
+            // 회원정보 수정용: 중복 체크는 건너뜀
             verificationService.createVerificationCode(email);
             return ResponseEntity.ok("✅ 수정용 인증 메일 발송 완료");
-        } catch (MessagingException e) {
-            return ResponseEntity.internalServerError().body("❌ 이메일 전송 실패: " + e.getMessage());
+            // ✅ 여기서도 MessagingException 제거
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError()
+                    .body("❌ 이메일 전송 실패: " + e.getMessage());
         }
     }
 
@@ -98,7 +106,7 @@ public class AuthController {
                 return ResponseEntity.badRequest().body("이메일 인증을 완료해주세요!");
             }
 
-            // ✅ 중복 이메일 2차 방어 (혹시 인증 과정 건너뛰었을 경우)
+            // ✅ 중복 이메일 2차 방어
             if (userRepository.findByEmail(user.getEmail()).isPresent()) {
                 return ResponseEntity.badRequest().body("이미 가입된 이메일입니다.");
             }
@@ -128,7 +136,7 @@ public class AuthController {
 
         return userService.login(username, password)
                 .<ResponseEntity<?>>map(ResponseEntity::ok)
-                .orElse(ResponseEntity.status(401)
+                .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body("아이디 또는 비밀번호가 올바르지 않습니다."));
     }
 
