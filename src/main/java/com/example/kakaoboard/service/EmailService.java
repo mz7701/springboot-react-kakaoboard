@@ -17,23 +17,26 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class EmailService {
 
-    // ✅ application.yml -> email.from
-    @Value("${email.from}")
+    // ✅ application.yml -> brevo.sender-email
+    @Value("${brevo.sender-email}")
     private String fromEmail;
 
-    // ✅ application.yml -> sendgrid.api-key
-    @Value("${sendgrid.api-key}")
-    private String sendGridApiKey;
+    // ✅ application.yml -> brevo.sender-name
+    @Value("${brevo.sender-name}")
+    private String senderName;
+
+    // ✅ application.yml -> brevo.api-key
+    @Value("${brevo.api-key}")
+    private String brevoApiKey;
 
     /**
-     * ✅ 이메일 인증번호 발송
+     * ✅ 이메일 인증번호 발송 (Brevo HTTP API 사용)
      */
     public void sendVerificationMail(String to, String code) {
 
         String subject = "[Kakaoboard] 이메일 인증번호 안내";
 
-        // ✅ Text Block( """ ) 대신 옛날 방식 문자열로 작성
-        // ⚠ String.format 을 쓰기 때문에 100% → 100%% 로 써야 함!!
+        // ✅ 네가 만든 HTML 템플릿 그대로 사용 (String.format으로 코드만 끼워넣기)
         String htmlContent =
                 "<div style=\"width:100%%; background-color:#f5f7fa; padding:24px 0; font-family:'Pretendard','Noto Sans KR',Arial,sans-serif;\">" +
                         "  <div style=\"max-width:480px; margin:0 auto; background:#ffffff; border-radius:16px; padding:24px 24px 28px; box-shadow:0 10px 30px rgba(15,23,42,0.12);\">" +
@@ -56,44 +59,40 @@ public class EmailService {
                         "  </div>" +
                         "</div>";
 
-        // ✅ SendGrid API 바디
+        // ✅ Brevo API용 요청 바디 (SendGrid JSON 아님!)
         Map<String, Object> body = Map.of(
-                "personalizations", List.of(
-                        Map.of("to", List.of(Map.of("email", to)))
+                "sender", Map.of(
+                        "email", fromEmail,
+                        "name", senderName
                 ),
-                "from", Map.of("email", fromEmail),
+                "to", List.of(
+                        Map.of("email", to)
+                ),
                 "subject", subject,
-                "content", List.of(
-                        Map.of(
-                                "type", "text/html",
-                                "value", String.format(htmlContent, code)
-                        )
-                )
+                "htmlContent", String.format(htmlContent, code)
         );
 
         try {
             WebClient client = WebClient.builder()
-                    .baseUrl("https://api.sendgrid.com/v3")
-                    .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + sendGridApiKey)
+                    .baseUrl("https://api.brevo.com/v3")                         // ✅ Brevo 엔드포인트
                     .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                    .defaultHeader("api-key", brevoApiKey)                       // ✅ Brevo는 Authorization 말고 api-key 헤더
                     .build();
 
             client.post()
-                    .uri("/mail/send")
+                    .uri("/smtp/email")                                         // ✅ Brevo 이메일 전송 API
                     .bodyValue(body)
                     .retrieve()
                     .toBodilessEntity()
-                    .block(); // 동기 호출
+                    .block();                                                   // 동기 호출
 
             log.info("✅ 이메일 인증코드 전송 완료 → {} / 코드: {}", to, code);
 
         } catch (WebClientResponseException e) {
-            // 🔥 SendGrid에서 4xx/5xx 떨어져도 여기서만 처리 → 위로 안 올라감
-            log.error("❌ SendGrid 요청 실패 - status: {}, body: {}",
+            log.error("❌ Brevo 요청 실패 - status: {}, body: {}",
                     e.getRawStatusCode(), e.getResponseBodyAsString(), e);
 
         } catch (Exception e) {
-            // 그 외 모든 예외도 여기서 마무리
             log.error("❌ 이메일 전송 중 알 수 없는 예외 발생", e);
         }
     }
