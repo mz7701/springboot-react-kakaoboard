@@ -462,7 +462,7 @@ const MyPage = () => {
                                 placeholder={
                                     isDeleteMode
                                         ? "현재 계정 비밀번호를 입력하세요"
-                                        : "영문+숫자+특수문자 8자 이상"
+                                        : "영문+숫자 8자 이상"
                                 }
                             />
                         </div>
