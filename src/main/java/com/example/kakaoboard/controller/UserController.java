@@ -93,7 +93,7 @@ public class UserController {
 
             return ResponseEntity.ok("✅ 인증번호가 이메일로 전송되었습니다.");
 
-        } catch (MessagingException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().body("메일 전송 실패: " + e.getMessage());
         }
