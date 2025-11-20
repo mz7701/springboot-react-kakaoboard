@@ -45,35 +45,32 @@ const DebateBoard = () => {
     const [expandedDebateId, setExpandedDebateId] = useState(null);
 
     const MAX_COMMENT_INDENT = 4;
+
+    const DEADLINE_HOURS = 12;
+    const KOREA_OFFSET_HOURS = 9; // 서버(UTC)와 한국 시차
     useEffect(() => {
         fetchDebates();
     }, []);
 
-    const fetchComments = async (debateId) => {
-        try {
-            const res = await axios.get(`/api/debates/${debateId}/comments/tree`);
-            setComments((prev) => ({ ...prev, [debateId]: res.data }));
-        } catch (err) {
-            console.error("댓글 불러오기 실패:", err);
-        }
-    };
-
-    // ✅ 남은시간 계산 함수
     const getRemainingTime = (debate) => {
         if (!debate.rebuttalAt || debate.isClosed) return null;
 
         const rebuttalTime = new Date(debate.rebuttalAt);
         const now = new Date();
+
         const diffMs =
-            rebuttalTime.getTime() + 12 * 60 * 60 * 1000 - now.getTime(); // 12시간 기준
+            rebuttalTime.getTime() +
+            (DEADLINE_HOURS + KOREA_OFFSET_HOURS) * 60 * 60 * 1000 -
+            now.getTime();
 
         if (diffMs <= 0) return "⏰ 마감된 토론";
 
         const hours = Math.floor(diffMs / (1000 * 60 * 60));
-        const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+        const minutes = Math.floor(
+            (diffMs % (1000 * 60 * 60)) / (1000 * 60)
+        );
         return `${hours}시간 ${minutes}분 남음`;
     };
-
     // ✅ 로그인 필요 기능 공통 가드
     const requireLogin = () => {
         if (!currentUser) {
