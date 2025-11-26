@@ -113,6 +113,18 @@ const DebateBoard = () => {
             console.error("❌ 토론 데이터 불러오기 실패:", err);
         }
     };
+    const fetchComments = async (debateId) => {
+        try {
+            const res = await axios.get(`/api/debates/${debateId}/comments`);
+            // res.data 가 [ { id, text, author, replies: [...] }, ... ] 형태라고 가정
+            setComments((prev) => ({
+                ...prev,
+                [debateId]: res.data,
+            }));
+        } catch (err) {
+            console.error("❌ 댓글 불러오기 실패:", err);
+        }
+    };
 
     const handleDelete = async (id) => {
         if (!window.confirm("정말 삭제하시겠습니까?")) return;

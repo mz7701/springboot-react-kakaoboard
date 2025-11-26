@@ -31,7 +31,7 @@ const ChatRoom = () => {
     // ✅ 입장하기 (STOMP 기반)
     const connectChat = () => {
         if (!nickname.trim()) return alert("닉네임을 입력하세요!");
-
+        if (connected || clientRef.current?.connected) return;
         const socket = new SockJS(`${API_BASE_URL}/ws`);
         const client = new Client({
             webSocketFactory: () => socket,
@@ -128,6 +128,39 @@ const ChatRoom = () => {
             messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
         }
     }, [messages]);
+
+    // ✅ 창 닫기 / 페이지 이동 시 자동 나가기
+    useEffect(() => {
+        const handleBeforeUnloadOrUnmount = () => {
+            if (clientRef.current && connected) {
+                try {
+                    // 서버에 퇴장 알림
+                    clientRef.current.publish({
+                        destination: "/app/chat.leaveUser",
+                        body: JSON.stringify({ sender: nickname }),
+                    });
+                } catch (e) {
+                    console.error("leave publish error", e);
+                }
+
+                try {
+                    clientRef.current.deactivate();
+                } catch (e) {
+                    console.error("deactivate error", e);
+                }
+            }
+        };
+
+        // 브라우저 창 닫기 / 새로고침
+        window.addEventListener("beforeunload", handleBeforeUnloadOrUnmount);
+
+        // 컴포넌트 언마운트 시
+        return () => {
+            handleBeforeUnloadOrUnmount();
+            window.removeEventListener("beforeunload", handleBeforeUnloadOrUnmount);
+        };
+    }, [connected, nickname]);
+
 
     return (
         <div className={styles.container}>
