@@ -46,8 +46,7 @@ const DebateBoard = () => {
         if (!debateId) return;
 
         try {
-            const res = await axios.get(`/api/debates/${debateId}/comments`);
-            // res.data : [ { id, text, author, replies: [...] }, ... ] 가정
+            const res = await axios.get(`/api/debates/${debateId}/comments/tree`);
             setComments((prev) => ({
                 ...prev,
                 [debateId]: Array.isArray(res.data) ? res.data : [],
