@@ -46,7 +46,9 @@ const DebateBoard = () => {
         if (!debateId) return;
 
         try {
+            // ✅ 트리 엔드포인트로 맞추기
             const res = await axios.get(`/api/debates/${debateId}/comments/tree`);
+
             setComments((prev) => ({
                 ...prev,
                 [debateId]: Array.isArray(res.data) ? res.data : [],
@@ -228,28 +230,25 @@ const DebateBoard = () => {
         if (isReply) {
             const prefix = `@${target.author} `;
             if (!raw.startsWith(prefix)) {
-                // 혹시라도 앞부분이 꼬였으면 그냥 일반 댓글로 처리
+                // 혹시라도 앞부분이 꼬였으면 그냥 일반 댓글 텍스트로
                 finalText = raw;
             }
         }
 
         try {
+            // ✅ 컨트롤러 형식에 맞춰 body 구성
+            const body = {
+                author: currentUser?.username || "익명",
+                text: finalText,
+            };
+
+            // ✅ 대댓글일 때만 parentId 넣기
             if (isReply) {
-                // ✅ 여기! 특정 댓글의 대댓글로 전송
-                await axios.post(
-                    `/api/debates/${debateId}/comments/${target.id}/reply`,
-                    {
-                        author: currentUser?.username || "익명",
-                        text: finalText,
-                    }
-                );
-            } else {
-                // 일반 댓글
-                await axios.post(`/api/debates/${debateId}/comments`, {
-                    author: currentUser?.username || "익명",
-                    text: finalText,
-                });
+                body.parentId = target.id;
             }
+
+            // ✅ 엔드포인트는 항상 여기 하나만 사용
+            await axios.post(`/api/debates/${debateId}/comments`, body);
 
             // 입력값 + 타겟 초기화
             setCommentInputs((prev) => ({ ...prev, [debateId]: "" }));
@@ -262,6 +261,7 @@ const DebateBoard = () => {
             alert("댓글 등록 중 오류가 발생했습니다.");
         }
     };
+
 
     // ✨ 댓글 삭제 (본인 것만)
     const handleCommentDelete = async (debateId, comment) => {
