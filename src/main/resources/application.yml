@@ -11,6 +11,15 @@ spring:
     password: ${SPRING_DATASOURCE_PASSWORD:hgVP2BUBVI9lYHh4mtZpqe1gRErB1dRH}
     driver-class-name: org.postgresql.Driver
 
+#spring:
+#  datasource:
+#    # 👉 기본값을 로컬 postgres 로 변경
+#    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5433/kakaoboard}
+#    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+#    password: ${SPRING_DATASOURCE_PASSWORD:1234}
+#    driver-class-name: org.postgresql.Driver
+
+
   jpa:
     hibernate:
       ddl-auto: update
