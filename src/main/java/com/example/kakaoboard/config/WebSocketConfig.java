@@ -1,7 +1,7 @@
 // src/main/java/com/example/kakaoboard/config/WebSocketConfig.java
 package com.example.kakaoboard.config;
 
-import com.example.kakaoboard.chat.ChatService;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
