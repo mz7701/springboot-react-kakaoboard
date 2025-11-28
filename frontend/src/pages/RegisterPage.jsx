@@ -212,7 +212,7 @@ const RegisterPage = () => {
                         <input
                             type="email"
                             name="email"
-                            placeholder="メールアドレス（例: test@naver.com）"
+                            placeholder="メールアドレス"
                             value={form.email}
                             onChange={handleChange}
                             className={styles.input}
