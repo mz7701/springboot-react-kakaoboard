@@ -12,6 +12,7 @@ public class CorsConfig implements WebMvcConfigurer {
                 .allowedOrigins(
                         "http://localhost:3000",
                         "http://192.168.0.21:3000",
+                        "http://192.168.0.40:3000",
                         "https://kakaoboard-frontend.onrender.com"  // 🔥 Render 프론트
                 )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")

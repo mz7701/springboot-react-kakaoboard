@@ -78,8 +78,7 @@ public class UserController {
         return ResponseEntity.ok("'" + username + "'");
     }
 
-    /** ✅ 이메일 인증번호 전송 (아이디/비밀번호 찾기 공용) */
-    /** ✅ 이메일 인증번호 전송 (아이디/비밀번호 찾기 공용) */
+
     @PostMapping("/send-code")
     public ResponseEntity<?> sendResetCode(@RequestParam String email) {
         try {
@@ -88,13 +87,12 @@ public class UserController {
                 return ResponseEntity.badRequest().body("❌ 존재하지 않는 이메일입니다.");
             }
 
-            // ✅ 인증번호 생성 및 메일 전송
-            String code = verificationService.createVerificationCode(email);
-            emailService.sendVerificationMail(email, code);
+            // ✅ 인증번호 생성 + (이 안에서 이미 이메일 발송까지 함)
+            verificationService.createVerificationCode(email);
 
+            // ✅ 여기서는 추가로 emailService 호출 절대 하지 않기!!
             return ResponseEntity.ok("✅ 인증번호가 이메일로 전송되었습니다.");
 
-            // ✅ 여기! MessagingException 말고 그냥 일반 예외 처리
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {

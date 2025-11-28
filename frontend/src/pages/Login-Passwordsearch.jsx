@@ -31,6 +31,7 @@ const LoginPasswordsearch = () => {
             alert("아이디와 이메일을 입력하세요.");
             return;
         }
+        if (sending || isCodeSent) return;
         try {
             // ⚠️ 백엔드에서는 @RequestParam String email → params로 전달해야 함
             await axios.post("/api/users/send-code", null, {

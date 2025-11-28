@@ -63,6 +63,7 @@ public class SecurityConfig {
         config.setAllowedOrigins(List.of(
                 "http://localhost:3000",
                 "http://192.168.0.21:3000",
+                "http://192.168.0.40:3000",
                 "https://kakaoboard-frontend.onrender.com"  // 🔥 프론트 도메인
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));

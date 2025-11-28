@@ -1,7 +1,7 @@
 server:
   # Render에서 PORT라는 환경변수를 던져줌. 없으면 8080으로 실행
   port: ${PORT:8080}
-
+#
 spring:
   datasource:
     # 1순위: Render에서 넣어줄 SPRING_DATASOURCE_URL
@@ -14,7 +14,7 @@ spring:
 #spring:
 #  datasource:
 #    # 👉 기본값을 로컬 postgres 로 변경
-#    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5433/kakaoboard}
+#    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5433/kakaoboard_local}
 #    username: ${SPRING_DATASOURCE_USERNAME:postgres}
 #    password: ${SPRING_DATASOURCE_PASSWORD:1234}
 #    driver-class-name: org.postgresql.Driver
@@ -55,5 +55,7 @@ spring:
 # ✅ Brevo HTTP API 설정
 brevo:
   api-key: ${BREVO_API_KEY:dummy}
-  sender-email: ${EMAIL_FROM:dummy@example.com}
+  sender-email: ${EMAIL_FROM:korean2071@gmail.com}
   sender-name: ${EMAIL_FROM_NAME:KakaoBoard}
+
+
