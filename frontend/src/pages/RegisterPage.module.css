@@ -80,24 +80,24 @@
     box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
 }
 
-/* ✅ 이메일 + 인증 그룹 정렬 */
+/* ✅ メール + 認証グループのレイアウト調整 */
 .emailGroup,
 .codeGroup {
     display: flex;
-    align-items: stretch; /* 🔹 세로 높이를 input과 완전히 맞춤 */
-    gap: 8px; /* 살짝 간격 줄임 */
+    align-items: stretch; /* 🔹 縦の高さをinputと完全に揃える */
+    gap: 8px; /* 🔹 間隔を少しだけ狭くする */
 }
 
 .smallBtn {
-    padding: 9px 16px; /* 🔹 input과 같은 높이 */
-    border-radius: 12px; /* 🔹 input과 동일한 곡선 */
+    padding: 9px 16px; /* 🔹 inputと同じ高さ */
+    border-radius: 12px; /* 🔹 inputと同じ丸み */
     background: rgba(255, 255, 255, 0.85);
     color: #111827;
     font-weight: 600;
-    border: 2px solid rgba(0,0,0,0.25); /* 🔹 통일감 */
+    border: 2px solid rgba(0,0,0,0.25); /* 🔹 デザインの統一感 */
     white-space: nowrap;
-    height: 100%;/* ✅ 줄바꿈 방지 */
-    min-width: 80px; /* ✅ 최소폭 확보 */
+    height: 100%;/* ✅ 改行防止 */
+    min-width: 80px; /* ✅ 最小幅を確保 */
     cursor: pointer;
     box-sizing: border-box;
     transition: all 0.25s ease;
@@ -108,13 +108,15 @@
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     transform: translateY(-1px);
 }
+
 @media (max-width: 500px) {
     .smallBtn {
         padding: 10px 12px;
         font-size: 13px;
-        min-width: 70px; /* 모바일에서도 두 줄 안 깨지게 */
+        min-width: 70px; /* モバイルでも2行に折り返さないように */
     }
-    }
+}
+
 .primaryBtn {
     width: 100%;
     padding: 12px 14px;
@@ -169,6 +171,7 @@
     font-size: 13px;
     margin-top: -4px;
 }
+
 .errorMsg {
     color: #ffbdbd;
     font-size: 13px;

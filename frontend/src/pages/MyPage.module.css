@@ -2,7 +2,7 @@
    🌈 Premium Glass UI for MyPage
    =========================================== */
 
-/* ✅ 폰트: Pretendard + Inter + Noto Sans KR */
+/* ✅ フォント: Pretendard + Inter + Noto Sans KR */
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Pretendard:wght@400;600;700&display=swap");
 
 :root {
@@ -23,7 +23,7 @@
     --blur: blur(14px);
 }
 
-/* 🎆 배경 애니메이션 */
+/* 🎆 背景アニメーション */
 @keyframes moveGradient {
     0% {
         background-position: 0% 50%;
@@ -36,7 +36,7 @@
     }
 }
 
-/* 🖥 전체 페이지 */
+/* 🖥 全体ページ */
 .container {
     display: flex;
     min-height: 100vh;
@@ -48,7 +48,7 @@
     overflow: hidden;
 }
 
-/* 🧭 사이드바 */
+/* 🧭 サイドバー */
 .sidebar {
     width: 260px;
     background: var(--glass-bg);
@@ -70,7 +70,7 @@
     margin-bottom: 32px;
 }
 
-/* 🧩 탭 버튼 */
+/* 🧩 タブボタン */
 .tabButton {
     width: 100%;
     padding: 12px 0;
@@ -98,14 +98,14 @@
     box-shadow: 0 0 12px var(--accent-glow);
 }
 
-/* 📜 콘텐츠 영역 */
+/* 📜 コンテンツエリア */
 .content {
     flex: 1;
     padding: 60px 80px;
     overflow-y: auto;
 }
 
-/* 🧍‍♂️ 내 정보 카드 */
+/* 🧍‍♂️ マイ情報カード */
 .infoSection,
 .editSection,
 .postSection {
@@ -133,17 +133,18 @@
     color: var(--accent-light);
     margin-bottom: 18px;
 }
-/* 👤 내 정보 내용 텍스트를 완전 흰색 계열로 */
+
+/* 👤 マイ情報のテキストをホワイト系に */
 .infoSection p {
-    color: #f9fafb !important;   /* 닉네임/이메일/EXP 내용 */
+    color: #f9fafb !important;
     font-size: 0.95rem;
 }
 
 .infoSection p b {
-    color: #ffffff !important;   /* "닉네임:", "이메일:" 같은 label */
+    color: #ffffff !important;
 }
 
-/* 📝 인풋 그룹 */
+/* 📝 インプットグループ */
 .inputGroup {
     display: flex;
     align-items: center;
@@ -154,7 +155,7 @@
 .inputGroup label {
     width: 100px;
     font-weight: 600;
-    color: #ffffff !important;   /* 완전 흰색으로 고정 */
+    color: #ffffff !important;
 }
 
 .inputGroup input {
@@ -172,11 +173,13 @@
     border-color: var(--accent-light);
     box-shadow: 0 0 8px var(--accent-glow);
 }
-/* 인풋 placeholder 색도 살짝 밝게 */
+
+/* インプットのプレースホルダー色も少し明るく */
 .inputGroup input::placeholder {
-    color: rgba(249, 250, 251, 0.8);   /* 연한 흰색 */
+    color: rgba(249, 250, 251, 0.8);
 }
-/* 🎛 버튼 */
+
+/* 🎛 ボタン */
 .smallButton,
 .updateButton {
     background: linear-gradient(90deg, var(--accent), var(--accent-light));
@@ -210,7 +213,7 @@
     filter: brightness(1.08);
 }
 
-/* 📦 내가 쓴 토론 */
+/* 📦 自分が書いたディベート */
 .debateCard {
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.12);
@@ -218,10 +221,10 @@
     padding: 24px;
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
     transition: 0.3s ease;
-    margin-bottom: 18px;            /* ✅ 카드 사이 간격 */
+    margin-bottom: 18px;            /* ✅ カード同士の間隔 */
 }
 .postSection .debateCard:last-child {
-    margin-bottom: 0;               /* 마지막 카드만 아래 여백 제거 (깔끔용) */
+    margin-bottom: 0;               /* 最後のカードだけ余白を消して整える */
 }
 .debateCard:hover {
     transform: translateY(-3px);
@@ -267,14 +270,14 @@
     color: #bbf7d0;
 }
 
-/* 💬 댓글 섹션 */
+/* 💬 コメントセクション */
 .commentSection {
     margin-top: 24px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     padding-top: 14px;
 }
 
-/* 📱 반응형 */
+/* 📱 レスポンシブ対応 */
 @media (max-width: 900px) {
     .container {
         flex-direction: column;
@@ -291,7 +294,8 @@
         padding: 24px;
     }
 }
-/* 🚨 회원 탈퇴 섹션 */
+
+/* 🚨 退会セクション */
 .deleteSection {
     margin-top: 24px;
     padding-top: 16px;
@@ -333,6 +337,7 @@
     box-shadow: none;
     transform: none;
 }
+
 .postHeaderRow {
     display: flex;
     justify-content: space-between;
@@ -356,7 +361,7 @@
     border: 1px solid rgba(148, 163, 184, 0.4);
 }
 
-/* 헤더 정렬 */
+/* ヘッダー整列 */
 .debateHeaderLeft {
     display: flex;
     align-items: center;
@@ -376,7 +381,7 @@
     font-size: 1rem;
 }
 
-/* 상태 뱃지 */
+/* 状態バッジ */
 .statusBadge {
     padding: 4px 10px;
     border-radius: 999px;
@@ -411,7 +416,7 @@
     opacity: 0.7;
 }
 
-/* 액션 버튼 영역 */
+/* アクションボタンエリア */
 .postActions {
     margin-top: 14px;
     display: flex;
@@ -469,16 +474,16 @@
     color: #fff;
 }
 
-/* 수정 폼 */
+/* 編集フォーム */
 .debateEditArea {
     margin-top: 16px;
-    padding: 16px 18px;   /* 안쪽 여백 살짝 키우기 */
+    padding: 16px 18px;
     border-radius: 16px;
     background: rgba(15, 23, 42, 0.85);
     border: 1px solid rgba(148, 163, 184, 0.6);
     display: flex;
     flex-direction: column;
-    gap: 10px;            /* 위아래 요소 간 간격 */
+    gap: 10px;
 }
 
 .debateEditInput,
@@ -486,20 +491,19 @@
     width: 100%;
     border-radius: 10px;
     border: 1px solid rgba(148, 163, 184, 0.8);
-    background: rgba(15, 23, 42, 0.95);   /* 짙은 남색 배경 */
-    color: #f9fafb;                       /* ✨ 입력 글자 완전 흰색에 가깝게 */
-    padding: 6px 3px;                  /* 위아래 여유 조금 더 */
+    background: rgba(15, 23, 42, 0.95);
+    color: #f9fafb;
+    padding: 6px 3px;
     font-size: 0.9rem;
     outline: none;
     transition: 0.2s;
 }
 
-/* placeholder도 회색 대신 밝은 회색으로 */
+/* プレースホルダーも明るいグレーに */
 .debateEditInput::placeholder,
 .debateEditTextarea::placeholder {
-    color: rgba(209, 213, 219, 0.9);      /* 밝은 회색 */
+    color: rgba(209, 213, 219, 0.9);
 }
-
 
 .debateEditTextarea {
     min-height: 100px;
@@ -540,80 +544,18 @@
     cursor: not-allowed;
     box-shadow: none;
 }
-/* 👤 내 정보 내용 글씨 흰색 계열로 */
+
+/* 👤 マイ情報のテキストをホワイト系に */
 .infoSection p {
-    color: var(--text-main);      /* 거의 흰색 */
+    color: var(--text-main);
     font-size: 0.95rem;
 }
 
 .infoSection p b {
-    color: #ffffff;               /* 라벨(닉네임:, 이메일:) 더 쨍한 흰색 */
+    color: #ffffff;
 }
 
-
-/* 🔥 탈퇴 사유 선택 영역 */
-.deleteReasonSection {
-    margin-top: 20px;
-    padding: 16px 18px;
-    border-radius: 16px;
-    background: rgba(15, 23, 42, 0.9);
-    border: 1px solid rgba(148, 163, 184, 0.6);
-}
-
-.deleteReasonSection h4 {
-    margin: 0 0 6px;
-    font-size: 0.95rem;
-    color: #f9fafb;
-}
-
-.deleteReasonDesc {
-    color: #f9fafb;             /* 설명 문구 흰색 */
-}
-
-
-.deleteReasonGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 8px;
-}
-
-.deleteReasonItem span {
-    color: #f9fafb;             /* 각 항목 텍스트 흰색 */
-}
-
-.deleteReasonItem:hover {
-    border-color: var(--accent-light);
-    box-shadow: 0 0 10px rgba(139, 92, 246, 0.35);
-}
-
-.deleteReasonItem input {
-    cursor: pointer;
-}
-
-/* 🔥 탈퇴 버튼 그룹 + 취소 버튼 */
-.deleteButtonGroup {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.deleteCancelButton {
-    padding: 10px 16px;
-    border-radius: 999px;
-    border: none;
-    background: rgba(148, 163, 184, 0.4);
-    color: var(--text-main);
-    font-size: 0.85rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: 0.2s ease;
-}
-
-.deleteCancelButton:hover:not(:disabled) {
-    background: rgba(148, 163, 184, 0.65);
-    transform: translateY(-1px);
-}
-/* 🔥 탈퇴 사유 선택 영역 */
+/* 🔥 退会理由選択エリア */
 .deleteReasonSection {
     margin-top: 16px;
     padding: 14px 16px;
@@ -663,11 +605,12 @@
 .deleteReasonItem input {
     cursor: pointer;
 }
+
 .deleteReasonSelected {
-    color: #f9fafb;             /* "선택된 사유: ..." 도 흰색 */
+    color: #f9fafb; /* 「選択された理由: ...」も白系に */
 }
 
-/* 기타 사유 입력 칸 */
+/* その他理由入力欄 */
 .deleteReasonEtcInput {
     margin-top: 10px;
     width: 100%;
@@ -683,7 +626,8 @@
 .deleteReasonEtcInput::placeholder {
     color: rgba(209, 213, 219, 0.9);
 }
-/* 탈퇴 버튼 그룹 */
+
+/* 退会ボタングループ */
 .deleteButtonGroup {
     display: flex;
     align-items: center;
@@ -699,6 +643,7 @@
     font-size: 0.8rem;
     cursor: pointer;
 }
+
 .deleteCancelButton:hover:not(:disabled) {
     background: rgba(148, 163, 184, 0.6);
 }

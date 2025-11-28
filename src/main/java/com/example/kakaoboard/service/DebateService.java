@@ -24,7 +24,7 @@ public class DebateService {
     private final CommentRepository commentRepository;
     private final ReplyRepository replyRepository;
 
-    // ✅ 공통 IP 추출 유틸 (여기로 옮기기)
+    // ✅ 共通IP取得ユーティリティ（ここに集約）
     private String getClientIp(HttpServletRequest request) {
         String ip = request.getHeader("X-Forwarded-For");
         if (ip == null || ip.isEmpty()) ip = request.getRemoteAddr();
@@ -32,22 +32,23 @@ public class DebateService {
         if ("0:0:0:0:0:0:0:1".equals(ip)) ip = "127.0.0.1";
         return ip;
     }
+
     /**
-     * ✅ 모든 토론 조회
+     * ✅ すべての討論取得
      */
     public List<Debate> findAll() {
         return debateRepository.findAll();
     }
 
     /**
-     * ✅ 새 토론 생성
+     * ✅ 新規討論作成
      */
     public Debate createDebate(Debate debate) {
         return debateRepository.save(debate);
     }
 
     /**
-     * ✅ 좋아요
+     * ✅ いいね
      */
     public Debate like(Long id) {
         return debateRepository.findById(id).map(d -> {
@@ -57,7 +58,7 @@ public class DebateService {
     }
 
     /**
-     * ✅ 싫어요
+     * ✅ よくないね
      */
     public Debate dislike(Long id) {
         return debateRepository.findById(id).map(d -> {
@@ -67,54 +68,45 @@ public class DebateService {
     }
 
     /**
-     * ✅ 댓글 추가
+     * ✅ コメント追加
      */
     public Comment addComment(Long debateId, Comment comment, HttpServletRequest request) {
         Debate debate = debateRepository.findById(debateId)
-                .orElseThrow(() -> new RuntimeException("토론을 찾을 수 없습니다."));
+                .orElseThrow(() -> new RuntimeException("討論が見つかりません。"));
         comment.setDebate(debate);
         comment.setCreatedAt(LocalDateTime.now());
 
-
-
         comment.setIpAddress(getClientIp(request));
-
-
 
         return commentRepository.save(comment);
     }
 
-    /** ✅ 대댓글 추가 (이제 Comment 기반으로 처리) */
-    /**
-     * ✅ 대댓글 추가 (IP까지 저장)
-     */
+    /** ✅ 返信コメント追加（IPも保存） */
     public Comment addReply(Long debateId, Long parentId, Comment reply, HttpServletRequest request) {
         Debate debate = debateRepository.findById(debateId)
-                .orElseThrow(() -> new RuntimeException("토론을 찾을 수 없습니다."));
+                .orElseThrow(() -> new RuntimeException("討論が見つかりません。"));
 
         Comment parent = commentRepository.findById(parentId)
-                .orElseThrow(() -> new RuntimeException("부모 댓글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new RuntimeException("親コメントが見つかりません。"));
 
         reply.setDebate(debate);
         reply.setParent(parent);
         reply.setCreatedAt(LocalDateTime.now());
 
-
         reply.setIpAddress(getClientIp(request));
-
 
         return commentRepository.save(reply);
     }
 
     /**
-     * ✅ 토론 삭제
+     * ✅ 討論削除
      */
     public void deleteById(Long id) {
         debateRepository.deleteById(id);
     }
 
     /**
-     * ✅ 승자 계산
+     * ✅ 勝者判定
      */
     public void updateWinner(Debate debate) {
         if (debate.getAuthorVotes() > debate.getRebuttalVotes()) {
@@ -128,7 +120,7 @@ public class DebateService {
     }
 
     /**
-     * ✅ 자동 마감 기능 (1분마다 검사)
+     * ✅ 自動クローズ機能（1分ごとにチェック）
      */
     @Scheduled(fixedRate = 60000)
     public void closeExpiredDebates() {
@@ -141,77 +133,77 @@ public class DebateService {
                     d.setClosed(true);
                     d.setClosedAt(now);
                     debateRepository.save(d);
-                    System.out.println("✅ 자동 마감된 토론: " + d.getTitle());
+                    System.out.println("✅ 自動クローズされた討論: " + d.getTitle());
                 }
             }
         }
     }
 
     /**
-     * ✅ 제3자 투표 기능
+     * ✅ 第三者投票機能
      */
     public ResponseEntity<?> vote(Long id, Map<String, String> body) {
         String type = body.get("type");
         String voter = body.get("voter");
 
         Debate debate = debateRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("토론을 찾을 수 없습니다."));
+                .orElseThrow(() -> new RuntimeException("討論が見つかりません。"));
 
         if (voter.equals(debate.getAuthor()) || voter.equals(debate.getRebuttalAuthor())) {
-            return ResponseEntity.badRequest().body("본인은 투표할 수 없습니다!");
+            return ResponseEntity.badRequest().body("ご本人は投票できません！");
         }
 
         if (debate.getVoters() == null) {
             debate.setVoters(new ArrayList<>());
         }
         if (debate.getVoters().contains(voter)) {
-            return ResponseEntity.badRequest().body("이미 이 토론에 투표하셨습니다!");
+            return ResponseEntity.badRequest().body("この討論にはすでに投票済みです！");
         }
 
         switch (type) {
             case "author" -> debate.setAuthorVotes(debate.getAuthorVotes() + 1);
             case "rebuttal" -> debate.setRebuttalVotes(debate.getRebuttalVotes() + 1);
             default -> {
-                return ResponseEntity.badRequest().body("잘못된 투표 유형입니다.");
+                return ResponseEntity.badRequest().body("不正な投票タイプです。");
             }
         }
 
         debate.getVoters().add(voter);
         debateRepository.save(debate);
 
-        return ResponseEntity.ok("✅ 투표 완료!");
+        return ResponseEntity.ok("✅ 投票が完了しました！");
     }
 
-    // DebateService.java 안에 추가
+    // DebateService.java 内に追加：返信コメントを Comment として登録
     public Comment addReplyAsComment(Long debateId, Long parentId, Comment reply) {
         Debate debate = debateRepository.findById(debateId)
-                .orElseThrow(() -> new RuntimeException("토론을 찾을 수 없습니다."));
+                .orElseThrow(() -> new RuntimeException("討論が見つかりません。"));
         Comment parent = commentRepository.findById(parentId)
-                .orElseThrow(() -> new RuntimeException("부모 댓글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new RuntimeException("親コメントが見つかりません。"));
 
         reply.setDebate(debate);
         reply.setParent(parent);
         reply.setCreatedAt(LocalDateTime.now());
-        parent.addReply(reply); // ✅ 부모 댓글에 직접 추가
+        parent.addReply(reply); // ✅ 親コメントに直接追加
         return commentRepository.save(reply);
     }
 
-    /** ✅ 댓글 트리 (중복 없는 무한 대댓글 완전 지원) */
+    /** ✅ コメントツリー（重複なしの無限ネスト返信を完全サポート） */
     public List<Comment> getCommentTree(Long debateId) {
-        // 1️⃣ 부모 댓글만 가져옴
+        // 1️⃣ 親コメントのみ取得
         List<Comment> roots = commentRepository.findByDebateIdAndParentIsNull(debateId);
 
-        // 2️⃣ 각각의 부모 댓글에 하위 댓글 재귀적으로 채우기
+        // 2️⃣ 各親コメントに対して、再帰的に子コメントを埋める
         for (Comment root : roots) {
             fillRepliesRecursively(root);
         }
 
-        // 3️⃣ 시간 순 정렬
+        // 3️⃣ 時間順にソート
         roots.sort(Comparator.comparing(Comment::getCreatedAt));
         return roots;
     }
 
-    /** ✅ 재귀적으로 모든 하위 댓글 로딩 */
+    /** ✅ 再帰的にすべての子コメントをロード */
     private void fillRepliesRecursively(Comment comment) {
         List<Comment> replies = commentRepository.findByParentId(comment.getId());
         replies.sort(Comparator.comparing(Comment::getCreatedAt));

@@ -1,4 +1,4 @@
-/* Google Font (선택) - 네트워크 환경에 따라 로컬 폰트로 대체 가능 */
+/* Google Font（任意）- ネットワーク環境に応じてローカルフォントに置き換え可能 */
 @import url("https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700&display=swap");
 
 :root {
@@ -48,7 +48,7 @@
     }
 }
 
-/* 배경 애니메이션 */
+/* 背景アニメーション */
 @keyframes bgShift {
     0% { transform: translate3d(0, 0, 0) scale(1); }
     50% { transform: translate3d(-3%, -3%, 0) scale(1.03); }
@@ -60,7 +60,7 @@
     50%      { transform: translateY(-8px); opacity: 1; }
 }
 
-/* 페이지 컨테이너 */
+/* ページコンテナ */
 .page {
     min-height: 100vh;
     font-family: "Pretendard", system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", sans-serif;
@@ -75,7 +75,7 @@
     overflow: hidden;
 }
 
-/* 배경 데코 */
+/* 背景デコレーション */
 .bgLayer::before,
 .bgLayer::after {
     content: "";
@@ -91,7 +91,7 @@
     opacity: 0.6;
 }
 
-/* 카드 래퍼 */
+/* カードラッパー */
 .cardWrap {
     width: 100%;
     max-width: 420px;
@@ -99,7 +99,7 @@
     position: relative;
 }
 
-/* 카드 */
+/* カード本体 */
 .card {
     background: var(--card-bg);
     border: 1px solid var(--card-border);
@@ -111,7 +111,7 @@
     position: relative;
 }
 
-/* 카드 헤더 */
+/* カードヘッダー */
 .cardHeader {
     text-align: center;
     margin-bottom: 18px;
@@ -127,8 +127,8 @@
     color: var(--text-sub);
 }
 
-/* 에러 박스 */
-/* 다크모드 대응용 */
+/* エラーボックス */
+/* ダークモード対応用 */
 .errorBox {
     margin: 12px 0 16px;
     padding: 10px 12px;
@@ -136,14 +136,14 @@
     border: 1px solid var(--error-border);
     border-radius: 10px;
 
-    /* ✅ 가독성 향상 */
-    color: #111827; /* 밝은 회색~검정 글자 */
+    /* ✅ 可読性向上のため */
+    color: #111827;
     font-weight: 600;
     line-height: 1.4;
-    background: rgba(255, 255, 255, 0.85); /* 반투명 흰색 */
+    background: rgba(255, 255, 255, 0.85);
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
-/* 폼 */
+/* フォーム */
 .form {
     display: grid;
     gap: 14px;
@@ -156,7 +156,7 @@
     color: var(--text-sub);
 }
 
-/* 인풋 그룹 */
+/* 入力グループ */
 .inputGroup {
     position: relative;
     display: flex;
@@ -186,7 +186,7 @@
     box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
 }
 
-/* 비번 토글 */
+/* パスワード表示切替ボタン */
 .togglePw {
     position: absolute;
     right: 10px;
@@ -205,18 +205,18 @@
     outline: none;
 }
 
-/* 액션 영역 */
+/* アクションエリア（ボタンゾーン） */
 .actions {
     display: flex;
-    justify-content: center; /* 가로 중앙 정렬 */
-    align-items: center; /* 세로 기준 중앙 */
-    gap: 18px; /* 버튼 사이 간격 */
-    flex-wrap: wrap; /* 좁은 화면에서 자동 줄바꿈 */
+    justify-content: center;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
     margin-top: 10px;
 }
 
 
-/* 기본 버튼 */
+/* メインボタン */
 .primaryBtn {
     display: inline-flex;
     align-items: center;
@@ -248,7 +248,7 @@
     cursor: not-allowed;
 }
 
-/* 로딩 스피너 */
+/* ローディングスピナー */
 .loading {
     display: inline-flex;
     align-items: center;
@@ -266,7 +266,7 @@
     to { transform: rotate(360deg); }
 }
 
-/* 카카오 버튼 */
+/* Kakaoログインボタン */
 .kakaoBtn {
     display: inline-flex;
     align-items: center;
@@ -291,7 +291,7 @@
     color: #3a2929;
 }
 
-/* 링크 버튼 */
+/* リンク風ボタン */
 .linkBtn {
     background: transparent;
     border: none;
@@ -306,7 +306,7 @@
     opacity: 1;
 }
 
-/* 하단 안내 */
+/* 下部の案内テキスト */
 .helperText {
     margin-top: 10px;
     text-align: center;
@@ -314,7 +314,7 @@
     color: var(--text-sub);
 }
 
-/* 포커스 접근성 */
+/* フォーカス時のアクセシビリティ */
 button:focus-visible,
 a:focus-visible,
 input:focus-visible {
@@ -323,7 +323,7 @@ input:focus-visible {
     border-radius: 10px;
 }
 
-/* 반응형 */
+/* レスポンシブ対応 */
 @media (max-width: 420px) {
     .cardWrap {
         padding: 16px;

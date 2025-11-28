@@ -48,7 +48,7 @@
     background: linear-gradient(135deg, #2563eb, #1e40af);
 }
 
-/* ✅ 채팅 화면 */
+/* ✅ チャット画面 */
 .chatRoom {
     width: 90%;
     max-width: 650px;
@@ -131,6 +131,7 @@
     transform: translateY(-2px);
     background: linear-gradient(135deg, #0096e0, #26c6da);
 }
+
 .container {
     display: flex;
     justify-content: center;
@@ -140,7 +141,7 @@
     font-family: "Noto Sans KR", sans-serif;
 }
 
-/* ✅ 입장 전 화면 */
+/* ✅ 入室前画面 */
 .joinScreen {
     text-align: center;
     background: white;
@@ -174,7 +175,7 @@
     background: linear-gradient(135deg, #0096e0, #26c6da);
 }
 
-/* ✅ 메인 레이아웃 */
+/* ✅ メインレイアウト */
 .chatLayout {
     display: flex;
     gap: 20px;
@@ -182,7 +183,7 @@
     max-width: 1200px;
 }
 
-/* ✅ 채팅영역 */
+/* ✅ チャットエリア */
 .chatRoom {
     flex: 3;
     background: white;
@@ -216,7 +217,7 @@
     background: linear-gradient(135deg, #ff4d4d, #ff3030);
 }
 
-/* ✅ 메시지창 */
+/* ✅ メッセージウィンドウ */
 .messages {
     flex: 1;
     overflow-y: auto;
@@ -231,7 +232,7 @@
     line-height: 1.5;
 }
 
-/* ✅ 입력창 */
+/* ✅ 入力欄 */
 .inputArea {
     display: flex;
     margin-top: 10px;
@@ -259,7 +260,7 @@
     transform: translateY(-2px);
 }
 
-/* ✅ 접속자 리스트 */
+/* ✅ 接続ユーザーリスト */
 .userList {
     flex: 1;
     background: #ffffff;

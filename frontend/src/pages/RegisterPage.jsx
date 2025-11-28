@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 import styles from "./RegisterPage.module.css";
 import axios from "axios";
-import { API_BASE_URL } from "../api/baseURL";   // 경로는 파일 위치에 따라 ../ 또는 ../../
+import { API_BASE_URL } from "../api/baseURL";   // パスはファイル位置により ../ または ../../
 
 axios.defaults.baseURL = API_BASE_URL;
 
@@ -18,7 +18,7 @@ const RegisterPage = () => {
     const [isVerified, setIsVerified] = useState(false);
     const [isCodeSent, setIsCodeSent] = useState(false);
     const [isCheckingUsername, setIsCheckingUsername] = useState(false);
-    const [sending, setSending] = useState(false); // ✅ 중복 요청 방지 추가
+    const [sending, setSending] = useState(false); // ✅ 重複リクエスト防止用フラグ
 
     const [errors, setErrors] = useState({
         username: "",
@@ -29,7 +29,7 @@ const RegisterPage = () => {
         general: "",
     });
 
-    /** ✅ 입력 핸들러 */
+    /** ✅ 入力ハンドラー */
     const handleChange = (e) => {
         const { name, value } = e.target;
         setForm({ ...form, [name]: value });
@@ -43,35 +43,34 @@ const RegisterPage = () => {
         }
     };
 
-    /** ✅ 비밀번호 유효성 검사 */
+    /** ✅ パスワードのバリデーション */
     const validatePasswords = (pw, pwCheck) => {
-        // 🔁 영문 + 숫자 최소 1개씩 포함, 길이 8자 이상 (나머지 문자 자유)
+        // 🔁 英字 + 数字をそれぞれ1文字以上含み、8文字以上（それ以外の文字は自由）
         const pwRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
 
         if (!pwRegex.test(pw)) {
             setErrors((prev) => ({
                 ...prev,
-                password: "❌ 비밀번호는 8자 이상이며, 영문과 숫자를 포함해야 합니다.",
-                // 형식 자체가 틀리면 일단 확인 비밀번호 에러는 비움
+                password: "❌ パスワードは8文字以上で、英字と数字をそれぞれ1文字以上含めてください。",
+                // 形式自体が間違っている場合は、ひとまず確認用パスワードのエラーはそのまま
                 passwordCheck: prev.passwordCheck,
             }));
         } else if (pwCheck && pw !== pwCheck) {
             setErrors((prev) => ({
                 ...prev,
-                passwordCheck: "❌ 비밀번호가 일치하지 않습니다.",
+                passwordCheck: "❌ パスワードが一致しません。",
             }));
         } else {
             setErrors((prev) => ({ ...prev, password: "", passwordCheck: "" }));
         }
     };
 
-
-    /** ✅ 아이디 중복 확인 */
+    /** ✅ ID重複チェック */
     const checkUsername = async () => {
         if (!form.username.trim())
             return setErrors((prev) => ({
                 ...prev,
-                username: "❌ 아이디를 입력해주세요.",
+                username: "❌ IDを入力してください。",
             }));
 
         setIsCheckingUsername(true);
@@ -79,41 +78,41 @@ const RegisterPage = () => {
             await axios.get(
                 `/api/auth/check-username?username=${form.username}`
             );
-            setErrors((prev) => ({ ...prev, username: "✅ 사용 가능한 아이디입니다." }));
+            setErrors((prev) => ({ ...prev, username: "✅ 使用可能なIDです。" }));
         } catch {
-            setErrors((prev) => ({ ...prev, username: "❌ 이미 존재하는 아이디입니다." }));
+            setErrors((prev) => ({ ...prev, username: "❌ 既に存在するIDです。" }));
         } finally {
             setIsCheckingUsername(false);
         }
     };
 
-    /** ✅ 이메일 인증번호 전송 */
+    /** ✅ メール認証コード送信 */
     const sendCode = async () => {
-        if (sending || isCodeSent) return; // ✅ 중복 요청 방지
+        if (sending || isCodeSent) return; // ✅ 重複リクエスト防止
         if (!form.email.trim())
-            return setErrors((prev) => ({ ...prev, email: "❌ 이메일을 입력해주세요." }));
+            return setErrors((prev) => ({ ...prev, email: "❌ メールアドレスを入力してください。" }));
 
-        setSending(true); // ✅ 요청 시작
+        setSending(true); // ✅ リクエスト開始
         try {
             await axios.post("/api/auth/send-code", null, {
                 params: { email: form.email },
             });
             setIsCodeSent(true);
-            alert("📩 인증번호를 이메일로 보냈습니다.");
+            alert("📩 認証コードをメールに送信しました。");
         } catch (err) {
             const msg = err.response?.data?.includes("이미 가입된")
-                ? "❌ 이미 가입된 이메일입니다. 아이디/비밀번호 찾기를 이용해주세요."
-                : "❌ 이메일 전송 실패. 서버 오류입니다.";
+                ? "❌ すでに登録されているメールアドレスです。ID/パスワード検索をご利用ください。"
+                : "❌ メール送信に失敗しました。サーバーエラーです。";
             setErrors((prev) => ({ ...prev, email: msg }));
         } finally {
-            setSending(false); // ✅ 요청 종료
+            setSending(false); // ✅ リクエスト終了
         }
     };
 
-    /** ✅ 인증번호 확인 */
+    /** ✅ 認証コード確認 */
     const verifyCode = async () => {
         if (!form.code.trim())
-            return setErrors((prev) => ({ ...prev, code: "❌ 인증번호를 입력해주세요." }));
+            return setErrors((prev) => ({ ...prev, code: "❌ 認証コードを入力してください。" }));
 
         try {
             const res = await axios.post(
@@ -123,33 +122,33 @@ const RegisterPage = () => {
             );
 
             if (typeof res.data === "string" && res.data.includes("성공")) {
-                alert("✅ 이메일 인증이 완료되었습니다!");
+                alert("✅ メール認証が完了しました！");
                 setIsVerified(true);
                 setErrors((prev) => ({ ...prev, code: "" }));
             } else {
                 setErrors((prev) => ({
                     ...prev,
-                    code: "❌ 인증 실패: 인증번호가 올바르지 않습니다.",
+                    code: "❌ 認証失敗：認証コードが正しくありません。",
                 }));
             }
         } catch (err) {
             const msg =
-                err.response?.data || "❌ 인증 실패: 서버 오류 또는 잘못된 인증번호입니다.";
+                err.response?.data || "❌ 認証失敗：サーバーエラー、または不正な認証コードです。";
             setErrors((prev) => ({ ...prev, code: msg }));
         }
     };
 
-    /** ✅ 회원가입 처리 */
+    /** ✅ 会員登録処理 */
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         let newErrors = {};
-        if (!form.username.trim()) newErrors.username = "❌ 아이디를 입력해주세요.";
-        if (!form.email.trim()) newErrors.email = "❌ 이메일을 입력해주세요.";
-        if (!form.password.trim()) newErrors.password = "❌ 비밀번호를 입력해주세요.";
+        if (!form.username.trim()) newErrors.username = "❌ IDを入力してください。";
+        if (!form.email.trim()) newErrors.email = "❌ メールアドレスを入力してください。";
+        if (!form.password.trim()) newErrors.password = "❌ パスワードを入力してください。";
         if (!form.passwordCheck.trim())
-            newErrors.passwordCheck = "❌ 비밀번호 확인을 입력해주세요.";
-        if (!isVerified) newErrors.code = "❌ 이메일 인증을 완료해주세요.";
+            newErrors.passwordCheck = "❌ パスワード確認を入力してください。";
+        if (!isVerified) newErrors.code = "❌ メール認証を完了してください。";
 
         if (Object.keys(newErrors).length > 0) {
             setErrors((prev) => ({ ...prev, ...newErrors }));
@@ -158,12 +157,12 @@ const RegisterPage = () => {
 
         try {
             await axios.post("/api/auth/register", form);
-            alert("✅ 회원가입 성공! 로그인 페이지로 이동합니다.");
+            alert("✅ 会員登録に成功しました！ログインページへ移動します。");
             window.location.href = "/login";
         } catch (err) {
             setErrors((prev) => ({
                 ...prev,
-                general: err.response?.data || "❌ 회원가입 실패. 서버 오류입니다.",
+                general: err.response?.data || "❌ 会員登録に失敗しました。サーバーエラーです。",
             }));
         }
     };
@@ -172,17 +171,17 @@ const RegisterPage = () => {
         <div className={styles.page}>
             <div className={styles.cardWrap}>
                 <div className={styles.card}>
-                    <h1 className={styles.title}>회원가입 ✨</h1>
-                    <p className={styles.subtitle}>이메일 인증 후 가입을 완료하세요</p>
+                    <h1 className={styles.title}>新規会員登録 ✨</h1>
+                    <p className={styles.subtitle}>メール認証を行ってから登録を完了してください。</p>
 
                     {errors.general && <p className={styles.errorMsg}>{errors.general}</p>}
 
-                    {/* ✅ 아이디 중복 확인 */}
+                    {/* ✅ ID重複チェック */}
                     <div className={styles.emailGroup}>
                         <input
                             type="text"
                             name="username"
-                            placeholder="아이디"
+                            placeholder="ID"
                             value={form.username}
                             onChange={handleChange}
                             className={styles.input}
@@ -193,7 +192,7 @@ const RegisterPage = () => {
                             disabled={isCheckingUsername}
                             className={styles.smallBtn}
                         >
-                            중복확인
+                            重複確認
                         </button>
                     </div>
                     {errors.username && (
@@ -208,12 +207,12 @@ const RegisterPage = () => {
                         </p>
                     )}
 
-                    {/* ✅ 이메일 인증 */}
+                    {/* ✅ メール認証 */}
                     <div className={styles.emailGroup}>
                         <input
                             type="email"
                             name="email"
-                            placeholder="이메일 (예: test@naver.com)"
+                            placeholder="メールアドレス（例: test@naver.com）"
                             value={form.email}
                             onChange={handleChange}
                             className={styles.input}
@@ -221,10 +220,10 @@ const RegisterPage = () => {
                         <button
                             type="button"
                             onClick={sendCode}
-                            disabled={sending || isCodeSent} // ✅ 전송 중이거나 완료되면 비활성화
+                            disabled={sending || isCodeSent} // ✅ 送信中または送信済みなら無効
                             className={styles.smallBtn}
                         >
-                            {isCodeSent ? "전송됨" : sending ? "전송 중..." : "인증요청"}
+                            {isCodeSent ? "送信済み" : sending ? "送信中..." : "認証リクエスト"}
                         </button>
                     </div>
                     {errors.email && <p className={styles.errorMsg}>{errors.email}</p>}
@@ -234,7 +233,7 @@ const RegisterPage = () => {
                             <input
                                 type="text"
                                 name="code"
-                                placeholder="인증번호 입력"
+                                placeholder="認証コードを入力"
                                 value={form.code}
                                 onChange={handleChange}
                                 className={styles.input}
@@ -245,18 +244,18 @@ const RegisterPage = () => {
                                 disabled={isVerified}
                                 className={styles.smallBtn}
                             >
-                                {isVerified ? "✅ 완료" : "인증확인"}
+                                {isVerified ? "✅ 完了" : "認証確認"}
                             </button>
                         </div>
                     )}
                     {errors.code && <p className={styles.errorMsg}>{errors.code}</p>}
 
-                    {/* ✅ 비밀번호 입력 */}
+                    {/* ✅ パスワード入力 */}
                     <form onSubmit={handleSubmit} className={styles.form}>
                         <input
                             type="password"
                             name="password"
-                            placeholder="비밀번호 (숫자+영문 8자 이상)"
+                            placeholder="パスワード（数字+英字を含む8文字以上）"
                             value={form.password}
                             onChange={handleChange}
                             className={styles.input}
@@ -266,7 +265,7 @@ const RegisterPage = () => {
                         <input
                             type="password"
                             name="passwordCheck"
-                            placeholder="비밀번호 확인"
+                            placeholder="パスワード確認"
                             value={form.passwordCheck}
                             onChange={handleChange}
                             className={styles.input}
@@ -276,7 +275,7 @@ const RegisterPage = () => {
                         )}
 
                         <button type="submit" className={styles.primaryBtn}>
-                            회원가입 완료
+                            会員登録を完了する
                         </button>
                     </form>
 
@@ -285,7 +284,7 @@ const RegisterPage = () => {
                             className={styles.linkBtn}
                             onClick={() => (window.location.href = "/login")}
                         >
-                            로그인으로 돌아가기
+                            ログイン画面に戻る
                         </button>
                     </div>
                 </div>

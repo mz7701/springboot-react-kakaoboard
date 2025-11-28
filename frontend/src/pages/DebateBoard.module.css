@@ -1,4 +1,4 @@
-/* 🎨 기본 색상 변수 */
+/* 🎨 基本カラー変数 */
 :root {
     --blue: #007bff;
     --blue-light: #00a2ff;
@@ -14,7 +14,7 @@
     --transition: all 0.25s ease;
 }
 
-/* ✅ 전체 컨테이너 */
+/* ✅ 全体コンテナ */
 .container {
     max-width: 960px;
     margin: 0 auto;
@@ -25,7 +25,7 @@
     min-height: 100vh;
 }
 
-/* ✅ 헤더 */
+/* ✅ ヘッダー */
 .header {
     display: flex;
     justify-content: space-between;
@@ -53,7 +53,7 @@
     font-size: 0.9rem;
 }
 
-/* ✅ 새 토론 등록 버튼 */
+/* ✅ 新規ディベート登録ボタン */
 .postButton {
     background: linear-gradient(135deg, var(--blue), var(--blue-light));
     color: white;
@@ -72,7 +72,7 @@
     filter: brightness(1.1);
 }
 
-/* ✅ 탭 버튼 */
+/* ✅ タブボタン */
 .tabContainer {
     display: flex;
     justify-content: center;
@@ -102,7 +102,7 @@
     box-shadow: var(--shadow);
 }
 
-/* ✅ 토론 카드 */
+/* ✅ ディベートカード */
 .card {
     background: white;
     border-radius: 16px;
@@ -139,7 +139,7 @@
     color: #777;
 }
 
-/* ✅ 삭제 버튼 */
+/* ✅ 削除ボタン */
 .deleteButton {
     background: none;
     border: none;
@@ -153,7 +153,7 @@
     color: #ff1e1e;
 }
 
-/* ✅ 반박 버튼 */
+/* ✅ 反論ボタン */
 .rebuttalButton {
     background: linear-gradient(135deg, #ffc107, #ffe588);
     border: none;
@@ -171,7 +171,7 @@
     filter: brightness(1.05);
 }
 
-/* ✅ 반박 입력 폼 */
+/* ✅ 反論入力フォーム */
 .rebuttalForm {
     position: relative;
     display: flex;
@@ -238,12 +238,12 @@
 .rebuttalInput {
     width: 95%;
     border: 1px solid rgba(210, 210, 210, 0.8);
-    border-radius: 10px;        /* 🔹 기존 12px → 10px : 폼과 딱 맞게 */
-    padding: 10px 12px;         /* 🔹 12px → 10px : 위아래 균형 맞춤 */
+    border-radius: 10px;        /* 🔹 以前は 12px → 10px：フォームとぴったり合うように */
+    padding: 10px 12px;         /* 🔹 12px → 10px：上下バランス調整 */
     font-size: 15px;
     outline: none;
     background: rgba(255, 255, 255, 0.95);
-    box-sizing: border-box;     /* ✅ 폼 경계와 크기 일치 */
+    box-sizing: border-box;     /* ✅ フォーム枠とサイズを一致 */
     transition: all 0.25s ease;
 }
 .rebuttalInput:focus {
@@ -251,13 +251,13 @@
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
 }
 
-/* ✅ 내용 textarea */
+/* ✅ 内容用 textarea */
 .rebuttalTextarea {
     width: 95%;
-    height: 120px;              /* 🔹 130px → 120px : 폼 비율 조정 */
+    height: 120px;              /* 🔹 130px → 120px：フォーム全体の比率調整 */
     border: 1px solid rgba(210, 210, 210, 0.8);
-    border-radius: 10px;        /* 🔹 동일하게 맞춤 */
-    padding: 10px 12px;         /* 🔹 input과 동일한 여백 */
+    border-radius: 10px;        /* 🔹 同じ丸みでそろえる */
+    padding: 10px 12px;         /* 🔹 input と同じ余白 */
     font-size: 15px;
     background: rgba(255, 255, 255, 0.95);
     resize: none;
@@ -270,7 +270,7 @@
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
 }
 
-/* ✅ 등록 버튼 */
+/* ✅ 登録ボタン */
 .rebuttalSubmit {
     align-self: flex-end;
     background: linear-gradient(135deg, #3b82f6, #2563eb);
@@ -289,7 +289,7 @@
     background: linear-gradient(135deg, #2563eb, #1e40af);
 }
 
-/* 🎯 반박 내용 카드 (반박중 / 마감 둘 다 공용) */
+/* 🎯 反論内容カード（反論中/締め切り共通） */
 .rebuttalBox {
     position: relative;
     margin-top: 1.2rem;
@@ -300,7 +300,7 @@
     box-shadow: 0 14px 32px rgba(15, 23, 42, 0.15);
     overflow: hidden;
 }
-/* 왼쪽 포인트 컬러 바 */
+/* 左側ポイントカラーのバー */
 .rebuttalBox::before {
     content: "";
     position: absolute;
@@ -312,7 +312,7 @@
 }
 
 
-/* 제목 (🗣️ 반박 제목) */
+/* タイトル（🗣️ 反論タイトル） */
 .rebuttalBox h4 {
     margin: 0 0 6px 0;
     padding-left: 4px;
@@ -323,7 +323,7 @@
     align-items: center;
     gap: 6px;
 }
-/* 본문 */
+/* 本文 */
 .rebuttalBox p {
     margin: 2px 0;
     padding-left: 4px;
@@ -333,14 +333,14 @@
 }
 
 
-/* 작성자 */
+/* 投稿者 */
 .rebuttalMeta {
     font-size: 0.85rem;
     color: #6b7280;
     text-align: right;
     margin-top: 8px;
 }
-/* 🕒 남은 시간 뱃지용 (원하면 JSX에서 className으로 사용) */
+/* 🕒 残り時間バッジ用（必要なら JSX で className として使用） */
 .timerBadge {
     display: inline-flex;
     align-items: center;
@@ -355,7 +355,7 @@
     font-weight: 600;
 }
 
-/* 🗳 투표 영역 – 중앙 캡슐 카드 */
+/* 🗳 投票エリア – 中央カプセルカード */
 .voteSection {
     margin-top: 1.1rem;
     display: flex;
@@ -371,7 +371,7 @@
     margin-right: auto;
 }
 
-/* 기본 버튼 스타일 */
+/* 基本ボタンスタイル */
 .voteButton {
     flex: 1;
     border: none;
@@ -384,32 +384,32 @@
     box-shadow: 0 6px 16px rgba(15, 23, 42, 0.15);
     white-space: nowrap;
 }
-/* 왼쪽(원글 작성자) 버튼 */
+/* 左側（元投稿者）ボタン */
 .voteLeft {
     background: linear-gradient(135deg, #e0ecff, #bfd3ff);
     color: #1d4ed8;
 }
-/* 오른쪽(반박자) 버튼 */
+/* 右側（反論者）ボタン */
 .voteRight {
     background: linear-gradient(135deg, #ffe3f2, #ffbfd8);
     color: #be185d;
 }
 
-/* 호버 상태 */
+/* ホバー時 */
 .voteButton:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: 0 10px 22px rgba(15, 23, 42, 0.22);
     filter: brightness(1.03);
 }
 
-/* 비활성화 상태 */
+/* 非活性状態 */
 .voteButton:disabled {
     opacity: 0.55;
     cursor: not-allowed;
     box-shadow: none;
 }
 
-/* 가운데 VS */
+/* 中央の VS 表示 */
 .vs {
     align-self: center;
     font-weight: 800;
@@ -417,7 +417,7 @@
     color: #6b7280;
 }
 
-/* 🕛 마감된 토론 카드 */
+/* 🕛 締め切り済みディベートカード */
 .closedSection {
     margin-top: 1.3rem;
     padding: 16px 18px;
@@ -430,7 +430,7 @@
     gap: 6px;
 }
 
-/* 제목 줄 */
+/* タイトル行 */
 .closedSection h4 {
     margin: 0;
     font-size: 0.95rem;
@@ -441,7 +441,7 @@
     gap: 6px;
 }
 
-/* 결과/승자 텍스트 */
+/* 結果/勝者テキスト */
 .closedSection p {
     margin: 0;
     font-size: 0.98rem;
@@ -449,7 +449,7 @@
     color: #1d4ed8;
 }
 
-/* ✅ 댓글 */
+/* ✅ コメント */
 .commentSection {
     margin-top: 1rem;
 }
@@ -508,7 +508,7 @@
     transform: translateY(-2px);
 }
 
-/* ✅ 대댓글 (reply) */
+/* ✅ 返信コメント（reply） */
 .replyButton {
     background: none;
     border: none;
@@ -555,7 +555,7 @@
     padding: 4px 0;
 }
 
-/* ✅ 페이지네이션 */
+/* ✅ ページネーション */
 .pagination {
     margin: 16px 0;
     text-align: center;
@@ -582,7 +582,7 @@
     border-color: var(--blue);
 }
 
-/* ✅ 검색 입력 */
+/* ✅ 検索入力 */
 .searchInput {
     margin-left: 1rem;
     padding: 6px 10px;
@@ -596,7 +596,7 @@
     border-color: var(--blue);
 }
 
-/* ✅ 애니메이션 */
+/* ✅ アニメーション */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -608,7 +608,7 @@
     }
 }
 
-/* ✅ 반응형 */
+/* ✅ レスポンシブ対応 */
 @media (max-width: 768px) {
     .container {
         padding: 1rem;
@@ -629,7 +629,8 @@
         width: 100%;
     }
 }
-/* ✅ 로그인 버튼 (민트-블루 그라데이션, 반박버튼 스타일 기반) */
+
+/* ✅ ログインボタン（ミント×ブルーグラデーション・反論ボタン風） */
 .loginBtn {
     background: linear-gradient(135deg, #00b4ff, #4dd0e1);
     color: #fff;
@@ -649,7 +650,7 @@
     box-shadow: 0 6px 14px rgba(0, 180, 255, 0.35);
 }
 
-/* ✅ 로그아웃 버튼 (반박 버튼 느낌, 딸기-레드톤) */
+/* ✅ ログアウトボタン（反論ボタン風・ストロベリーレッド系） */
 .logoutBtn {
     background: linear-gradient(135deg, #ff7070, #ff4d4d);
     color: #fff;
@@ -669,7 +670,7 @@
     box-shadow: 0 6px 14px rgba(255, 77, 77, 0.35);
 }
 
-/* ✅ 모바일 반응형 */
+/* ✅ モバイル向けレスポンシブ */
 @media (max-width: 600px) {
     .loginBtn,
     .logoutBtn {
@@ -678,19 +679,21 @@
         border-radius: 10px;
     }
 }
-/*일단 /* ✅ 카테고리 버튼 숨기기*/
+
+/* とりあえず ✅ カテゴリーボタンを非表示にする */
 .categoryItem {
     display: none !important;
 }
-/* 🎨 카테고리 버튼 전체 컨테이너 */
+
+/* 🎨 カテゴリーボタン全体コンテナ */
 .categoryBar {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 12px;
     margin: auto 24px;
-    margin-top: -8px;   /* ✅ 위로 살짝 올리기 */
-    margin-bottom: 20px; /* ✅ 아래 간격 살짝 유지 */
+    margin-top: -8px;   /* ✅ 上に少し持ち上げる */
+    margin-bottom: 20px; /* ✅ 下との間隔を少し確保 */
     padding: 12px 20px;
     border-radius: 14px;
     background: linear-gradient(145deg, #ffffff, #f6f8ff);
@@ -700,7 +703,7 @@
     transition: all 0.3s ease;
 }
 
-/* 📌 각 카테고리 버튼 */
+/* 📌 各カテゴリーのボタン */
 .categoryBtn {
     background: white;
     border: 1px solid #dfe4f5;
@@ -720,7 +723,7 @@
     transform: translateY(-2px);
 }
 
-/* ✅ 선택된 버튼 */
+/* ✅ 選択中のボタン */
 .activeCategory {
     background: linear-gradient(135deg, #ffeb84, #ffd43b);
     color: #222;
@@ -729,7 +732,7 @@
     transform: translateY(-2px);
 }
 
-/* 📱 반응형 */
+/* 📱 レスポンシブ */
 @media (max-width: 600px) {
     .categoryBar {
         flex-wrap: wrap;
@@ -743,16 +746,18 @@
         padding: 8px 14px;
     }
 }
-/* ✅ 카테고리 버튼 전체 줄(전체·게임·사회 등)을 살짝 위로 올리기 */
+
+/* ✅ カテゴリーボタン全体の行（全体・ゲーム・社会など）を少し上へ */
 .categoryFilter {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 12px;
-    margin-top: -8px;   /* 🔼 위로 8px 올림 */
+    margin-top: -8px;   /* 🔼 上に 8px 持ち上げ */
     margin-bottom: 16px;
     transition: all 0.25s ease;
 }
+
 .chatroomButton {
     display: inline-flex;
     align-items: center;
@@ -760,7 +765,7 @@
 
     padding: 12px 22px;
     margin-top: 10px;
-    margin-bottom: 15px; /* 🔥 아래 요소와 충돌 방지 */
+    margin-bottom: 15px; /* 🔥 下の要素と重ならないように */
 
     background: linear-gradient(135deg, #6eb6ff, #4d8dff);
     color: #fff;
@@ -776,8 +781,8 @@
 
     white-space: nowrap;
 
-    display: block;       /* 🔥 겹침 해결 핵심 */
-    width: fit-content;   /* 버튼 크기 고정 */
+    display: block;       /* 🔥 重なり解消のポイント */
+    width: fit-content;   /* ボタンサイズを固定 */
 }
 
 .chatroomButton:hover {
@@ -789,6 +794,7 @@
 .chatroomButton:active {
     transform: scale(0.97);
 }
+
 .commentDeleteButton {
     border: none;
     background: transparent;
@@ -804,10 +810,11 @@
     opacity: 1;
     transform: translateY(-1px);
 }
-/* 🧵 댓글 한 줄 레이아웃 (닉네임 | 내용 | 시간) */
+
+/* 🧵 コメント1行レイアウト（ニックネーム | 内容 | 時間） */
 .commentRow {
     display: grid;
-    grid-template-columns: 140px 1fr 130px; /* 왼쪽 / 가운데 / 오른쪽 */
+    grid-template-columns: 140px 1fr 130px; /* 左 / 中央 / 右 */
     column-gap: 8px;
     padding: 6px 4px;
     align-items: flex-start;
@@ -820,7 +827,7 @@
     border-top: none;
 }
 
-/* 왼쪽: 닉네임 / IP */
+/* 左：ニックネーム / IP */
 .leftCell {
     display: flex;
     flex-direction: column;
@@ -832,7 +839,7 @@
     color: #999;
 }
 
-/* 가운데: 내용 + ㄴ 표시 + 답글 */
+/* 中央：内容 + ㄴ マーク + 返信 */
 .middleCell {
     display: flex;
     align-items: center;
@@ -841,7 +848,7 @@
 }
 
 .depthMarker {
-    color: #f59e0b;          /* 노란 느낌 */
+    color: #f59e0b;          /* 黄色っぽい雰囲気 */
     font-weight: 700;
     margin-right: 4px;
     letter-spacing: 1px;
@@ -851,7 +858,7 @@
     color: #444;
 }
 
-/* 오른쪽: 시간 + 삭제 버튼 */
+/* 右：時間 + 削除ボタン */
 .rightCell {
     display: flex;
     justify-content: flex-end;
@@ -860,18 +867,18 @@
     font-size: 0.8rem;
 }
 
-/* 🌿 대댓글 줄 (답글)은 살짝 다른 배경 + 초록 닉네임 */
+/* 🌿 返信行は少し違う背景色 + 緑のニックネーム */
 .childRow {
     background-color: #f4f5ff;
 }
 
 .childRow .commentAuthor {
-    color: #16a34a; /* 연초록 */
+    color: #16a34a; /* 明るいグリーン */
 }
 
 
 
-/* 입력창 위 멘션 바 */
+/* 入力欄の上に出るメンションバー */
 .mentionBar {
     display: flex;
     align-items: center;
@@ -902,18 +909,19 @@
     color: #ef4444;
 }
 
-/* 댓글 줄 안에서 보이는 멘션 태그 */
+/* コメント行の中に表示されるメンションタグ */
 .mentionTag {
     display: inline-flex;
     align-items: center;
     padding: 2px 8px;
     border-radius: 999px;
-    background: rgba(79, 70, 229, 0.12);  /* 보라빛 반투명 */
+    background: rgba(79, 70, 229, 0.12);  /* 紫系の半透明 */
     color: #4338ca;
     font-size: 0.78rem;
     font-weight: 600;
     margin-right: 6px;
 }
+
 .commentInputMention {
     border-color: #4f46e5;
     box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.18);

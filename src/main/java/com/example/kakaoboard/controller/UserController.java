@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/users")  // ✅ 정확히 이 경로여야 React와 일치
+@RequestMapping("/api/users")  // ✅ このパスとReact側のURLを必ず一致させる
 @CrossOrigin(
         origins = {
                 "http://localhost:3000",
@@ -35,7 +35,7 @@ public class UserController {
     private final EmailVerificationService verificationService;
     private final PasswordEncoder passwordEncoder;
 
-    /** ✅ 회원정보 수정 */
+    /** ✅ 会員情報の修正 */
     @PutMapping("/update/{id}")
     public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody UpdateRequest request) {
         try {
@@ -52,7 +52,7 @@ public class UserController {
         }
     }
 
-    /** ✅ 비밀번호 검증 */
+    /** ✅ パスワード検証 */
     @PostMapping("/verify")
     public boolean verifyPassword(@RequestBody Map<String, String> data) {
         String email = data.get("email");
@@ -65,12 +65,12 @@ public class UserController {
         return passwordEncoder.matches(password, user.getPassword());
     }
 
-    /** ✅ 아이디 찾기 */
+    /** ✅ ユーザーID検索 */
     @PostMapping("/find-username")
     public ResponseEntity<?> findUsername(@RequestParam String email) {
         Optional<User> userOpt = userRepository.findByEmail(email);
         if (userOpt.isEmpty()) {
-            return ResponseEntity.badRequest().body("❌ 존재하지 않는 이메일입니다.");
+            return ResponseEntity.badRequest().body("❌ 存在しないメールアドレスです。");
         }
 
         User user = userOpt.get();
@@ -82,34 +82,34 @@ public class UserController {
     @PostMapping("/send-code")
     public ResponseEntity<?> sendResetCode(@RequestParam String email) {
         try {
-            // ✅ 존재하는 이메일만 가능
+            // ✅ 既に登録されているメールアドレスのみ許可
             if (!userRepository.findByEmail(email).isPresent()) {
-                return ResponseEntity.badRequest().body("❌ 존재하지 않는 이메일입니다.");
+                return ResponseEntity.badRequest().body("❌ 存在しないメールアドレスです。");
             }
 
-            // ✅ 인증번호 생성 + (이 안에서 이미 이메일 발송까지 함)
+            // ✅ 認証コード生成＋（この中で既にメール送信まで実行）
             verificationService.createVerificationCode(email);
 
-            // ✅ 여기서는 추가로 emailService 호출 절대 하지 않기!!
-            return ResponseEntity.ok("✅ 인증번호가 이메일로 전송되었습니다.");
+            // ✅ ここでは追加で emailService を絶対に呼び出さないこと！！
+            return ResponseEntity.ok("✅ 認証コードがメールアドレス宛に送信されました。");
 
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError()
-                    .body("메일 전송 실패: " + e.getMessage());
+                    .body("メール送信失敗: " + e.getMessage());
         }
     }
 
-    /** ✅ 인증번호 검증 */
+    /** ✅ 認証コードの検証 */
     @PostMapping("/verify-code")
     public ResponseEntity<?> verifyResetCode(@RequestParam String email, @RequestParam String code) {
         boolean valid = verificationService.verifyCode(email, code);
         if (valid) {
-            return ResponseEntity.ok("✅ 인증 성공");
+            return ResponseEntity.ok("✅ 認証成功");
         }
-        return ResponseEntity.badRequest().body("❌ 인증 실패 (번호 불일치 또는 만료)");
+        return ResponseEntity.badRequest().body("❌ 認証失敗（コード不一致または有効期限切れ）");
     }
 
     @DeleteMapping("/delete/{id}")
@@ -121,7 +121,7 @@ public class UserController {
         String password = request != null ? request.getPassword() : null;
 
         userService.deleteUser(id, password);
-        return ResponseEntity.ok("회원 탈퇴가 완료되었습니다.");
+        return ResponseEntity.ok("退会が完了しました。");
     }
 
     @Data
@@ -130,29 +130,26 @@ public class UserController {
         private String password;
     }
 
-    /** ✅ 비밀번호 재설정 */
+    /** ✅ パスワード再設定 */
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> body) {
         String email = body.get("email");
         String newPassword = body.get("newPassword");
 
         if (!verificationService.isVerified(email)) {
-            return ResponseEntity.badRequest().body("이메일 인증을 먼저 완료해주세요!");
+            return ResponseEntity.badRequest().body("先にメール認証を完了してください！");
         }
 
         try {
             userService.updatePassword(email, newPassword);
             verificationService.clearVerification(email);
-            return ResponseEntity.ok("✅ 비밀번호가 성공적으로 변경되었습니다.");
+            return ResponseEntity.ok("✅ パスワードが正常に変更されました。");
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("비밀번호 변경 중 오류: " + e.getMessage());
+            return ResponseEntity.internalServerError().body("パスワード変更中のエラー: " + e.getMessage());
         }
-
-
-
     }
 
-    /** ✅ 내부 DTO */
+    /** ✅ 内部DTO */
     public static class UpdateRequest {
         public String email;
         public String password;

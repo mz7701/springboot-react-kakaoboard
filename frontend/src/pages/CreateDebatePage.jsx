@@ -3,36 +3,34 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import styles from "./CreateDebatePage.module.css";
 
-import { API_BASE_URL } from "../api/baseURL";   // 경로는 파일 위치에 따라 ../ 또는 ../../
+import { API_BASE_URL } from "../api/baseURL";   // パスはファイル位置によって ../ または ../../
 
 axios.defaults.baseURL = API_BASE_URL;
 
-// ✅ axios 기본 설정 (같은 네트워크에서 접근 가능하도록 IP 기반)
- // ⚠️ 본인 서버 IP로 변경
-
+// ✅ axios 基本設定（同じネットワークからアクセスできるように IP ベース）
 
 const CreateDebatePage = () => {
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
-    const [category, setCategory] = useState("게임");
+    const [category, setCategory] = useState("ゲーム");
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const storedUser = localStorage.getItem("user");
     const currentUser = storedUser ? JSON.parse(storedUser) : null;
 
-    // ✅ 토론 등록 처리
+    // ✅ 討論投稿処理
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (!currentUser) {
-            alert("⚠️ 로그인 후 이용해주세요.");
+            alert("⚠️ ログイン後にご利用ください。");
             navigate("/login");
             return;
         }
 
         if (!title.trim() || !content.trim()) {
-            alert("제목과 내용을 모두 입력해주세요!");
+            alert("タイトルと内容をすべて入力してください！");
             return;
         }
 
@@ -51,21 +49,21 @@ const CreateDebatePage = () => {
                 }
             );
 
-            alert("✅ 토론이 성공적으로 등록되었습니다!");
-            if (window.confirm("내가 쓴 글로 이동하시겠습니까?")) {
+            alert("✅ 討論が正常に登録されました！");
+            if (window.confirm("自分の投稿一覧に移動しますか？")) {
                 navigate("/mypage");
             } else {
                 navigate("/");
             }
         } catch (err) {
-            console.error("❌ 토론 등록 실패:", err);
+            console.error("❌ 討論登録に失敗しました:", err);
 
             if (err.code === "ERR_NETWORK") {
-                alert("서버와 연결할 수 없습니다. 백엔드가 실행 중인지 확인하세요.");
+                alert("サーバーに接続できません。バックエンドが起動しているか確認してください。");
             } else if (err.response?.status === 403) {
-                alert("접근 권한이 없습니다. 다시 로그인해주세요.");
+                alert("アクセス権限がありません。もう一度ログインしてください。");
             } else {
-                alert("토론 등록 중 오류가 발생했습니다: " + err.message);
+                alert("討論登録中にエラーが発生しました: " + err.message);
             }
         } finally {
             setLoading(false);
@@ -74,55 +72,55 @@ const CreateDebatePage = () => {
 
     return (
         <div className={styles.container}>
-            <h1 className={styles.title}>✏️ 새 토론 등록</h1>
+            <h1 className={styles.title}>✏️ 新しい討論を作成</h1>
 
             <form onSubmit={handleSubmit} className={styles.form}>
-                {/* ✅ 카테고리 선택 */}
+                {/* ✅ カテゴリー選択 */}
                 <div className={styles.categoryBox}>
-                    <label className={styles.label}>카테고리 선택</label>
+                    <label className={styles.label}>カテゴリーを選択</label>
                     <select
                         value={category}
                         onChange={(e) => setCategory(e.target.value)}
                         className={styles.select}
                     >
-                        <option value="게임">게임</option>
-                        <option value="사회">사회</option>
-                        <option value="연애">연애</option>
-                        <option value="스포츠">스포츠</option>
-                        <option value="기타">기타</option>
+                        <option value="ゲーム">ゲーム</option>
+                        <option value="社会">社会</option>
+                        <option value="恋愛">恋愛</option>
+                        <option value="スポーツ">スポーツ</option>
+                        <option value="その他">その他</option>
                     </select>
                 </div>
 
-                {/* ✅ 제목 입력 */}
+                {/* ✅ タイトル入力 */}
                 <div className={styles.inputGroup}>
-                    <label className={styles.label}>제목</label>
+                    <label className={styles.label}>タイトル</label>
                     <input
                         type="text"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
-                        placeholder="토론 제목을 입력하세요"
+                        placeholder="討論のタイトルを入力してください"
                         className={styles.input}
                     />
                 </div>
 
-                {/* ✅ 내용 입력 */}
+                {/* ✅ 内容入力 */}
                 <div className={styles.inputGroup}>
-                    <label className={styles.label}>내용</label>
+                    <label className={styles.label}>内容</label>
                     <textarea
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
-                        placeholder="토론 내용을 입력하세요"
+                        placeholder="討論の内容を入力してください"
                         className={styles.textarea}
                     />
                 </div>
 
-                {/* ✅ 제출 버튼 */}
+                {/* ✅ 送信ボタン */}
                 <button
                     type="submit"
                     disabled={loading}
                     className={styles.submitButton}
                 >
-                    {loading ? "등록 중..." : "등록하기"}
+                    {loading ? "登録中..." : "登録する"}
                 </button>
             </form>
         </div>

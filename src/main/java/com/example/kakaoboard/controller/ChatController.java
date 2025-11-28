@@ -21,7 +21,7 @@ public class ChatController {
         this.messagingTemplate = messagingTemplate;
     }
 
-    // ✅ 일반 채팅 메시지
+    // ✅ 通常チャットメッセージ
     @MessageMapping("/chat.sendMessage")
     public void sendMessage(@Payload Map<String, Object> payload) {
 
@@ -36,7 +36,7 @@ public class ChatController {
         messagingTemplate.convertAndSend("/topic/public", chat);
     }
 
-    // ✅ 새 유저 입장
+    // ✅ 新規ユーザー入室
     @MessageMapping("/chat.newUser")
     public void newUser(@Payload Map<String, Object> payload,
                         SimpMessageHeaderAccessor headerAccessor) {
@@ -46,7 +46,7 @@ public class ChatController {
 
         String sender = (String) payload.get("sender");
 
-        // HandshakeInterceptor 에서 넣어둔 ip 사용
+        // HandshakeInterceptorで保存しておいたIPを使用
         String ip = payload.get("ip") instanceof String ? (String) payload.get("ip") : null;
         if ((ip == null || ip.isBlank()) && attrs != null) {
             Object ipAttr = attrs.get("ip");
@@ -56,19 +56,19 @@ public class ChatController {
         }
         if (ip == null) ip = "-";
 
-        // 🎯 같은 닉네임(sender)을 가진 이전 세션들 전부 제거해서 중복 방지
+        // 🎯 同じニックネーム(sender)を持つ既存セッションをすべて削除して重複を防ぐ
         connectedUsers.entrySet().removeIf(entry -> {
             Map<String, String> info = entry.getValue();
             return sender != null && sender.equals(info.get("sender"));
         });
 
-        // 새 세션 정보 등록
+        // 新しいセッション情報を登録
         Map<String, String> info = new HashMap<>();
         info.put("sender", sender);
         info.put("ip", ip);
         connectedUsers.put(sessionId, info);
 
-        // 입장 메시지
+        // 入室メッセージ
         Map<String, Object> join = new HashMap<>();
         join.put("type", "JOIN");
         join.put("sender", sender);
@@ -76,19 +76,19 @@ public class ChatController {
 
         messagingTemplate.convertAndSend("/topic/public", join);
 
-        // 현재 접속자 목록 (배열 형태) 브로드캐스트
+        // 現在の接続ユーザー一覧（配列）をブロードキャスト
         Collection<Map<String, String>> users = connectedUsers.values();
         messagingTemplate.convertAndSend("/topic/users", users);
     }
 
-    // ✅ 유저 퇴장
+    // ✅ ユーザー退室
     @MessageMapping("/chat.leaveUser")
     public void leaveUser(@Payload Map<String, Object> payload,
                           SimpMessageHeaderAccessor headerAccessor) {
 
         String sessionId = headerAccessor.getSessionId();
 
-        // 이 세션 제거
+        // このセッションを削除
         connectedUsers.remove(sessionId);
 
         String sender = (String) payload.get("sender");
@@ -99,7 +99,7 @@ public class ChatController {
 
         messagingTemplate.convertAndSend("/topic/public", leave);
 
-        // 남은 접속자 목록 다시 브로드캐스트
+        // 残りの接続ユーザー一覧を再度ブロードキャスト
         Collection<Map<String, String>> users = connectedUsers.values();
         messagingTemplate.convertAndSend("/topic/users", users);
     }

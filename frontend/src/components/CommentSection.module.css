@@ -1,14 +1,14 @@
-/* 전체 영역 */
+/* 全体エリア */
 .commentSection {
     margin-top: 16px;
     border-radius: 12px;
-    background: rgba(15, 23, 42, 0.25); /* 바깥은 살짝 어두운 보라 톤 유지 */
+    background: rgba(15, 23, 42, 0.25); /* 外側は少し暗めの紫トーンを維持 */
     border: 1px solid rgba(148, 163, 184, 0.4);
     font-family: "Pretendard", system-ui, -apple-system, BlinkMacSystemFont,
     sans-serif;
 }
 
-/* 상단 "전체 댓글 35개" 줄 */
+/* 上部「コメント 35件」ライン */
 .headerRow {
     padding: 8px 16px;
     border-bottom: 1px solid rgba(148, 163, 184, 0.4);
@@ -19,25 +19,25 @@
     color: #e5e7eb;
 }
 
-/* 리스트 영역 */
+/* リストエリア */
 .list {
     max-height: 360px;
     overflow-y: auto;
 }
 
-/* 공백 문구 */
+/* コメントがないときの文言 */
 .empty {
     padding: 12px 16px;
     font-size: 0.85rem;
     color: #9ca3af;
 }
 
-/* 공통: 한 줄 구조 (닉네임 | 내용 | 시간) */
+/* 共通：1行構造（ニックネーム | 内容 | 時間） */
 .row,
 .replyRow,
 .newRow {
     display: grid;
-    grid-template-columns: 140px 1fr 120px; /* 왼쪽 닉네임 / 가운데 내용 / 오른쪽 시간 */
+    grid-template-columns: 140px 1fr 120px; /* 左：ニックネーム / 中央：内容 / 右：時間 */
     column-gap: 8px;
     padding: 6px 16px;
     align-items: flex-start;
@@ -45,10 +45,10 @@
     font-size: 0.85rem;
 }
 
-/* 마지막 줄 아래는 선 제거하고 싶으면 여기 추가로 조절해도 됨 */
+/* 最後の行の下の線を消したい場合はここで調整してもOK */
 /* .list > .row:last-child { border-bottom: none; } */
 
-/* 왼쪽: 닉네임 / IP */
+/* 左：ニックネーム / IP */
 .leftCell {
     display: flex;
     flex-direction: column;
@@ -57,7 +57,7 @@
 
 .nickname {
     font-weight: 600;
-    color: #a5b4fc; /* 연보라 */
+    color: #a5b4fc; /* 薄い紫 */
 }
 
 .ip {
@@ -65,7 +65,7 @@
     color: #9ca3af;
 }
 
-/* 가운데: 내용 + ㄴ 표시 + 답글 버튼 */
+/* 中央：本文 + ㄴ 表示 + 返信ボタン */
 .middleCell {
     display: flex;
     align-items: center;
@@ -74,10 +74,10 @@
 }
 
 .depthMarker {
-    color: #facc15;           /* 노란색으로 딱 보이게 */
+    color: #facc15;           /* 黄色で見やすく */
     font-weight: 700;
     margin-right: 4px;
-    letter-spacing: 1px;      /* ㄴ ㄴ 사이 간격 조금 */
+    letter-spacing: 1px;      /* ㄴ ㄴ の間を少し広く */
 }
 
 .text {
@@ -85,7 +85,7 @@
     line-height: 1.5;
 }
 
-/* "답글" 링크 */
+/* 「返信」リンク */
 .replyLink {
     border: none;
     background: transparent;
@@ -96,7 +96,7 @@
     padding: 0;
 }
 
-/* 오른쪽: 시간 / X 버튼 */
+/* 右：時間 / X ボタン */
 .rightCell {
     text-align: right;
     display: flex;
@@ -118,7 +118,7 @@
     cursor: pointer;
 }
 
-/* 대댓글 입력 줄 */
+/* 返信入力行 */
 .replyRow .middleCell {
     align-items: stretch;
 }
@@ -149,7 +149,7 @@
     cursor: pointer;
 }
 
-/* 맨 아래 새 댓글 줄 */
+/* 一番下の新規コメント行 */
 .newTextarea {
     width: 100%;
     min-height: 48px;
@@ -176,21 +176,22 @@
     font-weight: 600;
     cursor: pointer;
 }
-/* 🌿 대댓글 줄(답글)은 살짝 다른 배경과 닉네임 색 */
+
+/* 🌿 返信行（子コメント）は少し違う背景とニックネーム色にする */
 .childRow {
-    background: rgba(15, 23, 42, 0.45); /* 루트보다 살짝 더 진한 배경 */
+    background: rgba(15, 23, 42, 0.45); /* ルートより少し濃い背景 */
 }
 
 .childRow .nickname {
-    color: #bef264; /* 연초록: 루트랑 확실히 다른 느낌 */
+    color: #bef264; /* 薄い黄緑：ルートとしっかり差別化 */
 }
 
-/* 🔔 입력창 위 멘션 안내 바 */
+/* 🔔 入力欄上のメンション案内バー */
 .mentionBar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: rgba(79, 70, 229, 0.18); /* 연보라 하이라이트 */
+    background: rgba(79, 70, 229, 0.18); /* 薄い紫のハイライト */
     border-radius: 6px;
     padding: 4px 8px;
     margin-bottom: 6px;
@@ -216,7 +217,7 @@
     color: #fca5a5;
 }
 
-/* 댓글 줄 안에서 보이는 멘션 태그 (@닉네임) */
+/* コメント行の中に表示されるメンションタグ（@ニックネーム） */
 .mentionTag {
     display: inline-flex;
     align-items: center;
@@ -229,13 +230,13 @@
     margin-right: 6px;
 }
 
-/* 멘션 모드일 때 입력창 강조 */
+/* メンションモードのとき入力欄を少し強調 */
 .newTextareaMention {
     border-color: #6366f1;
     box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.7);
 }
 
-/* 선택된 타겟 줄 약간 하이라이트(선택 안 해도 되면 삭제 가능) */
+/* 選択中のターゲット行を軽くハイライト（不要なら削除してもOK） */
 .activeRow {
     background: rgba(30, 64, 175, 0.45);
 }

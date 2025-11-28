@@ -1,10 +1,9 @@
-
 import React, { useState } from "react";
 
 import { useNavigate } from "react-router-dom";
-import styles from "./LoginPage.module.css"; // ★ CSS 모듈 import
+import styles from "./LoginPage.module.css"; // ★ CSSモジュールのインポート
 import axios from "axios";
-import { API_BASE_URL } from "../api/baseURL";   // 경로는 파일 위치에 따라 ../ 또는 ../../
+import { API_BASE_URL } from "../api/baseURL";   // パスはファイル位置によって ../ または ../../
 
 axios.defaults.baseURL = API_BASE_URL;
 
@@ -27,63 +26,63 @@ const LoginPage = () => {
         try {
             const res = await axios.post("/api/auth/login", form);
             localStorage.setItem("user", JSON.stringify(res.data));
-            alert("✅ 로그인 성공!");
+            alert("✅ ログインに成功しました！");
             navigate("/board");
         } catch (err) {
-            setErrMsg("아이디 또는 비밀번호를 확인해주세요.");
+            setErrMsg("IDまたはパスワードをご確認ください。");
         } finally {
             setIsLoading(false);
         }
     };
 
     const handleKakaoLogin = () => {
-        window.location.href = "/oauth2/authorization/kakao"
+        window.location.href = "/oauth2/authorization/kakao";
     };
 
     return (
         <div className={styles.page}>
-            {/* 배경 데코레이션 */}
+            {/* 背景デコレーション */}
             <div className={styles.bgLayer} aria-hidden />
 
-            {/* 카드 */}
+            {/* カード */}
             <div className={styles.cardWrap}>
                 <div className={styles.card}>
                     <header className={styles.cardHeader}>
-                        <h1 className={styles.title}>환영합니다 👋</h1>
+                        <h1 className={styles.title}>ようこそ 👋</h1>
                         <p className={styles.subtitle}>
-                            계정으로 로그인하거나 카카오로 간편 로그인하세요.
+                            アカウントでログインするか、カカオでかんたんログインできます。
                         </p>
                     </header>
 
                     {errMsg && (
                         <div role="alert" className={styles.errorBox}>
-                            <strong>로그인 실패:</strong> {errMsg}
+                            <strong>ログインに失敗しました:</strong> {errMsg}
                         </div>
                     )}
 
                     <form onSubmit={handleSubmit} className={styles.form}>
-                        {/* 아이디 */}
+                        {/* ID */}
                         <label className={styles.label}>
-                            <span className={styles.labelText}>아이디</span>
+                            <span className={styles.labelText}>ID</span>
                             <div className={styles.inputGroup}>
-                <span className={styles.icon} aria-hidden>
-                  {/* user icon */}
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                    <path
-                        d="M12 12c2.761 0 5-2.239 5-5S14.761 2 12 2 7 4.239 7 7s2.239 5 5 5zM4 22c0-4.419 3.581-8 8-8s8 3.581 8 8"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                    />
-                  </svg>
-                </span>
+                                <span className={styles.icon} aria-hidden>
+                                    {/* user icon */}
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                        <path
+                                            d="M12 12c2.761 0 5-2.239 5-5S14.761 2 12 2 7 4.239 7 7s2.239 5 5 5zM4 22c0-4.419 3.581-8 8-8s8 3.581 8 8"
+                                            stroke="currentColor"
+                                            strokeWidth="1.5"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                        />
+                                    </svg>
+                                </span>
                                 <input
                                     type="text"
                                     name="username"
                                     value={form.username}
                                     onChange={handleChange}
-                                    placeholder="아이디를 입력하세요"
+                                    placeholder="IDを入力してください"
                                     className={styles.input}
                                     required
                                     autoComplete="username"
@@ -91,36 +90,36 @@ const LoginPage = () => {
                             </div>
                         </label>
 
-                        {/* 비밀번호 */}
+                        {/* パスワード */}
                         <label className={styles.label}>
-                            <span className={styles.labelText}>비밀번호</span>
+                            <span className={styles.labelText}>パスワード</span>
                             <div className={styles.inputGroup}>
-                <span className={styles.icon} aria-hidden>
-                  {/* lock icon */}
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                    <path
-                        d="M7 10V7a5 5 0 0 1 10 0v3"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                    />
-                    <rect
-                        x="5"
-                        y="10"
-                        width="14"
-                        height="10"
-                        rx="2"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                    />
-                  </svg>
-                </span>
+                                <span className={styles.icon} aria-hidden>
+                                    {/* lock icon */}
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                        <path
+                                            d="M7 10V7a5 5 0 0 1 10 0v3"
+                                            stroke="currentColor"
+                                            strokeWidth="1.5"
+                                            strokeLinecap="round"
+                                        />
+                                        <rect
+                                            x="5"
+                                            y="10"
+                                            width="14"
+                                            height="10"
+                                            rx="2"
+                                            stroke="currentColor"
+                                            strokeWidth="1.5"
+                                        />
+                                    </svg>
+                                </span>
                                 <input
                                     type={showPw ? "text" : "password"}
                                     name="password"
                                     value={form.password}
                                     onChange={handleChange}
-                                    placeholder="비밀번호를 입력하세요"
+                                    placeholder="パスワードを入力してください"
                                     className={styles.input}
                                     required
                                     autoComplete="current-password"
@@ -129,7 +128,7 @@ const LoginPage = () => {
                                     type="button"
                                     onClick={() => setShowPw((s) => !s)}
                                     className={styles.togglePw}
-                                    aria-label={showPw ? "비밀번호 숨기기" : "비밀번호 보기"}
+                                    aria-label={showPw ? "パスワードを隠す" : "パスワードを表示"}
                                 >
                                     {showPw ? (
                                         // eye-off
@@ -162,7 +161,7 @@ const LoginPage = () => {
                             </div>
                         </label>
 
-                        {/* 액션 */}
+                        {/* アクション */}
                         <div className={styles.actions}>
                             <button
                                 type="submit"
@@ -171,10 +170,10 @@ const LoginPage = () => {
                             >
                                 {isLoading ? (
                                     <span className={styles.loading}>
-                    <span className={styles.spinner} /> 로그인 중…
-                  </span>
+                                        <span className={styles.spinner} /> ログイン処理中…
+                                    </span>
                                 ) : (
-                                    "로그인"
+                                    "ログイン"
                                 )}
                             </button>
 
@@ -182,7 +181,7 @@ const LoginPage = () => {
                                 type="button"
                                 onClick={handleKakaoLogin}
                                 className={styles.kakaoBtn}
-                                aria-label="카카오로 로그인"
+                                aria-label="カカオでログイン"
                             >
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                                     <path
@@ -190,30 +189,35 @@ const LoginPage = () => {
                                         fill="currentColor"
                                     />
                                 </svg>
-                                카카오로 로그인
+                                カカオでログイン
                             </button>
 
-
-                            <button onClick={() => navigate("/login/idsearch")} className={styles.linkBtn}>
-                                아이디 찾기
+                            <button
+                                onClick={() => navigate("/login/idsearch")}
+                                className={styles.linkBtn}
+                            >
+                                ID検索
                             </button>
-                            <button onClick={() => navigate("/login/passwordsearch")} className={styles.linkBtn}>
-                                비밀번호 찾기
+                            <button
+                                onClick={() => navigate("/login/passwordsearch")}
+                                className={styles.linkBtn}
+                            >
+                                パスワードをお忘れの方
                             </button>
                             <button
                                 type="button"
                                 onClick={() => navigate("/register")}
                                 className={styles.linkBtn}
                             >
-                                회원가입
+                                新規会員登録
                             </button>
-
                         </div>
                     </form>
                 </div>
 
                 <p className={styles.helperText}>
-                    로그인에 문제가 있나요? <strong>관리자에게 문의</strong>하세요.
+                    ログインに問題がありますか？{" "}
+                    <strong>管理者までお問い合わせ</strong>ください。
                 </p>
             </div>
         </div>

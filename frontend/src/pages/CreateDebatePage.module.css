@@ -1,4 +1,4 @@
-/* 전체 카드 레이아웃 */
+/* 全体カードレイアウト */
 .container {
     max-width: 760px;
     margin: 60px auto;
@@ -9,7 +9,7 @@
     border: 1px solid rgba(148, 163, 184, 0.25);
 }
 
-/* 제목 영역 */
+/* タイトルエリア */
 .title {
     text-align: center;
     font-size: 1.9rem;
@@ -23,7 +23,7 @@
     color: transparent;
 }
 
-/* 폼 전체 레이아웃 */
+/* フォーム全体レイアウト */
 .form {
     display: flex;
     flex-direction: column;
@@ -32,14 +32,14 @@
     align-items: stretch;
 }
 
-/* 🔥 한 줄 요소 폭 통일 */
+/* 🔥 1行要素の幅を統一 */
 .categoryBox,
 .inputGroup,
 .submitButton {
     width: 100%;
 }
 
-/* 공통 라벨 */
+/* 共通ラベル */
 .label {
     font-size: 0.95rem;
     font-weight: 600;
@@ -47,7 +47,7 @@
     margin-bottom: 6px;
 }
 
-/* 카테고리 선택 박스 */
+/* カテゴリー選択ボックス */
 .categoryBox {
     display: flex;
     flex-direction: column;
@@ -59,7 +59,7 @@
     box-sizing: border-box;
 }
 
-/* 셀렉트 박스 */
+/* セレクトボックス */
 .select {
     width: 100%;
     padding: 10px 12px;
@@ -84,13 +84,13 @@
     box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);
 }
 
-/* 제목/내용 공통 그룹 */
+/* タイトル/内容 共通グループ */
 .inputGroup {
     display: flex;
     flex-direction: column;
 }
 
-/* 텍스트 인풋 & 텍스트에어리어 공통 */
+/* テキスト入力 & テキストエリア 共通 */
 .input,
 .textarea {
     width: 100%;
@@ -117,14 +117,14 @@
     transform: translateY(-1px);
 }
 
-/* 내용 칸 */
+/* 本文入力欄 */
 .textarea {
     height: 220px;
     resize: none;
     line-height: 1.5;
 }
 
-/* 제출 버튼 (하단 고급버튼) */
+/* 送信ボタン（下部のリッチボタン） */
 .submitButton {
     margin-top: 4px;
     width: 100%;
@@ -154,7 +154,7 @@
     box-shadow: 0 8px 18px rgba(37, 99, 235, 0.4);
 }
 
-/* (필요하면 뒤로가기용 버튼/그룹) */
+/* （必要であれば戻るボタン用ボタン/グループ） */
 .buttonGroup {
     display: flex;
     justify-content: space-between;

@@ -20,30 +20,30 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String author;
-    private String text;
-    private String ipAddress;
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private String author;          // 投稿者
+    private String text;            // コメント内容
+    private String ipAddress;       // IP アドレス
+    private LocalDateTime createdAt = LocalDateTime.now();  // 作成日時
 
-    /** ✅ Debate와 연결 */
+    /** ✅ Debate と紐づく（N:1） */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "debate_id")
     @JsonBackReference("debate-comments")
     private Debate debate;
 
-    /** ✅ 부모 댓글 (자기 참조) */
+    /** ✅ 親コメント（自己参照） */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     @JsonBackReference("comment-replies")
     private Comment parent;
 
-    /** ✅ 자식 댓글 (무한 대댓글 구조) */
+    /** ✅ 子コメント一覧（無限にネスト可能な返信ツリー） */
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("id ASC")
     @JsonManagedReference("comment-replies")
     private List<Comment> replies = new ArrayList<>();
 
-    /** ✅ 편의 메서드 */
+    /** ✅ 便利メソッド：子コメントを追加 */
     public void addReply(Comment reply) {
         replies.add(reply);
         reply.setParent(this);

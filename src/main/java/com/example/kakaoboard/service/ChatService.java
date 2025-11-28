@@ -23,17 +23,17 @@ public class ChatService {
         this.messagingTemplate = messagingTemplate;
     }
 
-    /** 현재 접속자 Map 그대로 반환 (StompDisconnectInterceptor 등에서 사용) */
+    /** 現在の接続ユーザーMapをそのまま返却（StompDisconnectInterceptor などで使用） */
     public Map<String, Map<String, String>> getUsers() {
         return users;
     }
 
-    /** 접속자 목록 전체를 /topic/users 로 브로드캐스트 */
+    /** 接続者一覧を /topic/users にブロードキャストする */
     public void broadcastUsers() {
         messagingTemplate.convertAndSend("/topic/users", users);
     }
 
-    /** 누군가 입장했을 때 공지 */
+    /** 誰かが入室したときの通知メッセージを送信 */
     public void broadcastJoin(String sender, String ip) {
         Map<String, Object> msg = new HashMap<>();
         msg.put("type", "JOIN");
@@ -42,7 +42,7 @@ public class ChatService {
         messagingTemplate.convertAndSend("/topic/public", msg);
     }
 
-    /** 누군가 퇴장했을 때 공지 */
+    /** 誰かが退室したときの通知メッセージを送信 */
     public void broadcastLeave(String sender) {
         Map<String, Object> msg = new HashMap<>();
         msg.put("type", "LEAVE");
@@ -50,7 +50,7 @@ public class ChatService {
         messagingTemplate.convertAndSend("/topic/public", msg);
     }
 
-    /** 일반 채팅 메시지 브로드캐스트 */
+    /** 通常のチャットメッセージをブロードキャスト */
     public void broadcastChat(String sender, String message) {
         Map<String, Object> msg = new HashMap<>();
         msg.put("type", "CHAT");

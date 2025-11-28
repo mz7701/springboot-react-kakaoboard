@@ -14,28 +14,30 @@ export default function App() {
     return (
         <Router>
             <Routes>
-                {/* ✅ 기본 루트 */}
+                {/* ✅ デフォルトルート */}
                 <Route path="/" element={<Navigate to="/board" />} />
+
+                {/* ✅ チャットルーム */}
                 <Route path="/chatroom" element={<ChatRoom />} />
-                {/* ✅ 주요 페이지 */}
+
+                {/* ✅ メインページ */}
                 <Route path="/board" element={<DebateBoard />} />
                 <Route path="/mypage" element={<MyPage />} />
                 <Route path="/applegame" element={<AppleGamePage />} />
 
-                {/* ✅ 로그인 / 회원가입 */}
+                {/* ✅ ログイン / 新規登録 */}
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
 
-                {/* ✅ 새 토론 생성 */}
+                {/* ✅ 新規ディベート作成 */}
                 <Route path="/create" element={<CreateDebatePage />} />
 
-                {/* ✅ fallback */}
+                {/* ✅ フォールバック */}
                 <Route path="*" element={<Navigate to="/board" />} />
 
+                {/* ✅ ID / パスワード検索ページ */}
                 <Route path="/login/idsearch" element={<LoginIDsearch />} />
                 <Route path="/login/passwordsearch" element={<LoginPasswordsearch />} />
-
-                
             </Routes>
         </Router>
     );

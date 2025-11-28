@@ -26,14 +26,14 @@
     color: #555;
 }
 
-/* ✅ 입력 필드 */
+/* ✅ 入力フィールド */
 .input {
     width: 100%;
-    padding: 11px 14px; /* 🔹 버튼 높이랑 맞춤 */
+    padding: 11px 14px; /* 🔹 ボタンの高さと揃える */
     border-radius: 12px;
     border: 1.8px solid rgba(0, 0, 0, 0.15);
     background: #fff;
-    margin-bottom: 14px; /* 🔹 여백 살짝 늘림 */
+    margin-bottom: 14px; /* 🔹 余白を少し広げる */
     outline: none;
     font-size: 15px;
     transition: all 0.25s ease;
@@ -45,10 +45,10 @@
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
 }
 
-/* ✅ 메인 버튼 */
+/* ✅ メインボタン */
 .primaryBtn {
     width: 100%;
-    padding: 11px 14px; /* 🔹 input 높이와 일치 */
+    padding: 11px 14px; /* 🔹 input の高さと一致 */
     border: none;
     border-radius: 12px;
     background: linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899);
@@ -91,6 +91,7 @@
     font-weight: 600;
     cursor: pointer;
 }
+
 .linkBtn:hover {
     color: #8b5cf6;
 }

@@ -21,13 +21,13 @@ public class Reply {
     private String text;
     private LocalDateTime createdAt;
 
-    /** ✅ Debate 연결 */
+    /** ✅ Debate との関連付け */
     @JsonBackReference("debate-replies")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "debate_id")
     private Debate debate;
 
-    /** ✅ 부모 댓글 연결 (Comment와 매핑) */
+    /** ✅ 親コメントとの関連付け（Comment とのマッピング） */
     @JsonBackReference("comment-replies")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "comment_id")

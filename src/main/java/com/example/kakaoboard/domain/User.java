@@ -5,11 +5,11 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * 회원 엔티티
- * - username: 아이디 (unique)
- * - email: 이메일 (unique)
- * - password: 암호화된 비밀번호
- * - code: 이메일 인증번호 (transient → DB에 저장되지 않음)
+ * 会員エンティティ
+ * - username: ログインID（unique）
+ * - email: メールアドレス（unique）
+ * - password: ハッシュ化されたパスワード
+ * - code: メール認証コード（transient → DBには保存されない）
  */
 @Entity
 @Getter
@@ -33,7 +33,7 @@ public class User {
     private int exp = 0;
     private int level = 1;
 
-    // ✅ 이메일 인증번호 (DB에는 저장되지 않음)
+    // ✅ メール認証コード（DBには保存しない）
     @Transient
     private String code;
 }
