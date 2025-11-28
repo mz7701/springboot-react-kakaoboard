@@ -223,7 +223,7 @@ const RegisterPage = () => {
                             disabled={sending || isCodeSent} // ✅ 送信中または送信済みなら無効
                             className={styles.smallBtn}
                         >
-                            {isCodeSent ? "送信済み" : sending ? "送信中..." : "認証リクエスト"}
+                            {isCodeSent ? "送信済み" : sending ? "送信中..." : "認証"}
                         </button>
                     </div>
                     {errors.email && <p className={styles.errorMsg}>{errors.email}</p>}
@@ -244,7 +244,7 @@ const RegisterPage = () => {
                                 disabled={isVerified}
                                 className={styles.smallBtn}
                             >
-                                {isVerified ? "✅ 完了" : "認証確認"}
+                                {isVerified ? "認証完了" : "認証確認"}
                             </button>
                         </div>
                     )}
