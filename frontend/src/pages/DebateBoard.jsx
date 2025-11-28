@@ -689,7 +689,7 @@ const DebateBoard = () => {
                                 >
                                     {debate.title}
                                 </h2>
-                                {currentUser?.username === debate.author && (
+                                {currentUser?.username === debate.author && !debate.isClosed &&(
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
