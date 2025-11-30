@@ -115,25 +115,19 @@ const RegisterPage = () => {
             return setErrors((prev) => ({ ...prev, code: "❌ 認証コードを入力してください。" }));
 
         try {
-            const res = await axios.post(
-                "/api/auth/verify-code",
-                null,
-                { params: { email: form.email, code: form.code } }
-            );
+            await axios.post("/api/auth/verify-code", null, {
+                params: { email: form.email, code: form.code },
+            });
 
-            if (typeof res.data === "string" && res.data.includes("성공")) {
-                alert("✅ メール認証が完了しました！");
-                setIsVerified(true);
-                setErrors((prev) => ({ ...prev, code: "" }));
-            } else {
-                setErrors((prev) => ({
-                    ...prev,
-                    code: "❌ 認証失敗：認証コードが正しくありません。",
-                }));
-            }
+            // ★ 여기까지 왔다는 건 백엔드가 200 OK 를 준 것 = 인증 성공
+            alert("✅ メール認証が完了しました！");
+            setIsVerified(true);
+            setErrors((prev) => ({ ...prev, code: "" }));
         } catch (err) {
             const msg =
-                err.response?.data || "❌ 認証失敗：サーバーエラー、または不正な認証コードです。";
+                err.response?.data ||
+                "❌ 認証失敗：サーバーエラー、または不正な認証コードです。";
+            setIsVerified(false);
             setErrors((prev) => ({ ...prev, code: msg }));
         }
     };
